@@ -2,7 +2,9 @@
 
 ## S3Proxy
 
-s3proxy 提供了一种在 Microsoft Azure 上实现 S3 API 兼容性的方法。详细的步骤和解决方案可在以下链接中找到：[[S3 API compatibility on Microsoft Azure](https://ventral.digital/posts/2020/10/11/s3-api-compatibility-on-microsoft-azure/)](https://ventral.digital/posts/2020/10/11/s3-api-compatibility-on-microsoft-azure/)
+s3proxy 提供了一种在 Microsoft Azure 上实现 S3 API 兼容性的方法。详细的步骤和解决方案可在以下链接中找到：
+
+[S3 API compatibility on Microsoft Azure](https://ventral.digital/posts/2020/10/11/s3-api-compatibility-on-microsoft-azure/)
 
 ```yaml
 apiVersion: v1
