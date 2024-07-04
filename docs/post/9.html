@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html data-color-mode="light" data-dark-theme="dark" data-light-theme="light" lang="zh-CN">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="content-type" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href='https://mirrors.sustech.edu.cn/cdnjs/ajax/libs/Primer/21.0.7/primer.css' rel='stylesheet' />
+    <link rel="icon" href="https://github.githubassets.com/favicons/favicon.svg"><script>
+        let theme = localStorage.getItem("meek_theme") || "light";
+        document.documentElement.setAttribute("data-color-mode", theme);
+    </script>
+<meta name="description" content="## 前言
+
+为了提高虚拟机的性能，或是扩展其使用场景。">
+<meta property="og:title" content="Proxmox 开启 PCI Passthrough">
+<meta property="og:description" content="## 前言
+
+为了提高虚拟机的性能，或是扩展其使用场景。">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://blog.motofans.club/post/9.html">
+<meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
+<title>Proxmox 开启 PCI Passthrough</title>
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
+
+</head>
+<style>
+body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;padding: 45px;font-size: 16px;font-family: sans-serif;line-height: 1.25;}
+#header{display:flex;padding-bottom:8px;border-bottom: 1px solid var(--borderColor-muted, var(--color-border-muted));margin-bottom: 16px;}
+#footer {margin-top:64px; text-align: center;font-size: small;}
+
+</style>
+
+<style>
+.postTitle{margin: auto 0;font-size:40px;font-weight:bold;}
+.title-right{display:flex;margin:auto 0 0 auto;}
+.title-right .circle{padding: 14px 16px;margin-right:8px;}
+#postBody{border-bottom: 1px solid var(--color-border-default);padding-bottom:36px;}
+#postBody hr{height:2px;}
+#cmButton{height:48px;margin-top:48px;}
+#comments{margin-top:64px;}
+.g-emoji{font-size:24px;}
+@media (max-width: 600px) {
+    body {padding: 8px;}
+    .postTitle{font-size:24px;}
+}
+</style>
+
+
+
+
+<body>
+    <div id="header">
+<h1 class="postTitle">Proxmox 开启 PCI Passthrough</h1>
+<div class="title-right">
+    <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
+        <svg class="octicon" width="16" height="16">
+            <path id="pathHome" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+    
+
+    <a class="btn btn-invisible circle" onclick="modeSwitch();" title="切换主题">
+        <svg class="octicon" width="16" height="16" >
+            <path id="themeSwitch" fill-rule="evenodd"></path>
+        </svg>
+    </a>
+
+</div>
+</div>
+    <div id="content">
+<div class="markdown-body" id="postBody"><h2>前言</h2>
+<p>为了提高虚拟机的性能，或是扩展其使用场景。有时候，我们需要让虚拟机直接访问到硬件资源。</p>
+<p>开启 PCI Passthrough 需要硬件支持。</p>
+<h2>IOMMU</h2>
+<h3>IOMMU Enable</h3>
+<h3>查看当前主机是否支持</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep -e DMAR -e IOMMU
+</pre></div>
+<p>如果没有输出，则表示不支持。</p>
+<h3>修改内核启动参数</h3>
+<p>修改 /etc/default/grub</p>
+<ul>
+<li>Intel CPU</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet intel_iommu=on<span class="pl-pds">"</span></span>
+</pre></div>
+<ul>
+<li>AMD CPU</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet amd_iommu=on<span class="pl-pds">"</span></span>
+</pre></div>
+<h3>更新 grub</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Proxmox:  update-grub
+OpenSUSE: grub2-mkconfig -o /etc/grub2-efi.cfg
+CentOS:   grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
+</pre></div>
+<h3>重新启动主机</h3>
+<p>检查 grub 是否更新成功</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cat /proc/cmdline <span class="pl-k">|</span> grep iommu
+</pre></div>
+<h3>检查 IOMMU 是否开启</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">"</span>Virtualization Technology for Directed I/O<span class="pl-pds">"</span></span>
+</pre></div>
+<p>或</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep -e DMAR -e IOMMU <span class="pl-k">|</span> grep <span class="pl-c1">enable</span>
+</pre></div>
+
+<h3>PT Mode</h3>
+<p>Intel 与 AMD 芯片组均能够通过添加 "iommu=pt" 参数开启 PT 模式，以 Intel 为例:</p>
+<p>按照如下修改 /etc/default/grub 并更新 grub</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet intel_iommu=on iommu=pt<span class="pl-pds">"</span></span>
+</pre></div>
+<p>PT 模式只为直通模式中使用的设备启用 IOMMU，这将防止 Linux 试图接触 (touching) 无法直通的设备。</p>
+<h2>Interrupt Remapping</h2>
+<p><strong>要使用 PCI passthrough，Interrupt Remapping 是必须的。</strong></p>
+<p>Interrupt Remapping 能够工作在较新的设备上，你可以使用下面的命令查看当前的主机是否支持 Interrupt Remapping:</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">'</span>remapping<span class="pl-pds">'</span></span>
+</pre></div>
+<p>如果你看到了下面任何一行</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-s"><span class="pl-pds">"</span>AMD-Vi: Interrupt remapping enabled<span class="pl-pds">"</span></span>
+<span class="pl-s"><span class="pl-pds">"</span>DMAR-IR: Enabled IRQ remapping in x2apic mode<span class="pl-pds">"</span></span> (<span class="pl-s"><span class="pl-pds">'</span>x2apic<span class="pl-pds">'</span></span> can be different on old CPUs, but should still work)
+</pre></div>
+<p>那么当前的主机是能够支持 Interrupt Remapping 的。</p>
+<p>然而，如果当前的主机不支持 interrupt remapping，你可以使用如下命令开启 <code class="notranslate">unsafe interrupt remapping</code>:</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>options vfio_iommu_type1 allow_unsafe_interrupts=1<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> /etc/modprobe.d/iommu_unsafe_interrupts.conf
+</pre></div>
+<p>完成上述修改后，你需要更新 initramfs 并重新启动系统</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">update-initramfs -u -k all
+</pre></div>
+<p>另外，你也可以尝试配置 Interrupt Remapping 的内核引导参数</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">intremap={on,off,nosid,no_x2apic_optout}
+</pre></div>
+<h2>验证 IOMMU 分组</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">find /sys/kernel/iommu_groups/ -type l
+</pre></div>
+<h2>VFIO</h2>
+<h3>Required Moudules</h3>
+<p>修改 /etc/modules，开启以下 Kernel Moudules</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">vfio
+vfio_iommu_type1
+vfio_pci
+vfio_virqfd
+</pre></div>
+<h3>为 PCI 设备开启 VFIO</h3>
+<p>以 Intel 核心显卡为例:</p>
+<h3>查询 PCI 设备的 ID</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lspci -nn<span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">'</span>Intel Corporation<span class="pl-pds">'</span></span> <span class="pl-k">|</span> grep HD
+
+00:02.0 VGA compatible controller [0300]: Intel Corporation HD Graphics 630 [8086:5912] (rev 04)
+00:1f.3 Audio device [0403]: Intel Corporation 100 Series/C230 Series Chipset Family HD Audio Controller [8086:a170] (rev 31)
+</pre></div>
+<h3>绑定为 VFIO 设备</h3>
+<p>修改 /etc/modprobe.d/vfio.conf</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">options vfio-pci ids=8086:5912,8086:a170 disable_vga=1
+</pre></div>
+<p>在物理机禁用 Intel 核心显卡和音频，创建并修改 /etc/modprobe.d/custom-blacklist.conf</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">blacklist snd_hda_intel
+blacklist snd_hda_codec_hdmi
+blacklist i915</pre></div>
+<p>完成上述修改后，你需要更新 initramfs 并重新启动系统</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">update-initramfs -u -k all
+</pre></div>
+<p>重新启动系统后，确认 Intel 核心显卡使用的 driver 是不是 vfio-pci</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lspci -nnk<span class="pl-k">|</span> grep -C1 vfio</pre></div>
+<p>现在你可以使用 virt-manager 或 Proxmox 在虚拟机上分配 PCI 设备了。</p>
+<h2>其他的内核启动参数</h2>
+<p>这里列举可能会用到的部分内核启动参数</p>
+<ul>
+<li>尽可能多的将 iommu groups 拆分，方便直通一些板载的设备</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">pcie_acs_override=downstream,multifunction</pre></div>
+<ul>
+<li>禁用显卡的 frame buffering</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">video=vesafb:off
+video=efifb:off
+video=simplefb:off
+initcall_blacklist=sysfb_init</pre></div>
+<ul>
+<li>禁用显卡的 vesa driver</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">video=vesa:off</pre></div></div>
+<div style="font-size:small;margin-top:8px;float:right;"></div>
+
+<button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
+<div class="comments" id="comments"></div>
+
+</div>
+    <div id="footer">Copyright © <span id="year"></span><a href="https://blog.motofans.club"> XiaFan's Vision </a>
+<p>
+<span id="runday"></span>Powered by <a href="https://meekdai.com/Gmeek.html" target="_blank">Gmeek</a>
+</p>
+
+<script>
+if(""!=""){
+    var now=new Date();
+    var startSite=new Date("");
+    var diff=now.getTime()-startSite.getTime();
+    var diffDay=Math.floor(diff/(1000*60*60*24));
+    document.getElementById("year").innerHTML=now.getFullYear();
+    if(""!=""){document.getElementById("runday").innerHTML=" • "+"网站运行"+diffDay+"天"+" • ";}
+    else{document.getElementById("runday").innerHTML="网站运行"+diffDay+"天"+" • ";}
+}
+</script>
+</div>
+</body>
+<script>
+var IconList={'sun': 'M8 10.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5zM8 12a4 4 0 100-8 4 4 0 000 8zM8 0a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0V.75A.75.75 0 018 0zm0 13a.75.75 0 01.75.75v1.5a.75.75 0 01-1.5 0v-1.5A.75.75 0 018 13zM2.343 2.343a.75.75 0 011.061 0l1.06 1.061a.75.75 0 01-1.06 1.06l-1.06-1.06a.75.75 0 010-1.06zm9.193 9.193a.75.75 0 011.06 0l1.061 1.06a.75.75 0 01-1.06 1.061l-1.061-1.06a.75.75 0 010-1.061zM16 8a.75.75 0 01-.75.75h-1.5a.75.75 0 010-1.5h1.5A.75.75 0 0116 8zM3 8a.75.75 0 01-.75.75H.75a.75.75 0 010-1.5h1.5A.75.75 0 013 8zm10.657-5.657a.75.75 0 010 1.061l-1.061 1.06a.75.75 0 11-1.06-1.06l1.06-1.06a.75.75 0 011.06 0zm-9.193 9.193a.75.75 0 010 1.06l-1.06 1.061a.75.75 0 11-1.061-1.06l1.06-1.061a.75.75 0 011.061 0z', 'moon': 'M9.598 1.591a.75.75 0 01.785-.175 7 7 0 11-8.967 8.967.75.75 0 01.961-.96 5.5 5.5 0 007.046-7.046.75.75 0 01.175-.786zm1.616 1.945a7 7 0 01-7.678 7.678 5.5 5.5 0 107.678-7.678z', 'sync': 'M1.705 8.005a.75.75 0 0 1 .834.656 5.5 5.5 0 0 0 9.592 2.97l-1.204-1.204a.25.25 0 0 1 .177-.427h3.646a.25.25 0 0 1 .25.25v3.646a.25.25 0 0 1-.427.177l-1.38-1.38A7.002 7.002 0 0 1 1.05 8.84a.75.75 0 0 1 .656-.834ZM8 2.5a5.487 5.487 0 0 0-4.131 1.869l1.204 1.204A.25.25 0 0 1 4.896 6H1.25A.25.25 0 0 1 1 5.75V2.104a.25.25 0 0 1 .427-.177l1.38 1.38A7.002 7.002 0 0 1 14.95 7.16a.75.75 0 0 1-1.49.178A5.5 5.5 0 0 0 8 2.5Z', 'home': 'M6.906.664a1.749 1.749 0 0 1 2.187 0l5.25 4.2c.415.332.657.835.657 1.367v7.019A1.75 1.75 0 0 1 13.25 15h-3.5a.75.75 0 0 1-.75-.75V9H7v5.25a.75.75 0 0 1-.75.75h-3.5A1.75 1.75 0 0 1 1 13.25V6.23c0-.531.242-1.034.657-1.366l5.25-4.2Zm1.25 1.171a.25.25 0 0 0-.312 0l-5.25 4.2a.25.25 0 0 0-.094.196v7.019c0 .138.112.25.25.25H5.5V8.25a.75.75 0 0 1 .75-.75h3.5a.75.75 0 0 1 .75.75v5.25h2.75a.25.25 0 0 0 .25-.25V6.23a.25.25 0 0 0-.094-.195Z', 'github': 'M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z'};
+var utterancesLoad=0;
+
+let themeSettings={
+    "dark": ["dark","moon","#00f0ff","dark-blue"],
+    "light": ["light","sun","#ff5000","github-light"],
+    "auto": ["auto","sync","","preferred-color-scheme"]
+};
+function changeTheme(mode, icon, color, utheme){
+    document.documentElement.setAttribute("data-color-mode",mode);
+    document.getElementById("themeSwitch").setAttribute("d",value=IconList[icon]);
+    document.getElementById("themeSwitch").parentNode.style.color=color;
+    if(utterancesLoad==1){utterancesTheme(utheme);}
+}
+function modeSwitch(){
+    let currentMode=document.documentElement.getAttribute('data-color-mode');
+    let newMode = currentMode === "light" ? "dark" : currentMode === "dark" ? "auto" : "light";
+    localStorage.setItem("meek_theme", newMode);
+    if(themeSettings[newMode]){
+        changeTheme(...themeSettings[newMode]);
+    }
+}
+function utterancesTheme(theme){
+    const message={type:'set-theme',theme: theme};
+    const iframe=document.getElementsByClassName('utterances-frame')[0];
+    iframe.contentWindow.postMessage(message,'https://utteranc.es');
+}
+if(themeSettings[theme]){changeTheme(...themeSettings[theme]);}
+console.log("\n %c Gmeek last https://github.com/Meekdai/Gmeek \n\n","padding:5px 0;background:#02d81d;color:#fff");
+</script>
+
+<script>
+document.getElementById("pathHome").setAttribute("d",IconList["home"]);
+document.getElementById("pathIssue").setAttribute("d",IconList["github"]);
+
+
+
+function openComments(){
+    cm=document.getElementById("comments");
+    cmButton=document.getElementById("cmButton");
+    cmButton.innerHTML="loading";
+    span=document.createElement("span");
+    span.setAttribute("class","AnimatedEllipsis");
+    cmButton.appendChild(span);
+
+    script=document.createElement("script");
+    script.setAttribute("src","https://utteranc.es/client.js");
+    script.setAttribute("repo","anonsaber/anonsaber.github.io");
+    script.setAttribute("issue-term","title");
+    
+    if(localStorage.getItem("meek_theme")=="dark"){script.setAttribute("theme","dark-blue");}
+    else if(localStorage.getItem("meek_theme")=="light") {script.setAttribute("theme","github-light");}
+    else{script.setAttribute("theme","preferred-color-scheme");}
+    
+    script.setAttribute("crossorigin","anonymous");
+    script.setAttribute("async","");
+    cm.appendChild(script);
+
+    int=self.setInterval("iFrameLoading()",200);
+}
+
+function iFrameLoading(){
+    var utterances=document.getElementsByClassName('utterances');
+    if(utterances.length==1){
+        if(utterances[0].style.height!=""){
+            utterancesLoad=1;
+            int=window.clearInterval(int);
+            document.getElementById("cmButton").style.display="none";
+            console.log("utterances Load OK");
+        }
+    }
+}
+</script>
+
+
+</html>
