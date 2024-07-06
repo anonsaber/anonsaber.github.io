@@ -85,7 +85,7 @@ acme NS ns2.alidns.com.</pre></div>
 <h3>使用 AliDNS-Webhook</h3>
 <p>本文以 AliDNS 为例，你也可以使用 CloudFlare.</p>
 <p>在阿里云上，添加子域 <code class="notranslate">acme.exampleacmeverify.info</code></p>
-<p><em>添加子域的时候，需要在主域 <a href="http://exampleacmeverify.info/" rel="nofollow">exampleacmeverify.info</a> 添加 TXT 验证记录</em></p>
+<p>💡 添加子域的时候，需要在主域 exampleacmeverify.info 添加 TXT 验证记录</p>
 <p>生成能够管理子域 <code class="notranslate">acme.exampleacmeverify.info</code> 的 API Secret，随后在 Kubernetes 中创建一个 Secret，用于管理 AliDNS</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">kubectl -n cert-manager create secret generic alidns-secret --from-literal=access-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_ACCESS_KEY<span class="pl-pds">'</span></span> --from-literal=secret-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_SECRET_KEY<span class="pl-pds">'</span></span></pre></div>
 <p>部署 alidns-webhook</p>

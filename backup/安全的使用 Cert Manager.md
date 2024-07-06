@@ -35,7 +35,7 @@ acme NS ns2.alidns.com.
 
 在阿里云上，添加子域 `acme.exampleacmeverify.info`
 
-*添加子域的时候，需要在主域 [exampleacmeverify.info](http://exampleacmeverify.info/) 添加 TXT 验证记录*
+💡 添加子域的时候，需要在主域 exampleacmeverify.info 添加 TXT 验证记录
 
 生成能够管理子域 `acme.exampleacmeverify.info` 的 API Secret，随后在 Kubernetes 中创建一个 Secret，用于管理 AliDNS
 
