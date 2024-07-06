@@ -72,19 +72,19 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>在 Kubernetes 上使用 Cert Manager 的 ACME DNS Challenge 方式能够很轻松的为域名签发一张受信任的泛域名证书。然而由于 ACME-DNS 为了能够验证域名的所有权需要修改 DNS 记录，因此需要提供 DNS 服务商的 API Secret，如果它被泄漏了呢？</p>
 <h2>更安全的实现</h2>
 <p>简单来说就是实现通过 A 域名为 B 域名申请证书。</p>
-<p>在下面的例子中，我们使用 [<a href="http://acme.exampleacmeverify.info/" rel="nofollow">acme.exampleacmeverify.info</a>](<a href="http://acme.exampleacmeverify.info/" rel="nofollow">http://acme.exampleacmeverify.info/</a>) 为 [<a href="http://example.net/" rel="nofollow">example.net</a>](<a href="http://example.net/" rel="nofollow">http://example.net/</a>) 生成一张泛域名证书。你可以将 [<a href="http://acme.exampleacmeverify.info/" rel="nofollow">acme.exampleacmeverify.info</a>](<a href="http://acme.exampleacmeverify.info/" rel="nofollow">http://acme.exampleacmeverify.info/</a>) 单独托管到一个 DNS 服务商（本文中将其单独托管到阿里云），从而无需使用 [<a href="http://example.net/" rel="nofollow">example.net</a>](<a href="http://example.net/" rel="nofollow">http://example.net/</a>) 的 API Secret.</p>
+<p>在下面的例子中，我们使用 <code class="notranslate">acme.exampleacmeverify.info</code> 为 <code class="notranslate">example.net</code> 生成一张泛域名证书。你可以将 <code class="notranslate">acme.exampleacmeverify.info</code> 单独托管到一个 DNS 服务商（本文中将其单独托管到阿里云），从而无需使用 <code class="notranslate">example.net</code> 的 API Secret.</p>
 <h3>Cert Manager</h3>
 <p>在 Kubernetes 上部署 Cert Manager</p>
 <p><a href="https://cert-manager.io/docs/installation/helm/" rel="nofollow">https://cert-manager.io/docs/installation/helm/</a></p>
 <h3>添加解析</h3>
-<p>在 [<a href="http://example.net/" rel="nofollow">example.net</a>](<a href="http://example.net/" rel="nofollow">http://example.net/</a>) 的域名下添加一个 CNAME 解析。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">_acme-challenge CNAME _acme-challenge.acme.[exampleacmeverify.info](http://exampleacmeverify.info/).</pre></div>
-<p>在 <a href="http://exampleacmeverify.info/" rel="nofollow">exampleacmeverify.info</a> 的域名下添加一个 NS 解析。</p>
+<p>在 <code class="notranslate">example.net</code> 的域名下添加一个 CNAME 解析。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">_acme-challenge CNAME _acme-challenge.acme.exampleacmeverify.info.</pre></div>
+<p>在 <code class="notranslate">exampleacmeverify.info</code> 的域名下添加一个 NS 解析。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">acme NS ns1.alidns.com.
 acme NS ns2.alidns.com.</pre></div>
 <h3>使用 AliDNS-Webhook</h3>
 <p>本文以 AliDNS 为例，你也可以使用 CloudFlare.</p>
-<p>在阿里云上，添加子域 <code class="notranslate">acme.[exampleacmeverify.info](http://exampleacmeverify.info/)</code></p>
+<p>在阿里云上，添加子域 <code class="notranslate">acme.exampleacmeverify.info</code></p>
 <p><em>添加子域的时候，需要在主域 <a href="http://exampleacmeverify.info/" rel="nofollow">exampleacmeverify.info</a> 添加 TXT 验证记录</em></p>
 <p>生成能够管理子域 <code class="notranslate">acme.exampleacmeverify.info</code> 的 API Secret，随后在 Kubernetes 中创建一个 Secret，用于管理 AliDNS</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">kubectl -n cert-manager create secret generic alidns-secret --from-literal=access-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_ACCESS_KEY<span class="pl-pds">'</span></span> --from-literal=secret-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_SECRET_KEY<span class="pl-pds">'</span></span></pre></div>

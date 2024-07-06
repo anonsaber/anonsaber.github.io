@@ -6,7 +6,7 @@
 
 简单来说就是实现通过 A 域名为 B 域名申请证书。
 
-在下面的例子中，我们使用 [[acme.exampleacmeverify.info](http://acme.exampleacmeverify.info/)](http://acme.exampleacmeverify.info/) 为 [[example.net](http://example.net/)](http://example.net/) 生成一张泛域名证书。你可以将 [[acme.exampleacmeverify.info](http://acme.exampleacmeverify.info/)](http://acme.exampleacmeverify.info/) 单独托管到一个 DNS 服务商（本文中将其单独托管到阿里云），从而无需使用 [[example.net](http://example.net/)](http://example.net/) 的 API Secret.
+在下面的例子中，我们使用 `acme.exampleacmeverify.info` 为 `example.net` 生成一张泛域名证书。你可以将 `acme.exampleacmeverify.info` 单独托管到一个 DNS 服务商（本文中将其单独托管到阿里云），从而无需使用 `example.net` 的 API Secret.
 
 ### Cert Manager
 
@@ -16,13 +16,13 @@ https://cert-manager.io/docs/installation/helm/
 
 ### 添加解析
 
-在 [[example.net](http://example.net/)](http://example.net/) 的域名下添加一个 CNAME 解析。
+在 `example.net` 的域名下添加一个 CNAME 解析。
 
 ```bash
-_acme-challenge CNAME _acme-challenge.acme.[exampleacmeverify.info](http://exampleacmeverify.info/).
+_acme-challenge CNAME _acme-challenge.acme.exampleacmeverify.info.
 ```
 
-在 [exampleacmeverify.info](http://exampleacmeverify.info/) 的域名下添加一个 NS 解析。
+在 `exampleacmeverify.info` 的域名下添加一个 NS 解析。
 
 ```bash
 acme NS ns1.alidns.com.
@@ -33,7 +33,7 @@ acme NS ns2.alidns.com.
 
 本文以 AliDNS 为例，你也可以使用 CloudFlare.
 
-在阿里云上，添加子域 `acme.[exampleacmeverify.info](http://exampleacmeverify.info/)`
+在阿里云上，添加子域 `acme.exampleacmeverify.info`
 
 *添加子域的时候，需要在主域 [exampleacmeverify.info](http://exampleacmeverify.info/) 添加 TXT 验证记录*
 
