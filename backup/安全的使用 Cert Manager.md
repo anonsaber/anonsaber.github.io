@@ -46,7 +46,7 @@ kubectl -n cert-manager create secret generic alidns-secret --from-literal=acces
 部署 alidns-webhook
 
 ```Bash
-wget <https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml>
+wget https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml
 ```
 
 *获取下来的 yaml 不要直接用，要将里面的示例信息换掉*

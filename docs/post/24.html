@@ -89,7 +89,7 @@ acme NS ns2.alidns.com.</pre></div>
 <p>生成能够管理子域 <code class="notranslate">acme.exampleacmeverify.info</code> 的 API Secret，随后在 Kubernetes 中创建一个 Secret，用于管理 AliDNS</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">kubectl -n cert-manager create secret generic alidns-secret --from-literal=access-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_ACCESS_KEY<span class="pl-pds">'</span></span> --from-literal=secret-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_SECRET_KEY<span class="pl-pds">'</span></span></pre></div>
 <p>部署 alidns-webhook</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">wget <span class="pl-k">&lt;</span>https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml<span class="pl-k">&gt;</span></pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">wget https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml</pre></div>
 <p><em>获取下来的 yaml 不要直接用，要将里面的示例信息换掉</em></p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -i <span class="pl-s"><span class="pl-pds">'</span>s|acme.yourcompany.com|acme.exampleacmeverify.info|g<span class="pl-pds">'</span></span> bundle.yaml</pre></div>
 <p><em>有必要的话，可以把里面涉及的 Images Pull 下来，并传到自己的镜像仓库。</em></p>
