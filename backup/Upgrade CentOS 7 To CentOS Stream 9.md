@@ -1,4 +1,6 @@
-CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。本文将介绍如何将 CentOS 7 升级到 CentOS 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。
+CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。
+
+本文将介绍如何将 CentOS 7 升级到 CentOS Stream 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。
 
 **开始操作前，请确保对重要数据已经完成了非本机的备份。**
 
@@ -51,7 +53,7 @@ CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linu
 
 ## 准备系统环境
 
-在更新完CentOS 7之后，我们安装一些必要工具，为升级到 CentOS 9 做准备。
+在更新完 CentOS 7 之后，我们安装一些必要工具，为升级到 CentOS 8 做准备。
 
 1. 安装 rpmconf 工具，用于处理配置文件
 
@@ -278,7 +280,7 @@ CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linu
 
 28. 再次刷新并更新软件包
 
-    注意: 这里将会将当前系统的包升级到 CentOS 8-Stream
+    注意: 这里将会将当前系统的包升级到 CentOS Stream 8
 
     ```bash
     dnf upgrade --refresh -y
@@ -296,7 +298,7 @@ CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linu
     reboot
     ```
 
-## 升级到 CentOS 9 Stream
+## 升级到 CentOS Stream 9
 
 
 1. 禁用特定模块
@@ -304,35 +306,40 @@ CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linu
    ```bash
    dnf module disable python36 virt
    ```
+
 2. 替换镜像源
 
    视网络情况的可选步骤，建议参考 <https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/> 进行。
+
 3. 安装 CentOS Stream 9 核心包
 
    ```bash
    dnf install https://mirror.rackspace.com/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}
    ```
+
 4. 再次运行 rpmconf 处理配置文件
 
    ```bash
    rpmconf -a
    ```
+
 5. 移除旧的 EPEL 包
 
    ```bash
    dnf remove epel-release
    ```
+
 6. 删除备份的镜像源配置文件
 
    ```bash
    rm -rf /etc/yum.repos.d/*.repo.rpmsave
    ```
+
 7. 安装 EPEL 9 和 EPEL Next 9
 
    ```bash
    dnf install https://mirror.rackspace.com/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
    ```
-
 
  8. 清理 DNF 缓存并重新生成缓存
 
@@ -340,26 +347,31 @@ CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linu
     dnf clean all
     dnf makecache
     ```
+
  9. 删除旧的内核包
 
     ```bash
     rpm -e `rpm -q kernel`
     ```
+
 10. 同步发行版软件包
 
     ```bash
     dnf -y --releasever=9 --allowerasing --setopt=deltarpm=false distro-sync
     ```
+
 11. 再次清理 DNF 缓存
 
     ```bash
     dnf clean all
     ```
+
 12. 强制重启服务器
 
     ```bash
     systemctl --force --force reboot
     ```
+
 13. 重置特定模块
 
     实际情况可能不同，因此需要重置的模块也可能有所不同。请根据具体情况进行调整。
@@ -367,12 +379,14 @@ CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linu
     ```bash
     dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl satellite-5-client mysql
     ```
+
 14. 重建 RPM 数据库
 
     ```bash
     rm -f /var/lib/rpm/__db*
     rpm --rebuilddb
     ```
+
 15. 更新核心和最小安装组：
 
     ```bash

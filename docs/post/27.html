@@ -9,9 +9,9 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。">
+<meta name="description" content="CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。">
 <meta property="og:title" content="Upgrade CentOS 7 To CentOS Stream 9">
-<meta property="og:description" content="CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。">
+<meta property="og:description" content="CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.motofans.club/post/27.html">
 <meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
@@ -64,7 +64,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。本文将介绍如何将 CentOS 7 升级到 CentOS 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。</p>
+<div class="markdown-body" id="postBody"><p>CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。</p>
+<p>本文将介绍如何将 CentOS 7 升级到 CentOS Stream 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。</p>
 <p><strong>开始操作前，请确保对重要数据已经完成了非本机的备份。</strong></p>
 <p><strong>本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源</strong></p>
 <h2>更新 CentOS 7</h2>
@@ -105,7 +106,7 @@ yum upgrade -y</pre></div>
 </li>
 </ol>
 <h2>准备系统环境</h2>
-<p>在更新完CentOS 7之后，我们安装一些必要工具，为升级到 CentOS 9 做准备。</p>
+<p>在更新完 CentOS 7 之后，我们安装一些必要工具，为升级到 CentOS 8 做准备。</p>
 <ol>
 <li>
 <p>安装 rpmconf 工具，用于处理配置文件</p>
@@ -269,7 +270,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>再次刷新并更新软件包</p>
-<p>注意: 这里将会将当前系统的包升级到 CentOS 8-Stream</p>
+<p>注意: 这里将会将当前系统的包升级到 CentOS Stream 8</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf upgrade --refresh -y</pre></div>
 </li>
 <li>
@@ -281,7 +282,7 @@ package-cleanup --orphans</pre></div>
 <div class="highlight highlight-source-shell"><pre class="notranslate">reboot</pre></div>
 </li>
 </ol>
-<h2>升级到 CentOS 9 Stream</h2>
+<h2>升级到 CentOS Stream 9</h2>
 <ol>
 <li>
 <p>禁用特定模块</p>
