@@ -1,6 +1,6 @@
 CentOS 7 与 CentOS 8/8-Stream 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。本文将介绍如何将 CentOS 7 升级到 CentOS 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。
 
-**开始操作前，请确保已经完成重要数据的非本机备份。**
+**开始操作前，请确保对重要数据已经完成了非本机的备份。**
 
 **本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源**
 
