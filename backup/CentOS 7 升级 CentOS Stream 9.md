@@ -2,9 +2,11 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
 本文将介绍如何将 CentOS 7 升级到 CentOS Stream 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。
 
-**开始操作前，请确保对重要数据已经完成了非本机的备份。**
+>  [!IMPORTANT]
+> **开始操作前，请确保对重要数据已经完成了非本机的备份。**
 
-**本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源**
+>  [!NOTE]
+> **本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源**
 
 ## 更新 CentOS 7
 
@@ -62,16 +64,16 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    ```
 2. 运行 rpmconf，检查并合并所有配置文件
 
-   **注意：** 在执行此命令时，系统会询问你是否要合并不同版本的配置文件,你需要根据实际情况来做出决定。
+      > **在执行此命令时，系统会询问你是否要合并不同版本的配置文件,你需要根据实际情况来做出决定。**
 
    ```bash
    rpmconf -a
    ```
 3. 使用 package-cleanup 工具清理系统
 
-   **注意：** 在执行 package-cleanup --leaves 和 package-cleanup --orphans 命令时，系统会列出一些叶子包（无其他包依赖的包）和孤立包（不再被任何包依赖的包）。你需要根据具体情况来决定是否要移除这些包：
-   * 如果这些包对你的应用和服务没有影响，可以选择删除它们，以减少系统的冗余。
-   * 如果不确定某些包的作用，建议保留它们，以免影响系统运行。
+   > **在执行 package-cleanup --leaves 和 package-cleanup --orphans 命令时，系统会列出一些叶子包（无其他包依赖的包）和孤立包（不再被任何包依赖的包）。你需要根据具体情况来决定是否要移除这些包**：
+   > * 如果这些包对你的应用和服务没有影响，可以选择删除它们，以减少系统的冗余。
+   > * 如果不确定某些包的作用，建议保留它们，以免影响系统运行。
 
    ```bash
    package-cleanup --leaves
@@ -164,7 +166,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
 10. 同步发行版软件包
 
-    注意: 这里将会将当前系统的包升级到 CentOS 8.5.2111
+    > **这里将会将当前系统的包升级到 CentOS 8.5.2111**
 
     ```bash
     dnf -y --releasever=8.5.2111 --allowerasing --setopt=deltarpm=false distro-sync
@@ -202,7 +204,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
 16. 移除不需要的软件包和额外的软件包
 
-    注意：这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。
+    > **这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。**
 
     ```bash
     dnf --releasever=8.5.2111 repoquery --unneeded
@@ -226,7 +228,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
 20. **列出仍然安装的 CentOS 7 软件包**
 
-    注意：这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。
+    > **这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。**
 
     ```bash
     dnf --releasever=8.5.2111 list --installed | grep el7
@@ -280,7 +282,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
 28. 再次刷新并更新软件包
 
-    注意: 这里将会将当前系统的包升级到 CentOS Stream 8
+    > **这里将会将当前系统的包升级到 CentOS Stream 8**
 
     ```bash
     dnf upgrade --refresh -y

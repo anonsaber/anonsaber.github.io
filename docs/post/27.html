@@ -40,7 +40,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     .postTitle{font-size:24px;}
 }
 </style>
-
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style><style>.markdown-alert.markdown-alert-important {border-left-color:var(--borderColor-done-emphasis, var(--color-done-emphasis));background-color:var(--color-done-subtle);}.markdown-alert.markdown-alert-important .markdown-alert-title {color: var(--fgColor-done,var(--color-done-fg));}</style>
 
 
 
@@ -66,8 +66,10 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><p>CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。</p>
 <p>本文将介绍如何将 CentOS 7 升级到 CentOS Stream 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。</p>
-<p><strong>开始操作前，请确保对重要数据已经完成了非本机的备份。</strong></p>
-<p><strong>本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源</strong></p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p><strong>开始操作前，请确保对重要数据已经完成了非本机的备份。</strong></p>
+</div>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p><strong>本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源</strong></p>
+</div>
 <h2>更新 CentOS 7</h2>
 <p>在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。</p>
 <ol>
@@ -114,16 +116,20 @@ yum upgrade -y</pre></div>
 </li>
 <li>
 <p>运行 rpmconf，检查并合并所有配置文件</p>
-<p><strong>注意：</strong> 在执行此命令时，系统会询问你是否要合并不同版本的配置文件,你需要根据实际情况来做出决定。</p>
+<blockquote>
+<p><strong>在执行此命令时，系统会询问你是否要合并不同版本的配置文件,你需要根据实际情况来做出决定。</strong></p>
+</blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">rpmconf -a</pre></div>
 </li>
 <li>
 <p>使用 package-cleanup 工具清理系统</p>
-<p><strong>注意：</strong> 在执行 package-cleanup --leaves 和 package-cleanup --orphans 命令时，系统会列出一些叶子包（无其他包依赖的包）和孤立包（不再被任何包依赖的包）。你需要根据具体情况来决定是否要移除这些包：</p>
+<blockquote>
+<p><strong>在执行 package-cleanup --leaves 和 package-cleanup --orphans 命令时，系统会列出一些叶子包（无其他包依赖的包）和孤立包（不再被任何包依赖的包）。你需要根据具体情况来决定是否要移除这些包</strong>：</p>
 <ul>
 <li>如果这些包对你的应用和服务没有影响，可以选择删除它们，以减少系统的冗余。</li>
 <li>如果不确定某些包的作用，建议保留它们，以免影响系统运行。</li>
 </ul>
+</blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">package-cleanup --leaves
 package-cleanup --orphans</pre></div>
 </li>
@@ -191,7 +197,9 @@ dnf install https://mirror.rackspace.com/epel/epel-release-latest-8.noarch.rpm -
 </li>
 <li>
 <p>同步发行版软件包</p>
-<p>注意: 这里将会将当前系统的包升级到 CentOS 8.5.2111</p>
+<blockquote>
+<p><strong>这里将会将当前系统的包升级到 CentOS 8.5.2111</strong></p>
+</blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf -y --releasever=8.5.2111 --allowerasing --setopt=deltarpm=false distro-sync</pre></div>
 </li>
 <li>
@@ -216,7 +224,9 @@ dnf install https://mirror.rackspace.com/epel/epel-release-latest-8.noarch.rpm -
 </li>
 <li>
 <p>移除不需要的软件包和额外的软件包</p>
-<p>注意：这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。</p>
+<blockquote>
+<p><strong>这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。</strong></p>
+</blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf --releasever=8.5.2111 repoquery --unneeded
 dnf --releasever=8.5.2111 remove -y <span class="pl-s"><span class="pl-pds">$(</span>dnf --releasever=8.5.2111 repoquery --unneeded<span class="pl-pds">)</span></span>
 dnf --releasever=8.5.2111 repoquery --extras
@@ -233,7 +243,9 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p><strong>列出仍然安装的 CentOS 7 软件包</strong></p>
-<p>注意：这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。</p>
+<blockquote>
+<p><strong>这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。</strong></p>
+</blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf --releasever=8.5.2111 list --installed <span class="pl-k">|</span> grep el7</pre></div>
 </li>
 <li>
@@ -270,7 +282,9 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>再次刷新并更新软件包</p>
-<p>注意: 这里将会将当前系统的包升级到 CentOS Stream 8</p>
+<blockquote>
+<p><strong>这里将会将当前系统的包升级到 CentOS Stream 8</strong></p>
+</blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf upgrade --refresh -y</pre></div>
 </li>
 <li>
