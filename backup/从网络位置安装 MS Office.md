@@ -97,4 +97,6 @@ endlocal
 
 只需要把安装脚本 Network-INSTALL-OFFICE.bat 拷贝到目标计算机上，然后双击执行即可安装。
 
-根据本文的实际测试，千兆有线网络下，在 PD 虚拟机内安装完 Word, Excel, PowePoint 以及 Visio 总计耗时不到 5 分钟。
+根据本文的实际测试，千兆有线网络 + SATA SSD 下，在 PD 虚拟机内安装完 Word, Excel, PowePoint 以及 Visio 总计耗时不到 5 分钟。
+
+<!-- ##{"timestamp":1625673600}## -->
