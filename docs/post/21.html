@@ -44,7 +44,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     .postTitle{font-size:24px;}
 }
 </style>
-
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-important {border-left-color:var(--borderColor-done-emphasis, var(--color-done-emphasis));background-color:var(--color-done-subtle);}.markdown-alert.markdown-alert-important .markdown-alert-title {color: var(--fgColor-done,var(--color-done-fg));}</style>
 
 
 
@@ -70,13 +70,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h2>背景</h2>
 <p>一直以来，要怎么能够让在 EPIC-KBS9 上部署的 Seafile 能够稳定高效的访问到 Riverbed CX570 的 ZFS 阵列都是让我觉得需要改进的地方。Samba/GlusterFS/JuiceFS/BeeGFS 使用 FUSE Mount 的方式，性能损失较大。而 iSCSI 的方式又十分的不灵活，扩容也不够简单。至于 Minio，这东西 BugFix 的频率让我总是怀疑它是否应该使用在生产环境（尽管很多企业都将其开源版本部署在自家服务器）上。</p>
-<h2>特别提醒</h2>
-<p>Garage 是一个优劣十分明显的分布式存储系统，如果你计划将其使用在生产环境中，请务必深刻理解 Garage。</p>
-<p>本文不演示如何使用 Garage，这一点在 Garage 的官方文档中写的十分详细，请直接查看官方文档。</p>
 <h2><a href="https://garagehq.deuxfleurs.fr/" rel="nofollow">Garage</a></h2>
 <p>终于，在某一天我找到了 <a href="https://garagehq.deuxfleurs.fr/" rel="nofollow">Garage</a>，先来看看其官网对自己的表述以及愿景</p>
 <p><a href="https://garagehq.deuxfleurs.fr/documentation/design/goals/" rel="nofollow">https://garagehq.deuxfleurs.fr/documentation/design/goals/</a></p>
 <p>Garage 使用 Rust 实现，性能十分优秀，你能在其官网上找到它的性能对比，这里不做过多表述。</p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p>Garage 是一个优劣十分明显的分布式存储系统，如果你计划将其使用在生产环境中，请务必深刻理解 Garage。</p>
+<p>本文不演示如何使用 Garage，这一点在 Garage 的官方文档中写的十分详细，请直接查看官方文档。</p>
+</div>
 <h2>优势</h2>
 <p>对于 Homelab 来说，很难实现像数据中心一样稳定的网络和电力环境。Garage 最为吸引我的一点就是它<strong>对网络故障、网络延迟、磁盘故障、系统管理员故障具有高度弹性</strong>。与 Minio 使用纠删码进行工作不同的是，Garage 对网络延迟的要求远远没有那么苛刻（这是因为 Garage 的愿景不是设计一个拥有纠删码的分布式文件系统）</p>
 <h2>劣势</h2>

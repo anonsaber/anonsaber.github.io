@@ -2,12 +2,6 @@
 
 一直以来，要怎么能够让在 EPIC-KBS9 上部署的 Seafile 能够稳定高效的访问到 Riverbed CX570 的 ZFS 阵列都是让我觉得需要改进的地方。Samba/GlusterFS/JuiceFS/BeeGFS 使用 FUSE Mount 的方式，性能损失较大。而 iSCSI 的方式又十分的不灵活，扩容也不够简单。至于 Minio，这东西 BugFix 的频率让我总是怀疑它是否应该使用在生产环境（尽管很多企业都将其开源版本部署在自家服务器）上。
 
-## 特别提醒
-
-Garage 是一个优劣十分明显的分布式存储系统，如果你计划将其使用在生产环境中，请务必深刻理解 Garage。
-
-本文不演示如何使用 Garage，这一点在 Garage 的官方文档中写的十分详细，请直接查看官方文档。
-
 ## [Garage](https://garagehq.deuxfleurs.fr/)
 
 终于，在某一天我找到了 [Garage](https://garagehq.deuxfleurs.fr/)，先来看看其官网对自己的表述以及愿景
@@ -15,6 +9,11 @@ Garage 是一个优劣十分明显的分布式存储系统，如果你计划将�
 https://garagehq.deuxfleurs.fr/documentation/design/goals/
 
 Garage 使用 Rust 实现，性能十分优秀，你能在其官网上找到它的性能对比，这里不做过多表述。
+
+> [!IMPORTANT]
+> Garage 是一个优劣十分明显的分布式存储系统，如果你计划将其使用在生产环境中，请务必深刻理解 Garage。
+> 
+> 本文不演示如何使用 Garage，这一点在 Garage 的官方文档中写的十分详细，请直接查看官方文档。
 
 ## 优势
 
