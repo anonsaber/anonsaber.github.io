@@ -20,6 +20,8 @@ https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/
 
 由于会访问到哪个 Pod 这件事儿是 Nginx-Ingrss 所决定的，那么一致性哈希的实现也一定是在 Nginx-Ingress 的配置上了。
 
-```
+```yaml
 nginx.ingress.kubernetes.io/upstream-hash-by: "$host$request_uri"
 ```
+
+<!-- ##{"timestamp":1640448000}## -->

@@ -20,7 +20,7 @@
 <meta property="og:url" content="https://blog.motofans.club/post/23.html">
 <meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
 <title>Nginx-Ingress 一致性哈希</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 </head>
 <style>
@@ -79,8 +79,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>观察 Nginx-Ingress Controller 中生成的 nginx.conf 可以发现，Nginx-Ingress 是通过Lua 动态获取的 Endpoints 数据。</p>
 <h2>一致性哈希</h2>
 <p>由于会访问到哪个 Pod 这件事儿是 Nginx-Ingrss 所决定的，那么一致性哈希的实现也一定是在 Nginx-Ingress 的配置上了。</p>
-<pre class="notranslate"><code class="notranslate">nginx.ingress.kubernetes.io/upstream-hash-by: "$host$request_uri"
-</code></pre></div>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">nginx.ingress.kubernetes.io/upstream-hash-by</span>: <span class="pl-s"><span class="pl-pds">"</span>$host$request_uri<span class="pl-pds">"</span></span></pre></div>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
