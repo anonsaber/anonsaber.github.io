@@ -102,7 +102,8 @@ sync=1
 <h3>iptables</h3>
 <p>这里 nflog-group 后面的 ID 需要和上面保持一致</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">iptables -I POSTROUTING -o <span class="pl-k">&lt;</span>public_nic <span class="pl-k">&gt;</span> -m state --state NEW -j NFLOG --nflog-group 1 --nflog-prefix <span class="pl-s"><span class="pl-pds">'</span>[&gt;]NAT <span class="pl-pds">'</span></span></pre></div>
-<p>现在你可以考虑使用 Grafana + Loki + Promtail 对日志进行查询、展示。</p></div>
+<p>现在你可以考虑使用 Grafana + Loki + Promtail 对日志进行查询、展示。</p>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
