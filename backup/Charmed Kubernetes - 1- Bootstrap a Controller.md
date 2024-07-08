@@ -14,7 +14,7 @@ sudo snap install juju --channel=2.9 --classic
 
 Generate SSH keys:
 
-```
+```bash
 ssh-keygen
 ```
 
@@ -22,7 +22,7 @@ Copy the generated SSH keys to the specified address
 
 > Replace "ares@100.64.1.81" with the actual username and IP address. The following steps will continue in the same manner. There will be no further prompts.
 
-```
+```bash
 ssh-copy-id ares@100.64.1.81
 ```
 
@@ -32,7 +32,7 @@ Since we are not generating the nodes to be deployed via a cloud environment or 
 
 > You can give a name to your private cloud. I'll use "ares-homelab" here.
 
-```
+```bash
 juju add-cloud
 
 This operation can be applied to both a copy on this client and to the one on a controller.
@@ -51,7 +51,6 @@ Enter a name for your manual cloud: ares-homelab
 Enter the ssh connection string for controller, username@<hostname or IP> or <hostname or IP>: ares@100.64.1.81
 
 Cloud "ares-homelab" successfully added to your local client.
-
 ```
 
 ## Bootstrap a Controller
@@ -79,3 +78,5 @@ juju machines -m controller
 juju enable-ha --to=1,2
 juju controllers --refresh
 ```
+
+<!-- ##{"timestamp":1667750400}## -->

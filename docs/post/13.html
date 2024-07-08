@@ -25,7 +25,7 @@ sudo snap install juju --channel=2.9 --classic
 
 Generate SSH keys:
 
-```
+```bash
 ssh-keygen
 ```
 
@@ -33,7 +33,7 @@ Copy the generated SSH keys to the specified address
 
 > Replace 'ares@100.64.1.81' with the actual username and IP address. The following steps will continue in the same manner. There will be no further prompts.
 
-```
+```bash
 ssh-copy-id ares@100.64.1.81
 ```
 
@@ -43,7 +43,7 @@ Since we are not generating the nodes to be deployed via a cloud environment or 
 
 > You can give a name to your private cloud. I'll use 'ares-homelab' here.
 
-```
+```bash
 juju add-cloud
 
 This operation can be applied to both a copy on this client and to the one on a controller.
@@ -62,7 +62,6 @@ Enter a name for your manual cloud: ares-homelab
 Enter the ssh connection string for controller, username@<hostname or IP> or <hostname or IP>: ares@100.64.1.81
 
 Cloud 'ares-homelab' successfully added to your local client.
-
 ```
 
 ## Bootstrap a Controller
@@ -89,7 +88,9 @@ juju add-machine -m controller <ssh:ares@100.64.1.83>
 juju machines -m controller
 juju enable-ha --to=1,2
 juju controllers --refresh
-```。">
+```
+
+<!-- ##{'timestamp':1667750400}## -->。">
 <meta property="og:title" content="Charmed Kubernetes - 1: Bootstrap a Controller">
 <meta property="og:description" content="This section will cover how to deploy a Controller in a bare-metal environment.
 
@@ -107,7 +108,7 @@ sudo snap install juju --channel=2.9 --classic
 
 Generate SSH keys:
 
-```
+```bash
 ssh-keygen
 ```
 
@@ -115,7 +116,7 @@ Copy the generated SSH keys to the specified address
 
 > Replace 'ares@100.64.1.81' with the actual username and IP address. The following steps will continue in the same manner. There will be no further prompts.
 
-```
+```bash
 ssh-copy-id ares@100.64.1.81
 ```
 
@@ -125,7 +126,7 @@ Since we are not generating the nodes to be deployed via a cloud environment or 
 
 > You can give a name to your private cloud. I'll use 'ares-homelab' here.
 
-```
+```bash
 juju add-cloud
 
 This operation can be applied to both a copy on this client and to the one on a controller.
@@ -144,7 +145,6 @@ Enter a name for your manual cloud: ares-homelab
 Enter the ssh connection string for controller, username@<hostname or IP> or <hostname or IP>: ares@100.64.1.81
 
 Cloud 'ares-homelab' successfully added to your local client.
-
 ```
 
 ## Bootstrap a Controller
@@ -171,7 +171,9 @@ juju add-machine -m controller <ssh:ares@100.64.1.83>
 juju machines -m controller
 juju enable-ha --to=1,2
 juju controllers --refresh
-```。">
+```
+
+<!-- ##{'timestamp':1667750400}## -->。">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://blog.motofans.club/post/13.html">
 <meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
@@ -231,20 +233,18 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <div class="highlight highlight-source-shell"><pre class="notranslate">sudo snap install juju --channel=2.9 --classic</pre></div>
 <h2>Setting up password-less login</h2>
 <p>Generate SSH keys:</p>
-<pre class="notranslate"><code class="notranslate">ssh-keygen
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ssh-keygen</pre></div>
 <p>Copy the generated SSH keys to the specified address</p>
 <blockquote>
 <p>Replace "ares@100.64.1.81" with the actual username and IP address. The following steps will continue in the same manner. There will be no further prompts.</p>
 </blockquote>
-<pre class="notranslate"><code class="notranslate">ssh-copy-id ares@100.64.1.81
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ssh-copy-id ares@100.64.1.81</pre></div>
 <h2>Create a Cloud</h2>
 <p>Since we are not generating the nodes to be deployed via a cloud environment or infrastructure API, please enter "manual" here.</p>
 <blockquote>
 <p>You can give a name to your private cloud. I'll use "ares-homelab" here.</p>
 </blockquote>
-<pre class="notranslate"><code class="notranslate">juju add-cloud
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju add-cloud
 
 This operation can be applied to both a copy on this client and to the one on a controller.
 No current controller was detected and there are no registered controllers on this client: either bootstrap one or register one.
@@ -257,13 +257,11 @@ Cloud Types
 
 Select cloud type: manual
 
-Enter a name for your manual cloud: ares-homelab
+Enter a name <span class="pl-k">for</span> your manual cloud: ares-homelab
 
-Enter the ssh connection string for controller, username@&lt;hostname or IP&gt; or &lt;hostname or IP&gt;: ares@100.64.1.81
+Enter the ssh connection string <span class="pl-k">for</span> controller, username@<span class="pl-k">&lt;</span>hostname or IP<span class="pl-k">&gt;</span> or <span class="pl-k">&lt;</span>hostname or IP<span class="pl-k">&gt;</span>: ares@100.64.1.81
 
-Cloud "ares-homelab" successfully added to your local client.
-
-</code></pre>
+Cloud <span class="pl-s"><span class="pl-pds">"</span>ares-homelab<span class="pl-pds">"</span></span> successfully added to your <span class="pl-k">local</span> client.</pre></div>
 <h2>Bootstrap a Controller</h2>
 <p>The Juju controller is used to manage the software deployed through Juju, from deployment to upgrades to day-two operations. One Juju controller can manage multiple projects or workspaces, which in Juju are known as ‘models’.</p>
 <blockquote>
@@ -281,7 +279,8 @@ juju add-machine -m controller <span class="pl-k">&lt;</span>ssh:ares@100.64.1.<
 juju add-machine -m controller <span class="pl-k">&lt;</span>ssh:ares@100.64.1.<span class="pl-k">83&gt;</span>
 juju machines -m controller
 juju enable-ha --to=1,2
-juju controllers --refresh</pre></div></div>
+juju controllers --refresh</pre></div>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
