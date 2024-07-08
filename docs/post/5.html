@@ -131,7 +131,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>首先我们需要在 custom 路由表里面创建一个去往 1.1.1.1 的路由规则</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">ip route add 1.1.1.1/32 via 192.168.0.1 dev eth0 table custom</pre></div>
 <p>然后我们需要设置去往 1.1.1.1 的流量优先查找 custom 表</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ip rule add to 1.1.1.1 table custom priority 300</pre></div></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ip rule add to 1.1.1.1 table custom priority 300</pre></div>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

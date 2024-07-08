@@ -77,3 +77,5 @@ ip route add 1.1.1.1/32 via 192.168.0.1 dev eth0 table custom
 ```bash
 ip rule add to 1.1.1.1 table custom priority 300
 ```
+
+<!-- ##{"timestamp":1647446400}## -->
