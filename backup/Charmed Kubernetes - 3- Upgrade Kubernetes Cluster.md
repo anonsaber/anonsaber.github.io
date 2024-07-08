@@ -86,3 +86,5 @@ juju run-action kubernetes-worker/0 upgrade
 juju run-action kubernetes-worker/1 upgrade
 
 ```
+
+<!-- ##{"timestamp":1667750400}## -->
