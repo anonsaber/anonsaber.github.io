@@ -10,14 +10,8 @@ https://github.com/Azure/AKS/issues/1846
 
 https://docs.cilium.io/en/v1.9/gettingstarted/k8s-install-aks/
 
-<aside>
-💡 状态更新: 2023-03-09 该功能在海外版 AKS 实现支持，目前尚未 GA
-
-</aside>
-
-!https://blog.motofans.club/static/img/202f808b01689d78b292994b0e97ea09.image.png
-
-:::
+> [!NOTE]
+> 状态更新: 2023-03-09 该功能在海外版 AKS 实现支持，目前尚未 GA
 
 ## DNS 解析失败
 
@@ -71,3 +65,5 @@ az aks update-credentials \\
   --service-principal $SP_ID \\
   --client-secret $SP_SECRET
 ```
+
+<!-- ##{"timestamp":1631376000}## -->

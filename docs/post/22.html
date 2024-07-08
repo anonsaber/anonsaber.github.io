@@ -40,7 +40,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     .postTitle{font-size:24px;}
 }
 </style>
-
+<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style>
 
 
 
@@ -70,11 +70,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="695984145" data-permission-text="Title is private" data-url="https://github.com/Azure/AKS/issues/1846" data-hovercard-type="issue" data-hovercard-url="/Azure/AKS/issues/1846/hovercard" href="https://github.com/Azure/AKS/issues/1846">Azure/AKS#1846</a></p>
 <p>这就是说，较大规模的 AKS 集群会因为 iptables 而产生性能问题，如果遇到这个问题的朋友可以尝试使用 cilium 这个基于 eBPF 实现的 kube-proxy。</p>
 <p><a href="https://docs.cilium.io/en/v1.9/gettingstarted/k8s-install-aks/" rel="nofollow">https://docs.cilium.io/en/v1.9/gettingstarted/k8s-install-aks/</a></p>
-
-💡 状态更新: 2023-03-09 该功能在海外版 AKS 实现支持，目前尚未 GA
-
-<p>!<a href="https://blog.motofans.club/static/img/202f808b01689d78b292994b0e97ea09.image.png" rel="nofollow">https://blog.motofans.club/static/img/202f808b01689d78b292994b0e97ea09.image.png</a></p>
-<p>:::</p>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>状态更新: 2023-03-09 该功能在海外版 AKS 实现支持，目前尚未 GA</p>
+</div>
 <h2>DNS 解析失败</h2>
 <p>在使用 kubenet CNI 部署的 AKS 上，CoreDNS 中 timeout 的事件常有发生，这是 Kubernetes 的通病，它主要是由 Iptables 中 Conntrack竞争导致的 DNS 超时。</p>
 <p>具体而言，在 AKS 上面，解决这个问题有三种办法。</p>
@@ -104,7 +101,8 @@ SP_SECRET=0ec740d5-aca8-48c9-baf5-0fc2818e46b0</pre></div>
   --name <span class="pl-k">&lt;&gt;</span> <span class="pl-cce">\\</span>
   --reset-service-principal <span class="pl-cce">\\</span>
   --service-principal <span class="pl-smi">$SP_ID</span> <span class="pl-cce">\\</span>
-  --client-secret <span class="pl-smi">$SP_SECRET</span></pre></div></div>
+  --client-secret <span class="pl-smi">$SP_SECRET</span></pre></div>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>
