@@ -102,7 +102,8 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>开启 Websocket 的方式很简单，在 Jenkins Master 中点击添加一个 Node，然后勾选 Use WebSocket 即可。</p>
 <p>将 4.0 版本以后的 agent.jar 上传至 Agent 节点，执行启动命令即可。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">java -jar agent.jar -jnlpUrl <span class="pl-k">&lt;</span>https://jenkins.yourdomain.com/computer/test/jenkins-agent.jnlp<span class="pl-k">&gt;</span> -secret @secret-file -workDir <span class="pl-s"><span class="pl-pds">"</span>/home/jenkins<span class="pl-pds">"</span></span></pre></div>
-<p>现在你可以在 Jenkins Master 中看到一个 Jenkins Agent 上线了。</p></div>
+<p>现在你可以在 Jenkins Master 中看到一个 Jenkins Agent 上线了。</p>
+</div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
 <button class="btn btn-block" type="button" onclick="openComments()" id="cmButton">评论</button>

@@ -58,3 +58,5 @@ java -jar agent.jar -jnlpUrl <https://jenkins.yourdomain.com/computer/test/jenki
 ```
 
 现在你可以在 Jenkins Master 中看到一个 Jenkins Agent 上线了。
+
+<!-- ##{"timestamp":1662480000}## -->
