@@ -8,9 +8,8 @@ The same deployment method is applicable at least until version 1.23 and has bee
 
 The model holds a specific deployment. It is a good idea to create a new one specifically for each deployment.
 
-```
+```bash
 juju add-model k8s-lab
-
 ```
 
 Remember that you can have multiple models on each controller, so you can deploy multiple Kubernetes clusters, or other applications.
@@ -21,11 +20,10 @@ Remember that you can have multiple models on each controller, so you can deploy
 
 For a Production-Ready Charmed Kubernetes, you should have at least three etcd nodes, two master nodes, and several worker nodes. All these nodes should have password-less login set up in advance.
 
-:::tip{title="Note"}
-the master and etcd are not deployed on the same node. Although they can be deployed on the same node, I recommend deploying etcd separately.
-:::
+> [!NOTE]
+> the master and etcd are not deployed on the same node. Although they can be deployed on the same node, I recommend deploying etcd separately.
 
-```
+```bash
 juju switch k8s-lab
 # ETCD
 juju add-machine <ssh:ares@100.64.1.121>
@@ -41,14 +39,13 @@ juju add-machine <ssh:ares@100.64.1.127>
 # If you are using an external load balancer, these two machines are not necessary.
 juju add-machine <ssh:ares@100.64.1.128>
 juju add-machine <ssh:ares@100.64.1.129>
-
 ```
 
 ### View existing machines
 
 Run the following command to see if the machine has been set up. Also, make sure to remember the machine's ID because we'll need it for our deployment later on.
 
-```
+```bash
 juju status
 Model    Controller  Cloud/Region            Version  SLA          Timestamp
 k8s-lab  infra-demo  ares-homelab/default  2.9.25   unsupported  02:09:31Z
@@ -60,7 +57,6 @@ Machine  State    DNS           Inst id              Series  AZ  Message
 6        started  100.64.1.127  manual:100.64.1.127  focal       Manually provisioned machine
 7        started  100.64.1.128  manual:100.64.1.128  focal       Manually provisioned machine
 8        started  100.64.1.129  manual:100.64.1.129  focal       Manually provisioned machine
-
 ```
 
 ## Deploy Kubernetes
@@ -71,15 +67,14 @@ Download https://git.motofans.club/Motofans/charmed-kubernetes/archive/Bugfix-Re
 
 Please proceed with the following deployment command：
 
-:::warning{title="Note"}
-At the beginning, we will not deploy it in a high-availability state. We will temporarily deploy only a single replica for each component.
+> [!NOTE]
+> At the beginning, we will not deploy it in a high-availability state. We will temporarily deploy only a single replica for each component.
+> 
+> Please make sure to replace the "service-cidr" and "calico-cidr" with the appropriate values.
+> 
+> We use Calico CNI and enable IgnoreLooseRPF, You need to install ethtool on the machine in advance.
 
-Please make sure to replace the "service-cidr" and "calico-cidr" with the appropriate values.
-
-We use Calico CNI and enable IgnoreLooseRPF, You need to install ethtool on the machine in advance.
-:::
-
-```
+```bash
 # Core
 for i in {0..7}; do
   juju scp resources/core/core.* $i:
@@ -150,24 +145,21 @@ juju relate kubernetes-master:kube-api-endpoint kubernetes-worker:kube-api-endpo
 juju relate calico:etcd etcd:db
 juju relate calico:cni kubernetes-master:cni
 juju relate calico:cni kubernetes-worker:cni
-
 ```
 
 Juju is now busy creating instances, installing software and connecting the different parts of the cluster together, which can take several minutes. You can monitor what’s going on by running:
 
-```
+```bash
 watch -c juju status --color
-
 ```
 
 Once all the workloads are displayed as active, we can start increasing the number of replicas for the components by running:
 
-```
+```bash
 juju add-unit etcd --to 1
 juju add-unit etcd --to 2
 juju add-unit kubernetes-master --to 4
 juju add-unit kubernetes-worker --to 6
-
 ```
 
 ## KubeAPI Load Balancer
@@ -180,7 +172,7 @@ Once the scaling is complete, We've got two Master nodes, and to spread the load
 
 Here's how to set up the software LB using a controller.
 
-```
+```bash
 export VIP=100.64.1.128
 export VIP_HOSTNAME=kube-api.motofans.club
 juju deploy --to 7 ./kubeapi-load-balancer
@@ -194,14 +186,13 @@ juju relate kubernetes-master:kube-api-endpoint kubeapi-load-balancer:apiserver
 juju relate kubernetes-worker:kube-api-endpoint kubeapi-load-balancer:website
 juju relate kubeapi-load-balancer:certificates easyrsa:client
 juju relate kubernetes-master:loadbalancer kubeapi-load-balancer:loadbalancer
-
 ```
 
 Now, we have a load balancer distributing requests across two master nodes.
 
 You may have noticed that the load balancer itself isn't highly available as it's deployed on a specific node. If this node experiences issues, worker nodes will be unable to access the master nodes. We can solve this issue by deploying Keepalived:
 
-```
+```bash
 export VIP=100.64.1.110
 export VIP_HOSTNAME=kube-api.motofans.club
 juju deploy ./keepalived
@@ -223,7 +214,6 @@ juju add-unit kubeapi-load-balancer --to 8
 
 juju config kubernetes-master proxy-extra-args='bind-address=0.0.0.0 proxy-mode=ipvs master=https://kube-api.motofans.club:443'
 juju config kubernetes-worker proxy-extra-args='bind-address=0.0.0.0 proxy-mode=ipvs master=https://kube-api.motofans.club:443'
-
 ```
 
 ### External Load Balancer
@@ -244,10 +234,9 @@ juju config kubernetes-master loadbalancer-ips="$VIP $VIP_HOSTNAME"
 
 Finally, You can use the following command to retrieve the cluster config file:
 
-```
+```bash
 mkdir -p .kube
 juju scp kubernetes-master/0:config ~/.kube/config
-
 ```
 
 ## Use CoreDNS charm
@@ -256,7 +245,7 @@ CoreDNS has been the default DNS provider for Charmed Kubernetes clusters since 
 
 For additional control over CoreDNS, you can also deploy it into the cluster using the [[CoreDNS Kubernetes operator charm](https://charmhub.io/coredns)](https://charmhub.io/coredns).
 
-```
+```bash
 juju config -m k8s-lab kubernetes-master dns-provider=none
 juju add-k8s k8s-cloud --controller infra-demo
 juju add-model k8s-model k8s-cloud
@@ -265,7 +254,8 @@ juju deploy ./coredns --resource coredns-image=./resources/coredns-image.tgz
 juju offer coredns:dns-provider
 juju consume -m k8s-lab k8s-model.coredns
 juju relate -m k8s-lab coredns kubernetes-master
-
 ```
 
 Once everything settles out, new or restarted pods will use the CoreDNS charm as their DNS provider. The CoreDNS charm config allows you to change the cluster domain, the IP address or config file to forward unhandled queries to, add additional DNS servers, or even override the Corefile entirely.
+
+<!-- ##{"timestamp":1667750400}## -->
