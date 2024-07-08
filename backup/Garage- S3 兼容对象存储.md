@@ -31,3 +31,5 @@ Garage + SFTPGo
 Garage + Seafile
 
 Garage + Minio Gateway（Garage 仅支持 V4 版本的签名，如需 V2 版本，可使用 Minio Gateway 进行转换）
+
+<!-- ##{"timestamp":1667836800}## -->
