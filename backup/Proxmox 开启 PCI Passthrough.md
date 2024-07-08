@@ -215,3 +215,5 @@ initcall_blacklist=sysfb_init
 ```bash
 video=vesa:off
 ```
+
+<!-- ##{"timestamp":1653235200}## -->
