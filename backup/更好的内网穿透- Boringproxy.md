@@ -6,10 +6,9 @@
 
 ## Boringproxy
 
-偶然发现了 [[Boringproxy](https://boringproxy.io/)](https://boringproxy.io/) 这个东西。先看看它自己是怎么介绍的：
+偶然发现了 [Boringproxy](https://boringproxy.io) 这个东西。先看看它自己是怎么介绍的：
 
 > boringproxy is a combination of a reverse proxy and a tunnel manager.
-> 
 > 
 > What that means is if you have a self-hosted web service (Nextcloud, Emby, Jellyfin, etherpad, personal website, etc.) running on a private network (such as behind a [[NAT](https://en.wikipedia.org/wiki/Network_address_translation)](https://en.wikipedia.org/wiki/Network_address_translation) at home), boringproxy aims to provide the easiest way to securely (i.e. HTTPS and optional password-protection) expose that server to the internet, so you can access it from anywhere.
 > 
@@ -76,4 +75,6 @@ services:
       - /etc/ssl/certs/:/etc/ssl/certs/:ro
 ```
 
-目前 *.motofans.club 均使用 Boringproxy 进行暴露
+目前 proxmox.motofans.club 使用 Boringproxy 进行暴露
+
+<!-- ##{"timestamp":1660579200}## -->
