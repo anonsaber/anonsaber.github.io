@@ -13,53 +13,48 @@
 
 ### Containerd
 
-```
+```bash
 juju upgrade-charm containerd --path=./containerd
-
 ```
 
 ### ETCD
 
-```
+```bash
 juju upgrade-charm etcd --path=./etcd
 juju config etcd channel=3.4/stable
 juju attach etcd etcd=./resources/etcd/etcd.snap
-
 ```
 
 ### EasyRSA
 
-```
+```bash
 juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz
-
 ```
 
 ### Calico CNI
 
-```
-juju upgrade-charm calico --path=./calico \\
-    --resource calico=./resources/calico/calico.gz \\
-    --resource calico-node-image=./resources/calico/calico-node-image.gz \\
+```bash
+juju upgrade-charm calico --path=./calico \
+    --resource calico=./resources/calico/calico.gz \
+    --resource calico-node-image=./resources/calico/calico-node-image.gz \
     --resource calico-upgrade=./resources/calico/calico-upgrade.gz
-
 ```
 
 ## Upgrading Kubernetes
 
 ### KubeAPI Load Balancer
 
-```
+```bash
 juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
 juju upgrade-charm keepalived --path=./keepalived
-
 ```
 
 ### Kubernetes-Master Units
 
-```
-juju upgrade-charm kubernetes-master --path=./kubernetes-master \\
-    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \\
-    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \\
+```bash
+juju upgrade-charm kubernetes-master --path=./kubernetes-master \
+    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
+    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
     --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
 juju attach kubernetes-master core=./resources/core/core.snap
 juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
@@ -72,21 +67,19 @@ juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
 juju config kubernetes-master channel=1.22/stable
 juju run-action kubernetes-master/0 upgrade
 juju run-action kubernetes-master/1 upgrade
-
 ```
 
 ### Update Relation
 
-```
+```bash
 juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
 juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers
-
 ```
 
 ### Kubernetes-Worker Units
 
-```
-juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \\
+```bash
+juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
     --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
 juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
 juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
@@ -95,7 +88,6 @@ juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
 juju config kubernetes-worker channel=1.22/stable
 juju run-action kubernetes-worker/0 upgrade
 juju run-action kubernetes-worker/1 upgrade
-
 ```
 
 <!-- ##{'timestamp':1667750400}## -->。">
@@ -104,53 +96,48 @@ juju run-action kubernetes-worker/1 upgrade
 
 ### Containerd
 
-```
+```bash
 juju upgrade-charm containerd --path=./containerd
-
 ```
 
 ### ETCD
 
-```
+```bash
 juju upgrade-charm etcd --path=./etcd
 juju config etcd channel=3.4/stable
 juju attach etcd etcd=./resources/etcd/etcd.snap
-
 ```
 
 ### EasyRSA
 
-```
+```bash
 juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz
-
 ```
 
 ### Calico CNI
 
-```
-juju upgrade-charm calico --path=./calico \\
-    --resource calico=./resources/calico/calico.gz \\
-    --resource calico-node-image=./resources/calico/calico-node-image.gz \\
+```bash
+juju upgrade-charm calico --path=./calico \
+    --resource calico=./resources/calico/calico.gz \
+    --resource calico-node-image=./resources/calico/calico-node-image.gz \
     --resource calico-upgrade=./resources/calico/calico-upgrade.gz
-
 ```
 
 ## Upgrading Kubernetes
 
 ### KubeAPI Load Balancer
 
-```
+```bash
 juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
 juju upgrade-charm keepalived --path=./keepalived
-
 ```
 
 ### Kubernetes-Master Units
 
-```
-juju upgrade-charm kubernetes-master --path=./kubernetes-master \\
-    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \\
-    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \\
+```bash
+juju upgrade-charm kubernetes-master --path=./kubernetes-master \
+    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
+    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
     --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
 juju attach kubernetes-master core=./resources/core/core.snap
 juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
@@ -163,21 +150,19 @@ juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
 juju config kubernetes-master channel=1.22/stable
 juju run-action kubernetes-master/0 upgrade
 juju run-action kubernetes-master/1 upgrade
-
 ```
 
 ### Update Relation
 
-```
+```bash
 juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
 juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers
-
 ```
 
 ### Kubernetes-Worker Units
 
-```
-juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \\
+```bash
+juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
     --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
 juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
 juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
@@ -186,7 +171,6 @@ juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
 juju config kubernetes-worker channel=1.22/stable
 juju run-action kubernetes-worker/0 upgrade
 juju run-action kubernetes-worker/1 upgrade
-
 ```
 
 <!-- ##{'timestamp':1667750400}## -->。">
@@ -194,7 +178,7 @@ juju run-action kubernetes-worker/1 upgrade
 <meta property="og:url" content="https://blog.motofans.club/post/15.html">
 <meta property="og:image" content="https://github.githubassets.com/favicons/favicon.svg">
 <title>Charmed Kubernetes - 3: Upgrade Kubernetes Cluster</title>
-
+<link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 </head>
 <style>
@@ -244,36 +228,26 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h2>Infrastructure updates</h2>
 <h3>Containerd</h3>
-<pre class="notranslate"><code class="notranslate">juju upgrade-charm containerd --path=./containerd
-
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm containerd --path=./containerd</pre></div>
 <h3>ETCD</h3>
-<pre class="notranslate"><code class="notranslate">juju upgrade-charm etcd --path=./etcd
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm etcd --path=./etcd
 juju config etcd channel=3.4/stable
-juju attach etcd etcd=./resources/etcd/etcd.snap
-
-</code></pre>
+juju attach etcd etcd=./resources/etcd/etcd.snap</pre></div>
 <h3>EasyRSA</h3>
-<pre class="notranslate"><code class="notranslate">juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz
-
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz</pre></div>
 <h3>Calico CNI</h3>
-<pre class="notranslate"><code class="notranslate">juju upgrade-charm calico --path=./calico \\
-    --resource calico=./resources/calico/calico.gz \\
-    --resource calico-node-image=./resources/calico/calico-node-image.gz \\
-    --resource calico-upgrade=./resources/calico/calico-upgrade.gz
-
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm calico --path=./calico \
+    --resource calico=./resources/calico/calico.gz \
+    --resource calico-node-image=./resources/calico/calico-node-image.gz \
+    --resource calico-upgrade=./resources/calico/calico-upgrade.gz</pre></div>
 <h2>Upgrading Kubernetes</h2>
 <h3>KubeAPI Load Balancer</h3>
-<pre class="notranslate"><code class="notranslate">juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
-juju upgrade-charm keepalived --path=./keepalived
-
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
+juju upgrade-charm keepalived --path=./keepalived</pre></div>
 <h3>Kubernetes-Master Units</h3>
-<pre class="notranslate"><code class="notranslate">juju upgrade-charm kubernetes-master --path=./kubernetes-master \\
-    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \\
-    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \\
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubernetes-master --path=./kubernetes-master \
+    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
+    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
     --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
 juju attach kubernetes-master core=./resources/core/core.snap
 juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
@@ -285,16 +259,12 @@ juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
 
 juju config kubernetes-master channel=1.22/stable
 juju run-action kubernetes-master/0 upgrade
-juju run-action kubernetes-master/1 upgrade
-
-</code></pre>
+juju run-action kubernetes-master/1 upgrade</pre></div>
 <h3>Update Relation</h3>
-<pre class="notranslate"><code class="notranslate">juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
-juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers
-
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
+juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers</pre></div>
 <h3>Kubernetes-Worker Units</h3>
-<pre class="notranslate"><code class="notranslate">juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \\
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
     --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
 juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
 juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
@@ -302,9 +272,7 @@ juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
 
 juju config kubernetes-worker channel=1.22/stable
 juju run-action kubernetes-worker/0 upgrade
-juju run-action kubernetes-worker/1 upgrade
-
-</code></pre>
+juju run-action kubernetes-worker/1 upgrade</pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;"></div>
 
