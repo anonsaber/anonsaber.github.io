@@ -17,3 +17,5 @@ Jason van Zyl 在 Blog 里面介绍了为什么要创建这个中央仓库的副
 http://takari.io/2015/10/28/google-maven-central.html
 
 得益于 GCS 覆盖了美国，欧洲，亚太的服务器节点，这个仓库要比 [Maven Central](http://repo1.maven.org) 的速度快得多。
+
+<!-- ##{"timestamp":1692288000}## -->
