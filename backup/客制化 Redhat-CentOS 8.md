@@ -33,3 +33,5 @@ yum install lorax -y
 ```bash
 mkksiso /PATH/TO/KICKSTART /PATH/TO/ISO /PATH/TO/NEW-ISO
 ```
+
+<!-- ##{"timestamp":1683734400}## -->
