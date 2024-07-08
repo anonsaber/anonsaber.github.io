@@ -160,7 +160,7 @@ package-cleanup --orphans</pre></div>
 <li>
 <p>修改镜像源配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^mirrorlist=|#mirrorlist=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=baseurl=https://mirror.rackspace.com/centos-vault/centos|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g<span class="pl-pds">'</span></span> \
     -i /etc/yum.repos.d/CentOS-<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>

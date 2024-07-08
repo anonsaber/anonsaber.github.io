@@ -114,7 +114,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
    ```bash
    sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-       -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=baseurl=https://mirror.rackspace.com/centos-vault/centos|g' \
+       -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g' \
        -i /etc/yum.repos.d/CentOS-*.repo
    ```
 
