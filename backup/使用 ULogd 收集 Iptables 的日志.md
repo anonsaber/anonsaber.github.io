@@ -2,11 +2,11 @@
 
 在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。本来想着只需要使用`iptables –j LOG` 就可以轻松实现目标，然而由于这两台服务器上的流量是巨大的。使用这种方式直接导致了 CPU 单核被打爆。
 
-于是找到了 [这篇文章](https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf)](https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf)，它推荐了本文标题中提到的 ULogd。
+于是找到了 [这篇文章](https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf)，它推荐了本文标题中提到的 ULogd。
 
 ## 简介
 
-Ulogd 是 [[netfilter.org](http://netfilter.org/)](http://netfilter.org/) 的一个项目，它是一个运行在用户态的日志记录守护进程，用于 NetFilter/iptables 相关日志记录。
+Ulogd 是 [netfilter](http://netfilter.org/) 的一个项目，它是一个运行在用户态的日志记录守护进程，用于 NetFilter/iptables 相关日志记录。
 
 在 Ubuntu 上，你可以轻松的通过 apt 进行安装。而在 CentOS 上，由于官方的 Repo 里面并没有这个东西。所以你需要手动编译安装它，或是使用 [http://repo.iotti.biz/](http://repo.iotti.biz/) 提供的 Repo。
 

@@ -70,9 +70,9 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     <div id="content">
 <div class="markdown-body" id="postBody"><h2>背景</h2>
 <p>在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。本来想着只需要使用<code class="notranslate">iptables –j LOG</code> 就可以轻松实现目标，然而由于这两台服务器上的流量是巨大的。使用这种方式直接导致了 CPU 单核被打爆。</p>
-<p>于是找到了 <a href="https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf" rel="nofollow">这篇文章</a>](<a href="https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf)%EF%BC%8C%E5%AE%83%E6%8E%A8%E8%8D%90%E4%BA%86%E6%9C%AC%E6%96%87%E6%A0%87%E9%A2%98%E4%B8%AD%E6%8F%90%E5%88%B0%E7%9A%84" rel="nofollow">https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf)，它推荐了本文标题中提到的</a> ULogd。</p>
+<p>于是找到了 <a href="https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf" rel="nofollow">这篇文章</a>，它推荐了本文标题中提到的 ULogd。</p>
 <h2>简介</h2>
-<p>Ulogd 是 [<a href="http://netfilter.org/" rel="nofollow">netfilter.org</a>](<a href="http://netfilter.org/" rel="nofollow">http://netfilter.org/</a>) 的一个项目，它是一个运行在用户态的日志记录守护进程，用于 NetFilter/iptables 相关日志记录。</p>
+<p>Ulogd 是 <a href="http://netfilter.org/" rel="nofollow">netfilter</a> 的一个项目，它是一个运行在用户态的日志记录守护进程，用于 NetFilter/iptables 相关日志记录。</p>
 <p>在 Ubuntu 上，你可以轻松的通过 apt 进行安装。而在 CentOS 上，由于官方的 Repo 里面并没有这个东西。所以你需要手动编译安装它，或是使用 <a href="http://repo.iotti.biz/" rel="nofollow">http://repo.iotti.biz/</a> 提供的 Repo。</p>
 <p>在我的使用场景下，ulogd 能极大的提升 Iptables Log 的性能，几乎没有开销。</p>
 <h2>配置</h2>
