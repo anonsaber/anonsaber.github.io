@@ -312,9 +312,11 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    dnf module disable python36 virt
    ```
 
-2. 替换镜像源
+2. 安装 Perl，后续的步骤 5 需要
 
-   视网络情况的可选步骤，建议参考 <https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/> 进行。
+   ```bash
+   dnf install perl
+   ```
 
 3. 安装 CentOS Stream 9 核心包
 
@@ -328,57 +330,61 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    rpmconf -a
    ```
 
-5. 移除旧的 EPEL 包
+5. 替换镜像源
+
+   视网络情况的可选步骤，建议参考 <https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/> 进行。
+
+6. 移除旧的 EPEL 包
 
    ```bash
    dnf remove epel-release
    rm -rf /etc/yum.repos.d/epel*.repo
    ```
 
-6. 删除备份的镜像源配置文件
+7. 删除备份的镜像源配置文件
 
    ```bash
    rm -rf /etc/yum.repos.d/*.repo.rpmsave
    ```
 
-7. 安装 EPEL 9 和 EPEL Next 9
+8. 安装 EPEL 9 和 EPEL Next 9
 
    ```bash
    dnf install https://mirror.rackspace.com/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
    ```
 
- 8. 清理 DNF 缓存并重新生成缓存
+ 9. 清理 DNF 缓存并重新生成缓存
 
     ```bash
     dnf clean all
     dnf makecache
     ```
 
- 9. 删除旧的内核包
+ 10. 删除旧的内核包
 
     ```bash
     rpm -e `rpm -q kernel`
     ```
 
-10. 同步发行版软件包
+11. 同步发行版软件包
 
     ```bash
     dnf -y --releasever=9 --allowerasing --setopt=deltarpm=false distro-sync
     ```
 
-11. 再次清理 DNF 缓存
+12. 再次清理 DNF 缓存
 
     ```bash
     dnf clean all
     ```
 
-12. 强制重启服务器
+13. 强制重启服务器
 
     ```bash
     systemctl --force --force reboot
     ```
 
-13. 重置特定模块
+14. 重置特定模块
 
     实际情况可能不同，因此需要重置的模块也可能有所不同。请根据具体情况进行调整。
 
@@ -386,14 +392,14 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl satellite-5-client mysql
     ```
 
-14. 重建 RPM 数据库
+15. 重建 RPM 数据库
 
     ```bash
     rm -f /var/lib/rpm/__db*
     rpm --rebuilddb
     ```
 
-15. 更新核心和最小安装组：
+16. 更新核心和最小安装组：
 
     ```bash
     dnf -y groupupdate "Core" "Minimal Install"

@@ -306,8 +306,8 @@ package-cleanup --orphans</pre></div>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf module disable python36 virt</pre></div>
 </li>
 <li>
-<p>替换镜像源</p>
-<p>视网络情况的可选步骤，建议参考 <a href="https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/" rel="nofollow">https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/</a> 进行。</p>
+<p>安装 Perl，后续的步骤 5 需要</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install perl</pre></div>
 </li>
 <li>
 <p>安装 CentOS Stream 9 核心包</p>
@@ -316,6 +316,10 @@ package-cleanup --orphans</pre></div>
 <li>
 <p>再次运行 rpmconf 处理配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">rpmconf -a</pre></div>
+</li>
+<li>
+<p>替换镜像源</p>
+<p>视网络情况的可选步骤，建议参考 <a href="https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/" rel="nofollow">https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/</a> 进行。</p>
 </li>
 <li>
 <p>移除旧的 EPEL 包</p>
@@ -337,8 +341,13 @@ dnf makecache</pre></div>
 </li>
 <li>
 <p>删除旧的内核包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rpm -e <span class="pl-s"><span class="pl-pds">`</span>rpm -q kernel<span class="pl-pds">`</span></span></pre></div>
 </li>
+</ol>
+<pre class="notranslate"><code class="notranslate">```bash
+rpm -e `rpm -q kernel`
+```
+</code></pre>
+<ol start="11">
 <li>
 <p>同步发行版软件包</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf -y --releasever=9 --allowerasing --setopt=deltarpm=false distro-sync</pre></div>
