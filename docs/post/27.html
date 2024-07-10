@@ -199,6 +199,10 @@ dnf install https://mirror.rackspace.com/epel/epel-release-latest-8.noarch.rpm -
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove dracut-network sysvinit-tools dracut-network</pre></div>
 </li>
 <li>
+<p>移除旧版本的 rpmconf</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove python36-rpmconf</pre></div>
+</li>
+<li>
 <p>同步发行版软件包</p>
 <blockquote>
 <p><strong>这里将会将当前系统的包升级到 CentOS 8.5.2111</strong></p>
@@ -212,10 +216,6 @@ dnf install https://mirror.rackspace.com/epel/epel-release-latest-8.noarch.rpm -
 <li>
 <p>更新核心和最小安装组</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf -y --releasever=8.5.2111 groupupdate <span class="pl-s"><span class="pl-pds">"</span>Core<span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span>Minimal Install<span class="pl-pds">"</span></span></pre></div>
-</li>
-<li>
-<p>移除旧版本的 rpmconf</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf --releasever=8.5.2111 remove python36-rpmconf</pre></div>
 </li>
 <li>
 <p>安装最新版本的 rpmconf 和 yum-utils</p>

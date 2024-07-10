@@ -167,7 +167,13 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     dnf remove dracut-network sysvinit-tools dracut-network
     ```
 
-10. 同步发行版软件包
+10. 移除旧版本的 rpmconf
+
+    ```bash
+    dnf remove python36-rpmconf
+    ```
+
+11. 同步发行版软件包
 
     > **这里将会将当前系统的包升级到 CentOS 8.5.2111**
 
@@ -175,22 +181,16 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     dnf -y --releasever=8.5.2111 --allowerasing --setopt=deltarpm=false distro-sync
     ```
 
-11. 安装内核包
+12. 安装内核包
 
     ```bash
     dnf -y --releasever=8.5.2111 install kernel-core
     ```
 
-12. 更新核心和最小安装组
+13. 更新核心和最小安装组
 
     ```bash
     dnf -y --releasever=8.5.2111 groupupdate "Core" "Minimal Install"
-    ```
-
-13. 移除旧版本的 rpmconf
-
-    ```bash
-    dnf --releasever=8.5.2111 remove python36-rpmconf
     ```
 
 14. 安装最新版本的 rpmconf 和 yum-utils
