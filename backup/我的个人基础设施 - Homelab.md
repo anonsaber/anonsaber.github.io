@@ -2,6 +2,6 @@
 
 Version: 202403
 
-<img src="https://blog.motofans.club/homelab.svg">
+`Gmeek-html<img src="https://blog.motofans.club/homelab.svg">`
 
 <!-- ##{"timestamp":1616688000}## -->
