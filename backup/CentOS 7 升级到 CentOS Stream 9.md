@@ -363,7 +363,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 10. 删除旧的内核包
 
     ```bash
-    rpm -e `rpm -q kernel`
+    rpm -e $(rpm -q kernel)
     ```
 
 11. 同步发行版软件包
