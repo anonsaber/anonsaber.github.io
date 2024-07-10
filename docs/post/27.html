@@ -341,13 +341,8 @@ dnf makecache</pre></div>
 </li>
 <li>
 <p>删除旧的内核包</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">rpm -e <span class="pl-s"><span class="pl-pds">`</span>rpm -q kernel<span class="pl-pds">`</span></span></pre></div>
 </li>
-</ol>
-<pre class="notranslate"><code class="notranslate">```bash
-rpm -e `rpm -q kernel`
-```
-</code></pre>
-<ol start="11">
 <li>
 <p>同步发行版软件包</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf -y --releasever=9 --allowerasing --setopt=deltarpm=false distro-sync</pre></div>

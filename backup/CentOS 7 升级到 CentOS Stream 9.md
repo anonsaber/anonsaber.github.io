@@ -353,14 +353,14 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    dnf install https://mirror.rackspace.com/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
    ```
 
- 9. 清理 DNF 缓存并重新生成缓存
+9. 清理 DNF 缓存并重新生成缓存
 
     ```bash
     dnf clean all
     dnf makecache
     ```
 
- 10. 删除旧的内核包
+10. 删除旧的内核包
 
     ```bash
     rpm -e `rpm -q kernel`
