@@ -353,10 +353,8 @@ dnf makecache</pre></div>
 </li>
 <li>
 <p>卸载 CentOS Stream 9 中不受支持的安装包</p>
-</li>
-</ol>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove iptables-ebtables</pre></div>
-<ol start="13">
+</li>
 <li>
 <p>同步发行版软件包</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf -y --releasever=9 --allowerasing --setopt=deltarpm=false distro-sync</pre></div>
