@@ -128,7 +128,19 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y
    ```
 
-4. 修改 EPEL 镜像源配置文件
+4. 再次运行 rpmconf 以处理配置文件
+
+    ```bash
+    rpmconf -a
+    ```
+
+5. 删除备份的镜像源配置文件
+
+    ```bash
+    rm -rf /etc/yum.repos.d/CentOS-*.repo.rpmsave
+    ```
+
+6. 修改 EPEL 镜像源配置文件
 
    ```bash
    sed -e 's|^metalink=|#metalink=|g' \
@@ -137,31 +149,19 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
        -i /etc/yum.repos.d/epel*.repo
    ```
 
- 5. 再次运行 rpmconf 以处理配置文件
-
-    ```bash
-    rpmconf -a
-    ```
-
- 6. 删除旧的内核包
+7. 删除旧的内核包
 
     ```bash
     rpm -e $(rpm -q kernel)
     ```
 
- 7. 删除备份的镜像源配置文件
-
-    ```bash
-    rm -rf /etc/yum.repos.d/CentOS-*.repo.rpmsave
-    ```
-
- 8. 清理 DNF 缓存
+8. 清理 DNF 缓存
 
     ```bash
     dnf clean all
     ```
 
- 9. 移除不兼容的软件包
+9. 移除不兼容的软件包
 
     ```bash
     dnf remove dracut-network sysvinit-tools dracut-network
