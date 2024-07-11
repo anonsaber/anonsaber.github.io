@@ -379,7 +379,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 12. 卸载 CentOS Stream 9 中不受支持的安装包
 
     ```bash
-    dnf remove iptables-ebtables
+    dnf remove iptables-ebtables initscripts
     ```
 
 14. 同步发行版软件包
