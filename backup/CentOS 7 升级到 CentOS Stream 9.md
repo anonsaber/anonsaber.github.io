@@ -8,7 +8,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 > **由于 openssh-server 的升级，可能会造成过于陈旧的密钥格式无法使用，请做好相关预案。**
 
 >  [!NOTE]
-> **本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源**
+> **本文中的 mirrors.tuna.tsinghua.edu.cn 可以替换为 mirror.rackspace.com 或是其他的镜像源**
 
 ## 更新 CentOS 7
 
@@ -20,7 +20,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
    ```bash
    sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-       -e 's|^#baseurl=http://mirror.centos.org/centos|baseurl=https://mirror.rackspace.com/centos-vault/centos|g' \
+       -e 's|^#baseurl=http://mirror.centos.org/centos|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g' \
        -i /etc/yum.repos.d/*.repo
    ```
 2. 清理 YUM 缓存并重新生成缓存
@@ -37,15 +37,15 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 4. 安装 EPEL（Extra Packages for Enterprise Linux）仓库，以便能够访问更多的软件包
 
    ```bash
-   yum install https://mirror.rackspace.com/epel/epel-release-latest-7.noarch.rpm -y
+   yum install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-7.noarch.rpm -y
    ```
 5. 修改 EPEL 仓库配置文件，以确保使用正确的镜像源
 
    ```bash
    sed -e 's|^metalink=|#metalink=|g' \
        -e 's|^#baseurl=|baseurl=|g' \
-       -e 's|https\?://download\.fedoraproject\.org/pub/epel|https://mirror.rackspace.com/epel|g' \
-       -e 's|https\?://download\.example/pub/epel|https://mirror.rackspace.com/epel|g' \
+       -e 's|https\?://download\.fedoraproject\.org/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g' \
+       -e 's|https\?://download\.example/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g' \
        -i /etc/yum.repos.d/epel{,-testing}.repo
    ```
 6. 重新生成 YUM 缓存并进行系统升级
@@ -109,14 +109,14 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 1. 安装 CentOS 8 核心包
 
    ```bash
-   dnf install https://mirror.rackspace.com/centos-vault/8.5.2111/BaseOS/x86_64/os/Packages/{centos-linux-repos-8-3.el8.noarch.rpm,centos-linux-release-8.5-1.2111.el8.noarch.rpm,centos-gpg-keys-8-3.el8.noarch.rpm} -y
+   dnf install http://mirrors.tuna.tsinghua.edu.cn/centos-vault/8.5.2111/BaseOS/x86_64/os/Packages/{centos-linux-repos-8-3.el8.noarch.rpm,centos-linux-release-8.5-1.2111.el8.noarch.rpm,centos-gpg-keys-8-3.el8.noarch.rpm} -y
    ```
 
 2. 修改镜像源配置文件
 
    ```bash
    sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-       -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g' \
+       -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g' \
        -i /etc/yum.repos.d/CentOS-*.repo
    ```
 
@@ -125,15 +125,15 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    ```bash
    dnf remove epel-release
    rm -rf /etc/yum.repos.d/epel*.repo
-   dnf install https://mirror.rackspace.com/epel/epel-release-latest-8.noarch.rpm -y
+   dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y
    ```
 
 4. 修改 EPEL 镜像源配置文件
 
    ```bash
    sed -e 's|^metalink=|#metalink=|g' \
-       -e 's|^#baseurl=https\?://download.fedoraproject.org/pub/epel/|baseurl=https://mirror.rackspace.com/epel/|g' \
-       -e 's|^#baseurl=https\?://download.example/pub/epel/|baseurl=https://mirror.rackspace.com/epel/|g' \
+       -e 's|^#baseurl=https\?://download.fedoraproject.org/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g' \
+       -e 's|^#baseurl=https\?://download.example/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g' \
        -i /etc/yum.repos.d/epel*.repo
    ```
 
@@ -253,7 +253,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
     ```bash
     sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-        -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g' \
+        -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g' \
         -i /etc/yum.repos.d/CentOS-Stream-*.repo
     ```
 
@@ -279,7 +279,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
     ```bash
     sed -e 's|^mirrorlist=|#mirrorlist=|g' \
-        -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g' \
+        -e 's|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g' \
         -i /etc/yum.repos.d/CentOS-Stream-*.repo
     ```
 
@@ -321,7 +321,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 3. 安装 CentOS Stream 9 核心包
 
    ```bash
-   dnf install https://mirror.rackspace.com/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}
+   dnf install http://mirrors.tuna.tsinghua.edu.cn/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}
    ```
 
 4. 再次运行 rpmconf 处理配置文件
@@ -332,7 +332,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
 5. 替换镜像源
 
-   视网络情况的可选步骤，建议参考 <https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/> 进行。
+   视网络情况的可选步骤，建议参考 <http://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/> 进行。
 
 6. 移除旧的 EPEL 包
 
@@ -350,7 +350,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 8. 安装 EPEL 9 和 EPEL Next 9
 
    ```bash
-   dnf install https://mirror.rackspace.com/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
+   dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
    ```
 
 9. 清理 DNF 缓存并重新生成缓存

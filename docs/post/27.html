@@ -70,7 +70,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <strong>由于发行版升级可能造成网卡名字的变动，所以请做好准备使用 VNC 或是显示器处理此问题。</strong><br>
 <strong>由于 openssh-server 的升级，可能会造成过于陈旧的密钥格式无法使用，请做好相关预案。</strong></p>
 </div>
-<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p><strong>本文中的 mirror.rackspace.com 可以替换为 mirrors.tuna.tsinghua.edu.cn 或是其他的镜像源</strong></p>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p><strong>本文中的 mirrors.tuna.tsinghua.edu.cn 可以替换为 mirror.rackspace.com 或是其他的镜像源</strong></p>
 </div>
 <h2>更新 CentOS 7</h2>
 <p>在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。</p>
@@ -79,7 +79,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>启用 CentOS 的归档源</p>
 <p>由于默认的 mirrorlist 已经停止解析，所以我们需要手动启用 CentOS 的归档源。</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^mirrorlist=|#mirrorlist=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/centos|baseurl=https://mirror.rackspace.com/centos-vault/centos|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/centos|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g<span class="pl-pds">'</span></span> \
     -i /etc/yum.repos.d/<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
@@ -93,14 +93,14 @@ yum makecache </pre></div>
 </li>
 <li>
 <p>安装 EPEL（Extra Packages for Enterprise Linux）仓库，以便能够访问更多的软件包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">yum install https://mirror.rackspace.com/epel/epel-release-latest-7.noarch.rpm -y</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">yum install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-7.noarch.rpm -y</pre></div>
 </li>
 <li>
 <p>修改 EPEL 仓库配置文件，以确保使用正确的镜像源</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^metalink=|#metalink=|g<span class="pl-pds">'</span></span> \
     -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=|baseurl=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.fedoraproject\.org/pub/epel|https://mirror.rackspace.com/epel|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.example/pub/epel|https://mirror.rackspace.com/epel|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.fedoraproject\.org/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.example/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g<span class="pl-pds">'</span></span> \
     -i /etc/yum.repos.d/epel{,-testing}.repo</pre></div>
 </li>
 <li>
@@ -157,25 +157,25 @@ package-cleanup --orphans</pre></div>
 <ol>
 <li>
 <p>安装 CentOS 8 核心包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install https://mirror.rackspace.com/centos-vault/8.5.2111/BaseOS/x86_64/os/Packages/{centos-linux-repos-8-3.el8.noarch.rpm,centos-linux-release-8.5-1.2111.el8.noarch.rpm,centos-gpg-keys-8-3.el8.noarch.rpm} -y</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/centos-vault/8.5.2111/BaseOS/x86_64/os/Packages/{centos-linux-repos-8-3.el8.noarch.rpm,centos-linux-release-8.5-1.2111.el8.noarch.rpm,centos-gpg-keys-8-3.el8.noarch.rpm} -y</pre></div>
 </li>
 <li>
 <p>修改镜像源配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^mirrorlist=|#mirrorlist=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g<span class="pl-pds">'</span></span> \
     -i /etc/yum.repos.d/CentOS-<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
 <p>移除 EPEL 7 并安装 EPEL 8</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release
 rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo
-dnf install https://mirror.rackspace.com/epel/epel-release-latest-8.noarch.rpm -y</pre></div>
+dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y</pre></div>
 </li>
 <li>
 <p>修改 EPEL 镜像源配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^metalink=|#metalink=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.fedoraproject.org/pub/epel/|baseurl=https://mirror.rackspace.com/epel/|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.example/pub/epel/|baseurl=https://mirror.rackspace.com/epel/|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.fedoraproject.org/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.example/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g<span class="pl-pds">'</span></span> \
     -i /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
@@ -262,7 +262,7 @@ package-cleanup --orphans</pre></div>
 <li>
 <p>修改 CentOS Stream 镜像源配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^mirrorlist=|#mirrorlist=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g<span class="pl-pds">'</span></span> \
     -i /etc/yum.repos.d/CentOS-Stream-<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
@@ -280,7 +280,7 @@ package-cleanup --orphans</pre></div>
 <li>
 <p>再一次修改 CentOS Stream 镜像源配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^mirrorlist=|#mirrorlist=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=https://mirror.rackspace.com/centos-vault/centos|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=http://mirror.centos.org/$contentdir|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g<span class="pl-pds">'</span></span> \
     -i /etc/yum.repos.d/CentOS-Stream-<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
@@ -311,7 +311,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>安装 CentOS Stream 9 核心包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install https://mirror.rackspace.com/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}</pre></div>
 </li>
 <li>
 <p>再次运行 rpmconf 处理配置文件</p>
@@ -319,7 +319,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>替换镜像源</p>
-<p>视网络情况的可选步骤，建议参考 <a href="https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/" rel="nofollow">https://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/</a> 进行。</p>
+<p>视网络情况的可选步骤，建议参考 <a href="http://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/" rel="nofollow">http://mirrors.tuna.tsinghua.edu.cn/help/centos-stream/</a> 进行。</p>
 </li>
 <li>
 <p>移除旧的 EPEL 包</p>
@@ -332,7 +332,7 @@ rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
 <p>安装 EPEL 9 和 EPEL Next 9</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install https://mirror.rackspace.com/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}</pre></div>
 </li>
 <li>
 <p>清理 DNF 缓存并重新生成缓存</p>
