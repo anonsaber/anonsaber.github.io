@@ -420,3 +420,9 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     ```bash
     dnf -y groupupdate "Core" "Minimal Install"
     ```
+
+20. 同步发行版软件包
+
+    ```bash
+    dnf -y distro-sync
+    ```
