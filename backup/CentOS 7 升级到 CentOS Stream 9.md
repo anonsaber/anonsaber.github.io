@@ -376,25 +376,31 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     rpm -e $(rpm -q kernel)
     ```
 
-12. 同步发行版软件包
+12. 卸载 CentOS Stream 9 中不受支持的安装包
+
+   ```bash
+   dnf remove iptables-ebtables
+   ```
+
+13. 同步发行版软件包
 
     ```bash
     dnf -y --releasever=9 --allowerasing --setopt=deltarpm=false distro-sync
     ```
 
-13. 再次清理 DNF 缓存
+14. 再次清理 DNF 缓存
 
     ```bash
     dnf clean all
     ```
 
-14. 强制重启服务器
+15. 强制重启服务器
 
     ```bash
     systemctl --force --force reboot
     ```
 
-15. 重置特定模块
+16. 重置特定模块
 
     实际情况可能不同，因此需要重置的模块也可能有所不同。请根据具体情况进行调整。
 
@@ -402,14 +408,14 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl satellite-5-client mysql
     ```
 
-16. 重建 RPM 数据库
+17. 重建 RPM 数据库
 
     ```bash
     rm -f /var/lib/rpm/__db*
     rpm --rebuilddb
     ```
 
-17. 更新核心和最小安装组：
+18. 更新核心和最小安装组：
 
     ```bash
     dnf -y groupupdate "Core" "Minimal Install"
