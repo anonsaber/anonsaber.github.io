@@ -335,6 +335,14 @@ rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}</pre></div>
 </li>
 <li>
+<p>修改 EPEL 9 镜像源文件</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s!^metalink=!#metalink=!g<span class="pl-pds">'</span></span> \
+       -e <span class="pl-s"><span class="pl-pds">'</span>s!^#baseurl=!baseurl=!g<span class="pl-pds">'</span></span> \
+       -e <span class="pl-s"><span class="pl-pds">'</span>s!https\?://download\.fedoraproject\.org/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g<span class="pl-pds">'</span></span> \
+       -e <span class="pl-s"><span class="pl-pds">'</span>s!https\?://download\.example/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g<span class="pl-pds">'</span></span> \
+       -i /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
+</li>
+<li>
 <p>清理 DNF 缓存并重新生成缓存</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf clean all
 dnf makecache</pre></div>

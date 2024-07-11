@@ -353,38 +353,48 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
    ```
 
-9. 清理 DNF 缓存并重新生成缓存
+9. 修改 EPEL 9 镜像源文件
+
+    ```bash
+    sed -e 's!^metalink=!#metalink=!g' \
+           -e 's!^#baseurl=!baseurl=!g' \
+           -e 's!https\?://download\.fedoraproject\.org/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g' \
+           -e 's!https\?://download\.example/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g' \
+           -i /etc/yum.repos.d/epel*.repo
+    ```
+
+10. 清理 DNF 缓存并重新生成缓存
 
     ```bash
     dnf clean all
     dnf makecache
     ```
 
-10. 删除旧的内核包
+11. 删除旧的内核包
 
     ```bash
     rpm -e $(rpm -q kernel)
     ```
 
-11. 同步发行版软件包
+12. 同步发行版软件包
 
     ```bash
     dnf -y --releasever=9 --allowerasing --setopt=deltarpm=false distro-sync
     ```
 
-12. 再次清理 DNF 缓存
+13. 再次清理 DNF 缓存
 
     ```bash
     dnf clean all
     ```
 
-13. 强制重启服务器
+14. 强制重启服务器
 
     ```bash
     systemctl --force --force reboot
     ```
 
-14. 重置特定模块
+15. 重置特定模块
 
     实际情况可能不同，因此需要重置的模块也可能有所不同。请根据具体情况进行调整。
 
@@ -392,14 +402,14 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl satellite-5-client mysql
     ```
 
-15. 重建 RPM 数据库
+16. 重建 RPM 数据库
 
     ```bash
     rm -f /var/lib/rpm/__db*
     rpm --rebuilddb
     ```
 
-16. 更新核心和最小安装组：
+17. 更新核心和最小安装组：
 
     ```bash
     dnf -y groupupdate "Core" "Minimal Install"
