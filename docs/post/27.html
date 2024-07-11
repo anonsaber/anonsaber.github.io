@@ -96,12 +96,12 @@ yum makecache </pre></div>
 <div class="highlight highlight-source-shell"><pre class="notranslate">yum install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-7.noarch.rpm -y</pre></div>
 </li>
 <li>
-<p>修改 EPEL 仓库配置文件，以确保使用正确的镜像源</p>
+<p>修改 EPEL 的镜像源文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^metalink=|#metalink=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=|baseurl=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.fedoraproject\.org/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.example/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g<span class="pl-pds">'</span></span> \
-    -i /etc/yum.repos.d/epel{,-testing}.repo</pre></div>
+       -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=|baseurl=|g<span class="pl-pds">'</span></span> \
+       -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.fedoraproject\.org/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g<span class="pl-pds">'</span></span> \
+       -e <span class="pl-s"><span class="pl-pds">'</span>s|https\?://download\.example/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g<span class="pl-pds">'</span></span> \
+       -i /etc/yum.repos.d/epel{,-testing}.repo</pre></div>
 </li>
 <li>
 <p>重新生成 YUM 缓存并进行系统升级</p>

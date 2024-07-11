@@ -39,14 +39,14 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    ```bash
    yum install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-7.noarch.rpm -y
    ```
-5. 修改 EPEL 仓库配置文件，以确保使用正确的镜像源
+5. 修改 EPEL 的镜像源文件
 
    ```bash
    sed -e 's|^metalink=|#metalink=|g' \
-       -e 's|^#baseurl=|baseurl=|g' \
-       -e 's|https\?://download\.fedoraproject\.org/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g' \
-       -e 's|https\?://download\.example/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g' \
-       -i /etc/yum.repos.d/epel{,-testing}.repo
+          -e 's|^#baseurl=|baseurl=|g' \
+          -e 's|https\?://download\.fedoraproject\.org/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g' \
+          -e 's|https\?://download\.example/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g' \
+          -i /etc/yum.repos.d/epel{,-testing}.repo
    ```
 6. 重新生成 YUM 缓存并进行系统升级
 
