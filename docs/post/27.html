@@ -168,10 +168,13 @@ package-cleanup --orphans</pre></div>
     -i /etc/yum.repos.d/CentOS-<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
-<p>移除 EPEL 7 并安装 EPEL 8</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release
-rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo
-dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y</pre></div>
+<p>移除 EPEL 7 并</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo
+dnf remove epel-release</pre></div>
+</li>
+<li>
+<p>安装 EPEL 8</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y</pre></div>
 </li>
 <li>
 <p>再次运行 rpmconf 以处理配置文件</p>

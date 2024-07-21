@@ -120,27 +120,32 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
        -i /etc/yum.repos.d/CentOS-*.repo
    ```
 
-3. 移除 EPEL 7 并安装 EPEL 8
+3. 移除 EPEL 7 并
 
    ```bash
-   dnf remove epel-release
    rm -rf /etc/yum.repos.d/epel*.repo
+   dnf remove epel-release
+   ```
+
+4. 安装 EPEL 8
+
+   ```bash
    dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y
    ```
 
-4. 再次运行 rpmconf 以处理配置文件
+5. 再次运行 rpmconf 以处理配置文件
 
     ```bash
     rpmconf -a
     ```
 
-5. 删除备份的镜像源配置文件
+6. 删除备份的镜像源配置文件
 
     ```bash
     rm -rf /etc/yum.repos.d/CentOS-*.repo.rpmsave
     ```
 
-6. 修改 EPEL 镜像源配置文件
+7. 修改 EPEL 镜像源配置文件
 
    ```bash
    sed -e 's|^metalink=|#metalink=|g' \
@@ -149,31 +154,31 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
        -i /etc/yum.repos.d/epel*.repo
    ```
 
-7. 删除旧的内核包
+8. 删除旧的内核包
 
     ```bash
     rpm -e $(rpm -q kernel)
     ```
 
-8. 清理 DNF 缓存
+9. 清理 DNF 缓存
 
     ```bash
     dnf clean all
     ```
 
-9. 移除不兼容的软件包
+10. 移除不兼容的软件包
 
     ```bash
     dnf remove dracut-network sysvinit-tools dracut-network
     ```
 
-10. 移除旧版本的 rpmconf
+11. 移除旧版本的 rpmconf
 
     ```bash
     dnf remove python36-rpmconf
     ```
 
-11. 同步发行版软件包
+12. 同步发行版软件包
 
     > **这里将会将当前系统的包升级到 CentOS 8.5.2111**
 
@@ -181,31 +186,31 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     dnf -y --releasever=8.5.2111 --allowerasing --setopt=deltarpm=false distro-sync
     ```
 
-12. 安装内核包
+13. 安装内核包
 
     ```bash
     dnf -y --releasever=8.5.2111 install kernel-core
     ```
 
-13. 更新核心和最小安装组
+14. 更新核心和最小安装组
 
     ```bash
     dnf -y --releasever=8.5.2111 groupupdate "Core" "Minimal Install"
     ```
 
-14. 安装最新版本的 rpmconf 和 yum-utils
+15. 安装最新版本的 rpmconf 和 yum-utils
 
     ```bash
     dnf --releasever=8.5.2111 install rpmconf yum-utils
     ```
 
-15. 再次运行 rpmconf 处理配置文件
+16. 再次运行 rpmconf 处理配置文件
 
     ```bash
     rpmconf -a 
     ```
 
-16. 移除不需要的软件包和额外的软件包
+17. 移除不需要的软件包和额外的软件包
 
     > **这些软件包理论上都应该移除掉，但是请务必逐个确认是否已经有备份，以及后续是否有替代的工具。**
 
@@ -216,13 +221,13 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     dnf --releasever=8.5.2111 remove -y $(dnf --releasever=8.5.2111 repoquery --extras)
     ```
 
-17. 自动移除未使用的软件包
+18. 自动移除未使用的软件包
 
     ```bash
     dnf --releasever=8.5.2111 autoremove -y
     ```
 
-18. 使用 package-cleanup 工具进一步清理系统
+19. 使用 package-cleanup 工具进一步清理系统
 
     ```bash
     package-cleanup --leaves
@@ -415,13 +420,13 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     rpm --rebuilddb
     ```
 
-19. 更新核心和最小安装组：
+20. 更新核心和最小安装组：
 
     ```bash
     dnf -y groupupdate "Core" "Minimal Install"
     ```
 
-20. 同步发行版软件包
+21. 同步发行版软件包
 
     ```bash
     dnf -y distro-sync
