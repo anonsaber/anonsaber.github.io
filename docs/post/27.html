@@ -168,7 +168,7 @@ package-cleanup --orphans</pre></div>
     -i /etc/yum.repos.d/CentOS-<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
-<p>移除 EPEL 7 并</p>
+<p>移除 EPEL 7</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo
 dnf remove epel-release</pre></div>
 </li>
@@ -177,19 +177,19 @@ dnf remove epel-release</pre></div>
 <div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y</pre></div>
 </li>
 <li>
+<p>修改 EPEL 镜像源配置文件</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^metalink=|#metalink=|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.fedoraproject.org/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g<span class="pl-pds">'</span></span> \
+    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.example/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g<span class="pl-pds">'</span></span> \
+    -i /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
+</li>
+<li>
 <p>再次运行 rpmconf 以处理配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">rpmconf -a</pre></div>
 </li>
 <li>
 <p>删除备份的镜像源配置文件</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum.repos.d/CentOS-<span class="pl-k">*</span>.repo.rpmsave</pre></div>
-</li>
-<li>
-<p>修改 EPEL 镜像源配置文件</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sed -e <span class="pl-s"><span class="pl-pds">'</span>s|^metalink=|#metalink=|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.fedoraproject.org/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g<span class="pl-pds">'</span></span> \
-    -e <span class="pl-s"><span class="pl-pds">'</span>s|^#baseurl=https\?://download.example/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g<span class="pl-pds">'</span></span> \
-    -i /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
 <p>删除旧的内核包</p>

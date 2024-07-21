@@ -120,7 +120,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
        -i /etc/yum.repos.d/CentOS-*.repo
    ```
 
-3. 移除 EPEL 7 并
+3. 移除 EPEL 7
 
    ```bash
    rm -rf /etc/yum.repos.d/epel*.repo
@@ -133,19 +133,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-8.noarch.rpm -y
    ```
 
-5. 再次运行 rpmconf 以处理配置文件
-
-    ```bash
-    rpmconf -a
-    ```
-
-6. 删除备份的镜像源配置文件
-
-    ```bash
-    rm -rf /etc/yum.repos.d/CentOS-*.repo.rpmsave
-    ```
-
-7. 修改 EPEL 镜像源配置文件
+5. 修改 EPEL 镜像源配置文件
 
    ```bash
    sed -e 's|^metalink=|#metalink=|g' \
@@ -153,6 +141,18 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
        -e 's|^#baseurl=https\?://download.example/pub/epel/|baseurl=http://mirrors.tuna.tsinghua.edu.cn/epel/|g' \
        -i /etc/yum.repos.d/epel*.repo
    ```
+
+6. 再次运行 rpmconf 以处理配置文件
+
+    ```bash
+    rpmconf -a
+    ```
+
+7. 删除备份的镜像源配置文件
+
+    ```bash
+    rm -rf /etc/yum.repos.d/CentOS-*.repo.rpmsave
+    ```
 
 8. 删除旧的内核包
 
