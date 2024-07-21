@@ -365,7 +365,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
            -e 's!^#baseurl=!baseurl=!g' \
            -e 's!https\?://download\.fedoraproject\.org/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g' \
            -e 's!https\?://download\.example/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g' \
-           -i /etc/yum.repos.d/epel*.repo
+           -i /etc/yum.repos.d/{epel-next.repo,epel-next-testing.repo,epel.repo,epel-testing.repo}
     ```
 
 10. 清理 DNF 缓存并重新生成缓存

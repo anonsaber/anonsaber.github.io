@@ -345,7 +345,7 @@ rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
        -e <span class="pl-s"><span class="pl-pds">'</span>s!^#baseurl=!baseurl=!g<span class="pl-pds">'</span></span> \
        -e <span class="pl-s"><span class="pl-pds">'</span>s!https\?://download\.fedoraproject\.org/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g<span class="pl-pds">'</span></span> \
        -e <span class="pl-s"><span class="pl-pds">'</span>s!https\?://download\.example/pub/epel!http://mirrors.tuna.tsinghua.edu.cn/epel!g<span class="pl-pds">'</span></span> \
-       -i /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
+       -i /etc/yum.repos.d/{epel-next.repo,epel-next-testing.repo,epel.repo,epel-testing.repo}</pre></div>
 </li>
 <li>
 <p>清理 DNF 缓存并重新生成缓存</p>
