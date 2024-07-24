@@ -169,8 +169,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>移除 EPEL 7</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo
-dnf remove epel-release</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release</pre></div>
 </li>
 <li>
 <p>安装 EPEL 8</p>
@@ -328,8 +327,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>移除旧的 EPEL 包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release
-rm -rf /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release</pre></div>
 </li>
 <li>
 <p>删除备份的镜像源配置文件</p>

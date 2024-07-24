@@ -123,7 +123,6 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 3. 移除 EPEL 7
 
    ```bash
-   rm -rf /etc/yum.repos.d/epel*.repo
    dnf remove epel-release
    ```
 
@@ -343,7 +342,6 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 
    ```bash
    dnf remove epel-release
-   rm -rf /etc/yum.repos.d/epel*.repo
    ```
 
 7. 删除备份的镜像源配置文件
