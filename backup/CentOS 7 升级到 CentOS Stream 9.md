@@ -387,7 +387,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 11. 删除旧的内核包
 
     ```bash
-    rpm -e $(rpm -q kernel)
+    rpm -e $(rpm -q kernel-core crda NetworkManager-wifi)
     ```
 
 12. 卸载 CentOS Stream 9 中不受支持的安装包
