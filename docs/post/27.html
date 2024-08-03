@@ -169,7 +169,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>移除 EPEL 7</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release -y</pre></div>
 </li>
 <li>
 <p>安装 EPEL 8</p>
@@ -200,11 +200,11 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>移除不兼容的软件包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove dracut-network sysvinit-tools</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove dracut-network sysvinit-tools -y</pre></div>
 </li>
 <li>
 <p>移除旧版本的 rpmconf</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove python36-rpmconf</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove python36-rpmconf -y</pre></div>
 </li>
 <li>
 <p>同步发行版软件包</p>
@@ -257,11 +257,11 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>刷新并更新软件包：</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf --releasever=8.5.2111 upgrade --refresh -y</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf -y --releasever=8.5.2111 upgrade --refresh</pre></div>
 </li>
 <li>
 <p>安装 CentOS Stream 发布包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf --releasever=8.5.2111 install centos-release-stream</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf  -y --releasever=8.5.2111 install centos-release-stream</pre></div>
 </li>
 <li>
 <p>修改 CentOS Stream 镜像源配置文件</p>
@@ -271,7 +271,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>切换到 CentOS Stream 仓库</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf --releasever=8.5.2111 swap centos-{linux,stream}-repos</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf -y --releasever=8.5.2111 swap centos-{linux,stream}-repos</pre></div>
 </li>
 <li>
 <p>再次运行 rpmconf 处理配置文件</p>
@@ -311,11 +311,11 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>安装 Perl，后续的步骤 5 需要</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install perl</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install perl -y</pre></div>
 </li>
 <li>
 <p>安装 CentOS Stream 9 核心包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install -y http://mirrors.tuna.tsinghua.edu.cn/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}</pre></div>
 </li>
 <li>
 <p>再次运行 rpmconf 处理配置文件</p>
@@ -327,7 +327,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>移除旧的 EPEL 包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove epel-release -y</pre></div>
 </li>
 <li>
 <p>删除备份的镜像源配置文件</p>
@@ -335,7 +335,7 @@ package-cleanup --orphans</pre></div>
 </li>
 <li>
 <p>安装 EPEL 9 和 EPEL Next 9</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf install -y http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}</pre></div>
 </li>
 <li>
 <p>修改 EPEL 9 镜像源文件</p>
@@ -356,7 +356,7 @@ dnf makecache</pre></div>
 </li>
 <li>
 <p>卸载 CentOS Stream 9 中不受支持的安装包</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove iptables-ebtables initscripts</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf remove iptables-ebtables initscripts -y</pre></div>
 </li>
 <li>
 <p>同步发行版软件包</p>

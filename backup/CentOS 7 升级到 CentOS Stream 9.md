@@ -134,7 +134,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 3. 移除 EPEL 7
 
    ```bash
-   dnf remove epel-release
+   dnf remove epel-release -y
    ```
 
 4. 安装 EPEL 8
@@ -179,13 +179,13 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 10. 移除不兼容的软件包
 
     ```bash
-    dnf remove dracut-network sysvinit-tools
+    dnf remove dracut-network sysvinit-tools -y
     ```
 
 11. 移除旧版本的 rpmconf
 
     ```bash
-    dnf remove python36-rpmconf
+    dnf remove python36-rpmconf -y
     ```
 
 12. 同步发行版软件包
@@ -255,13 +255,13 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 21. 刷新并更新软件包：
 
     ```bash
-    dnf --releasever=8.5.2111 upgrade --refresh -y
+    dnf -y --releasever=8.5.2111 upgrade --refresh
     ```
 
 22. 安装 CentOS Stream 发布包
 
     ```bash
-    dnf --releasever=8.5.2111 install centos-release-stream
+    dnf  -y --releasever=8.5.2111 install centos-release-stream
     ```
 
 23. 修改 CentOS Stream 镜像源配置文件
@@ -275,7 +275,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 24. 切换到 CentOS Stream 仓库
 
     ```bash
-    dnf --releasever=8.5.2111 swap centos-{linux,stream}-repos
+    dnf -y --releasever=8.5.2111 swap centos-{linux,stream}-repos
     ```
 
 25. 再次运行 rpmconf 处理配置文件
@@ -330,13 +330,13 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 2. 安装 Perl，后续的步骤 5 需要
 
    ```bash
-   dnf install perl
+   dnf install perl -y
    ```
 
 3. 安装 CentOS Stream 9 核心包
 
    ```bash
-   dnf install http://mirrors.tuna.tsinghua.edu.cn/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}
+   dnf install -y http://mirrors.tuna.tsinghua.edu.cn/centos-stream/9-stream/BaseOS/x86_64/os/Packages/{centos-stream-repos-9.0-26.el9.noarch.rpm,centos-stream-release-9.0-26.el9.noarch.rpm,centos-gpg-keys-9.0-26.el9.noarch.rpm}
    ```
 
 4. 再次运行 rpmconf 处理配置文件
@@ -352,7 +352,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 6. 移除旧的 EPEL 包
 
    ```bash
-   dnf remove epel-release
+   dnf remove epel-release -y
    ```
 
 7. 删除备份的镜像源配置文件
@@ -364,7 +364,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 8. 安装 EPEL 9 和 EPEL Next 9
 
    ```bash
-   dnf install http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
+   dnf install -y http://mirrors.tuna.tsinghua.edu.cn/epel/{epel-release-latest-9.noarch.rpm,epel-next-release-latest-9.noarch.rpm}
    ```
 
 9. 修改 EPEL 9 镜像源文件
@@ -393,7 +393,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 12. 卸载 CentOS Stream 9 中不受支持的安装包
 
     ```bash
-    dnf remove iptables-ebtables initscripts
+    dnf remove iptables-ebtables initscripts -y
     ```
 
 13. 同步发行版软件包
