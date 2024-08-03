@@ -1,9 +1,7 @@
-CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterprise Linux 的免费社区版，一直以来在服务器操作系统领域占据着重要地位。
-
-本文将介绍如何将 CentOS 7 升级到 CentOS Stream 9，如果你公司的 CTO 并没有计划更换到其他的 Linux 发行版，本文可能对你有所帮助。
+Although CentOS 7/8/Stream-8 was already EOL, as the community distro of Red Hat Enterprise Linux, CentOS have long held an important position in the field of server operating systems.
 
 >  [!IMPORTANT]
-> **开始操作前，请确保对重要数据已经完成了非本机的备份。**
+> **You must be sure that you have finished backing up of the important data before upgrading.**
 > **由于发行版升级可能造成网卡名字的变动，所以请做好准备使用 VNC 或是显示器处理此问题。**
 > **由于 openssh-server 的升级，可能会造成过于陈旧的密钥格式无法使用，请做好相关预案。**
 
