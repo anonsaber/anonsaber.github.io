@@ -411,7 +411,8 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 15. 重建 RPM 数据库
 
     ```bash
-    rm -f /var/lib/rpm/__db*
+    rm -rf /etc/yum
+    rm -rf /var/lib/rpm/__db*
     rpm --rebuilddb
     dnf makecache
     ```
@@ -421,7 +422,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
     实际情况可能不同，因此需要重置的模块也可能有所不同。请根据具体情况进行调整。
 
     ```bash
-    dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl satellite-5-client mysql
+    dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl python27 mariadb
     ```
 
 17. 更新核心和最小安装组：

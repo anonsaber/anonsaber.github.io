@@ -368,14 +368,15 @@ dnf makecache</pre></div>
 </li>
 <li>
 <p>重建 RPM 数据库</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rm -f /var/lib/rpm/__db<span class="pl-k">*</span>
+<div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum
+rm -rf /var/lib/rpm/__db<span class="pl-k">*</span>
 rpm --rebuilddb
 dnf makecache</pre></div>
 </li>
 <li>
 <p>重置特定模块</p>
 <p>实际情况可能不同，因此需要重置的模块也可能有所不同。请根据具体情况进行调整。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl satellite-5-client mysql</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl python27 mariadb</pre></div>
 </li>
 <li>
 <p>更新核心和最小安装组：</p>
