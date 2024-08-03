@@ -179,7 +179,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
 10. 移除不兼容的软件包
 
     ```bash
-    dnf remove dracut-network sysvinit-tools dracut-network
+    dnf remove dracut-network sysvinit-tools
     ```
 
 11. 移除旧版本的 rpmconf
