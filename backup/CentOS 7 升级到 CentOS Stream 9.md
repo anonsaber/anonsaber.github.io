@@ -152,16 +152,16 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
        -i /etc/yum.repos.d/epel*.repo
    ```
 
-6. 再次运行 rpmconf 以处理配置文件
+6. 删除备份的镜像源配置文件
+
+    ```bash
+    rm -rf /etc/yum.repos.d/*.repo.rpmsave
+    ```
+
+7. 再次运行 rpmconf 以处理配置文件
 
     ```bash
     rpmconf -a
-    ```
-
-7. 删除备份的镜像源配置文件
-
-    ```bash
-    rm -rf /etc/yum.repos.d/CentOS-*.repo.rpmsave
     ```
 
 8. 删除旧的内核包

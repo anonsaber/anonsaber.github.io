@@ -183,12 +183,12 @@ package-cleanup --orphans</pre></div>
     -i /etc/yum.repos.d/epel<span class="pl-k">*</span>.repo</pre></div>
 </li>
 <li>
-<p>再次运行 rpmconf 以处理配置文件</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rpmconf -a</pre></div>
+<p>删除备份的镜像源配置文件</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum.repos.d/<span class="pl-k">*</span>.repo.rpmsave</pre></div>
 </li>
 <li>
-<p>删除备份的镜像源配置文件</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum.repos.d/CentOS-<span class="pl-k">*</span>.repo.rpmsave</pre></div>
+<p>再次运行 rpmconf 以处理配置文件</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">rpmconf -a</pre></div>
 </li>
 <li>
 <p>删除旧的内核包</p>
