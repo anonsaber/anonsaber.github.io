@@ -2,11 +2,10 @@ Although CentOS 7/8/Stream-8 was already EOL, as the community distro of Red Hat
 
 >  [!IMPORTANT]
 > **You must be sure that you have finished backing up of the important data before upgrading.**
-> **由于发行版升级可能造成网卡名字的变动，所以请做好准备使用 VNC 或是显示器处理此问题。**
-> **由于 openssh-server 的升级，可能会造成过于陈旧的密钥格式无法使用，请做好相关预案。**
+> **Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.**
 
 >  [!NOTE]
-> **本文中的 mirrors.tuna.tsinghua.edu.cn 可以替换为 mirror.rackspace.com 或是其他的镜像源**
+> **You can replace `mirrors.tuna.tsinghua.edu.cn` with `mirror.rackspace.com` or other mirrors**
 
 ## 更新 CentOS 7
 
