@@ -23,23 +23,21 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
        -e 's|^#baseurl=http://mirror.centos.org/centos|baseurl=http://mirrors.tuna.tsinghua.edu.cn/centos-vault/centos|g' \
        -i /etc/yum.repos.d/*.repo
    ```
+
 2. 清理 YUM 缓存并重新生成缓存
 
    ```bash
    yum clean all
    yum makecache 
    ```
-3. 安装 yum-utils 工具包来增强 YUM 的功能
 
-   ```bash
-   yum install yum-utils -y
-   ```
-4. 安装 EPEL（Extra Packages for Enterprise Linux）仓库，以便能够访问更多的软件包
+3. 安装 EPEL（Extra Packages for Enterprise Linux）仓库，以便能够访问更多的软件包
 
    ```bash
    yum install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-7.noarch.rpm -y
    ```
-5. 修改 EPEL 的镜像源文件
+
+4. 修改 EPEL 的镜像源文件
 
    ```bash
    sed -e 's|^metalink=|#metalink=|g' \
@@ -48,7 +46,8 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
           -e 's|https\?://download\.example/pub/epel|http://mirrors.tuna.tsinghua.edu.cn/epel|g' \
           -i /etc/yum.repos.d/epel{,-testing}.repo
    ```
-6. 重新生成 YUM 缓存并进行系统升级
+
+5. 重新生成 YUM 缓存并进行系统升级
 
    ```bash
    yum makecache
@@ -64,6 +63,7 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    ```bash
    yum install rpmconf -y
    ```
+
 2. 运行 rpmconf，检查并合并所有配置文件
 
       > **在执行此命令时，系统会询问你是否要合并不同版本的配置文件,你需要根据实际情况来做出决定。**
@@ -71,7 +71,14 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    ```bash
    rpmconf -a
    ```
-3. 使用 package-cleanup 工具清理系统
+
+3. 安装 yum-utils 工具包来增强 YUM 的功能
+
+   ```bash
+   yum install yum-utils -y
+   ```
+
+4. 使用 package-cleanup 工具清理系统
 
    > **在执行 package-cleanup --leaves 和 package-cleanup --orphans 命令时，系统会列出一些叶子包（无其他包依赖的包）和孤立包（不再被任何包依赖的包）。你需要根据具体情况来决定是否要移除这些包**：
    > * 如果这些包对你的应用和服务没有影响，可以选择删除它们，以减少系统的冗余。
@@ -81,24 +88,28 @@ CentOS 7 与 CentOS 8/ CentOS Stream 8 已经 EOL，然而作为 Red Hat Enterpr
    package-cleanup --leaves
    package-cleanup --orphans
    ```
-4. 切换到 DNF 并移除 YUM
+
+5. 切换到 DNF 并移除 YUM
 
    YUM 是 CentOS 7 使用的包管理器，而在 CentOS 8 及以后的版本中，DNF 取代了 YUM。所以我们需要安装 DNF 并移除 YUM。
 
    ```bash
    yum install dnf -y
    ```
-5. 移除 YUM 及其相关组件，并删除 YUM 配置文件夹
+
+6. 移除 YUM 及其相关组件，并删除 YUM 配置文件夹
 
    ```bash
    dnf -y remove yum yum-metadata-parser && rm -rf /etc/yum
    ```
-6. 使用 DNF 升级现有的软件包
+
+7. 使用 DNF 升级现有的软件包
 
    ```bash
    dnf upgrade -y
    ```
-7. 重新启动服务器
+
+8. 重新启动服务器
 
    ```bash
    reboot

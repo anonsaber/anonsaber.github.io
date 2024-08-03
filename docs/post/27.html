@@ -90,10 +90,6 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 yum makecache </pre></div>
 </li>
 <li>
-<p>安装 yum-utils 工具包来增强 YUM 的功能</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">yum install yum-utils -y</pre></div>
-</li>
-<li>
 <p>安装 EPEL（Extra Packages for Enterprise Linux）仓库，以便能够访问更多的软件包</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">yum install http://mirrors.tuna.tsinghua.edu.cn/epel/epel-release-latest-7.noarch.rpm -y</pre></div>
 </li>
@@ -124,6 +120,10 @@ yum upgrade -y</pre></div>
 <p><strong>在执行此命令时，系统会询问你是否要合并不同版本的配置文件,你需要根据实际情况来做出决定。</strong></p>
 </blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">rpmconf -a</pre></div>
+</li>
+<li>
+<p>安装 yum-utils 工具包来增强 YUM 的功能</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">yum install yum-utils -y</pre></div>
 </li>
 <li>
 <p>使用 package-cleanup 工具清理系统</p>
