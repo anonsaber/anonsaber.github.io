@@ -1,4 +1,4 @@
-Although CentOS 7/8/Stream-8 has already reached EOL, as the community distro of Red Hat Enterprise Linux, CentOS have long held an important position in the field of server operating systems.
+Although CentOS 7/8/Stream-8 has already reached EOL, as the community distro of Red Hat Enterprise Linux, CentOS have long held an important position in the field of server operating systems. There is considerable debate over whether we should continue using CentOS. However, your CEO might just have a soft spot for CentOS. Hence, this post was born.
 
 >  [!IMPORTANT]
 > - **You must be sure that you have finished backing up of the important data before upgrading.**
