@@ -389,12 +389,9 @@ dnf makecache</pre></div>
 <div class="highlight highlight-source-shell"><pre class="notranslate">systemctl --force --force reboot</pre></div>
 </li>
 <li>
-<p>清理 DNF 缓存</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnf clean all</pre></div>
-</li>
-<li>
 <p>重建 RPM 数据库</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">rm -rf /etc/yum
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnf clean all
+rm -rf /etc/yum
 rm -rf /var/lib/rpm/__db<span class="pl-k">*</span>
 rpm --rebuilddb
 dnf makecache</pre></div>

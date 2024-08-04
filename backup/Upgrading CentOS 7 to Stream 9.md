@@ -399,22 +399,17 @@ Although CentOS 7/8/Stream-8 has already reached EOL, as the community distro of
     systemctl --force --force reboot
     ```
 
-14. 清理 DNF 缓存
+14. 重建 RPM 数据库
 
     ```bash
     dnf clean all
-    ```
-
-15. 重建 RPM 数据库
-
-    ```bash
     rm -rf /etc/yum
     rm -rf /var/lib/rpm/__db*
     rpm --rebuilddb
     dnf makecache
     ```
 
-16. 重置特定模块
+15. 重置特定模块
 
     实际情况可能不同，因此需要重置的模块也可能有所不同。请根据具体情况进行调整。
 
@@ -422,13 +417,13 @@ Although CentOS 7/8/Stream-8 has already reached EOL, as the community distro of
     dnf module reset perl perl-IO-Socket-SSL perl-libwww-perl python27 mariadb
     ```
 
-17. 更新核心和最小安装组：
+16. 更新核心和最小安装组：
 
     ```bash
     dnf -y groupupdate "Core" "Minimal Install"
     ```
 
-18. 同步发行版软件包
+17. 同步发行版软件包
 
     ```bash
     dnf -y distro-sync
