@@ -1,13 +1,13 @@
 Although CentOS 7/8/Stream-8 was already EOL, as the community distro of Red Hat Enterprise Linux, CentOS have long held an important position in the field of server operating systems.
 
 >  [!IMPORTANT]
-> **You must be sure that you have finished backing up of the important data before upgrading.**
-> **Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.**
+> - **You must be sure that you have finished backing up of the important data before upgrading.**
+> - **Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.**
 
 >  [!NOTE]
-> **You can replace `mirrors.tuna.tsinghua.edu.cn` with `mirror.rackspace.com` or other mirrors**
+> - **You can replace `mirrors.tuna.tsinghua.edu.cn` with `mirror.rackspace.com` or other mirrors.**
 
-## 更新 CentOS 7
+## Upgrading CentOS 7
 
 在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。
 

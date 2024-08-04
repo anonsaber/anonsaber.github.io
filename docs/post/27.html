@@ -13,26 +13,26 @@
 <meta name="description" content="Although CentOS 7/8/Stream-8 was already EOL, as the community distro of Red Hat Enterprise Linux, CentOS have long held an important position in the field of server operating systems.
 
 >  [!IMPORTANT]
-> **You must be sure that you have finished backing up of the important data before upgrading.**
-> **Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.**
+> - **You must be sure that you have finished backing up of the important data before upgrading.**
+> - **Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.**
 
 >  [!NOTE]
-> **You can replace `mirrors.tuna.tsinghua.edu.cn` with `mirror.rackspace.com` or other mirrors**
+> - **You can replace `mirrors.tuna.tsinghua.edu.cn` with `mirror.rackspace.com` or other mirrors.**
 
-## 更新 CentOS 7
+## Upgrading CentOS 7
 
 在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。">
 <meta property="og:title" content="Upgrading CentOS 7 to Stream 9">
 <meta property="og:description" content="Although CentOS 7/8/Stream-8 was already EOL, as the community distro of Red Hat Enterprise Linux, CentOS have long held an important position in the field of server operating systems.
 
 >  [!IMPORTANT]
-> **You must be sure that you have finished backing up of the important data before upgrading.**
-> **Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.**
+> - **You must be sure that you have finished backing up of the important data before upgrading.**
+> - **Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.**
 
 >  [!NOTE]
-> **You can replace `mirrors.tuna.tsinghua.edu.cn` with `mirror.rackspace.com` or other mirrors**
+> - **You can replace `mirrors.tuna.tsinghua.edu.cn` with `mirror.rackspace.com` or other mirrors.**
 
-## 更新 CentOS 7
+## Upgrading CentOS 7
 
 在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。">
 <meta property="og:type" content="article">
@@ -89,12 +89,18 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
     <div id="content">
 <div class="markdown-body" id="postBody"><p>Although CentOS 7/8/Stream-8 was already EOL, as the community distro of Red Hat Enterprise Linux, CentOS have long held an important position in the field of server operating systems.</p>
-<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p><p><strong>You must be sure that you have finished backing up of the important data before upgrading.</strong><br>
-<strong>Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.</strong></p>
+<div class="markdown-alert markdown-alert-important"><p class="markdown-alert-title"><svg class="octicon octicon-report mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 1.75C0 .784.784 0 1.75 0h12.5C15.216 0 16 .784 16 1.75v9.5A1.75 1.75 0 0 1 14.25 13H8.06l-2.573 2.573A1.458 1.458 0 0 1 3 14.543V13H1.75A1.75 1.75 0 0 1 0 11.25Zm1.75-.25a.25.25 0 0 0-.25.25v9.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h6.5a.25.25 0 0 0 .25-.25v-9.5a.25.25 0 0 0-.25-.25Zm7 2.25v2.5a.75.75 0 0 1-1.5 0v-2.5a.75.75 0 0 1 1.5 0ZM9 9a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>Important</p>
+<ul>
+<li><strong>You must be sure that you have finished backing up of the important data before upgrading.</strong></li>
+<li><strong>Cross-version upgrades may cause changes in NIC names, and after upgrading, changes in openssh-server may prevent you log into the server. Please be prepared to fix these issues using VNC or a monitor.</strong></li>
+</ul>
 </div>
-<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p><strong>You can replace <code class="notranslate">mirrors.tuna.tsinghua.edu.cn</code> with <code class="notranslate">mirror.rackspace.com</code> or other mirrors</strong></p>
+<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p>
+<ul>
+<li><strong>You can replace <code class="notranslate">mirrors.tuna.tsinghua.edu.cn</code> with <code class="notranslate">mirror.rackspace.com</code> or other mirrors.</strong></li>
+</ul>
 </div>
-<h2>更新 CentOS 7</h2>
+<h2>Upgrading CentOS 7</h2>
 <p>在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。</p>
 <ol>
 <li>
