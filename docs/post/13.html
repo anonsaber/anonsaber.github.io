@@ -84,8 +84,8 @@ In a production environment, it is recommended to deploy the Controller in high-
 ```Bash
 ssh-copy-id ares@100.64.1.82
 ssh-copy-id ares@100.64.1.83
-juju add-machine -m controller <ssh:ares@100.64.1.82>
-juju add-machine -m controller <ssh:ares@100.64.1.83>
+juju add-machine -m controller ssh:ares@100.64.1.82
+juju add-machine -m controller ssh:ares@100.64.1.83
 juju machines -m controller
 juju enable-ha --to=1,2
 juju controllers --refresh
@@ -167,8 +167,8 @@ In a production environment, it is recommended to deploy the Controller in high-
 ```Bash
 ssh-copy-id ares@100.64.1.82
 ssh-copy-id ares@100.64.1.83
-juju add-machine -m controller <ssh:ares@100.64.1.82>
-juju add-machine -m controller <ssh:ares@100.64.1.83>
+juju add-machine -m controller ssh:ares@100.64.1.82
+juju add-machine -m controller ssh:ares@100.64.1.83
 juju machines -m controller
 juju enable-ha --to=1,2
 juju controllers --refresh
@@ -288,8 +288,8 @@ Cloud <span class="pl-s"><span class="pl-pds">"</span>ares-homelab<span class="p
 </blockquote>
 <div class="highlight highlight-source-shell"><pre class="notranslate">ssh-copy-id ares@100.64.1.82
 ssh-copy-id ares@100.64.1.83
-juju add-machine -m controller <span class="pl-k">&lt;</span>ssh:ares@100.64.1.<span class="pl-k">82&gt;</span>
-juju add-machine -m controller <span class="pl-k">&lt;</span>ssh:ares@100.64.1.<span class="pl-k">83&gt;</span>
+juju add-machine -m controller ssh:ares@100.64.1.82
+juju add-machine -m controller ssh:ares@100.64.1.83
 juju machines -m controller
 juju enable-ha --to=1,2
 juju controllers --refresh</pre></div>

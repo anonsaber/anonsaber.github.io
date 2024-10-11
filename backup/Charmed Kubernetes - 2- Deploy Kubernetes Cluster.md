@@ -26,19 +26,19 @@ For a Production-Ready Charmed Kubernetes, you should have at least three etcd n
 ```bash
 juju switch k8s-lab
 # ETCD
-juju add-machine <ssh:ares@100.64.1.121>
-juju add-machine <ssh:ares@100.64.1.122>
-juju add-machine <ssh:ares@100.64.1.123>
+juju add-machine ssh:ares@100.64.1.121
+juju add-machine ssh:ares@100.64.1.122
+juju add-machine ssh:ares@100.64.1.123
 # Master
-juju add-machine <ssh:ares@100.64.1.124>
-juju add-machine <ssh:ares@100.64.1.125>
+juju add-machine ssh:ares@100.64.1.124
+juju add-machine ssh:ares@100.64.1.125
 # Worker
-juju add-machine <ssh:ares@100.64.1.126>
-juju add-machine <ssh:ares@100.64.1.127>
+juju add-machine ssh:ares@100.64.1.126
+juju add-machine ssh:ares@100.64.1.127
 # kubeapi-load-balancer
 # If you are using an external load balancer, these two machines are not necessary.
-juju add-machine <ssh:ares@100.64.1.128>
-juju add-machine <ssh:ares@100.64.1.129>
+juju add-machine ssh:ares@100.64.1.128
+juju add-machine ssh:ares@100.64.1.129
 ```
 
 ### View existing machines
@@ -99,12 +99,13 @@ juju deploy ./containerd
 # Kubernetes-master
 # Disable the built-in dashboard
 # Use the IPVS mode
-juju deploy --to 3 ./kubernetes-master \\
-    --config channel=1.21/stable \\
-    --config service-cidr=172.31.192.0/21 \\
-    --config enable-dashboard-addons=false \\
-    --config image-registry=jcr.motofans.club/mirror/rocks.canonical.com/cdk \\
+juju deploy --to 3 ./kubernetes-master \
+    --config channel=1.21/stable \
+    --config service-cidr=172.31.192.0/21 \
+    --config enable-dashboard-addons=false \
+    --config image-registry=jcr.motofans.club/mirror/rocks.canonical.com/cdk \
     --config proxy-extra-args='bind-address=0.0.0.0 proxy-mode=ipvs'
+
 juju attach kubernetes-master core=./resources/core/core.snap
 juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
 juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
@@ -115,20 +116,22 @@ juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
 
 # Kubernetes-worker
 # Use the IPVS mode
-juju deploy --to 5 ./kubernetes-worker \\
-    --config channel=1.21/stable \\
-    --config ingress=false \\
+juju deploy --to 5 ./kubernetes-worker \
+    --config channel=1.21/stable \
+    --config ingress=false \
     --config proxy-extra-args='bind-address=0.0.0.0 proxy-mode=ipvs'
+
 juju attach kubernetes-worker cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
 juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
 juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
 juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
 
 # Calico
-juju deploy ./calico \\
-    --config cidr=172.31.128.0/18 \\
-    --config vxlan=Always \\
+juju deploy ./calico \
+    --config cidr=172.31.128.0/18 \
+    --config vxlan=Always \
     --config ignore-loose-rpf=true
+
 juju attach calico calico=./resources/calico/calico.gz
 juju attach calico calico-node-image=./resources/calico/calico-node-image.gz
 juju attach calico calico-upgrade=./resources/calico/calico-upgrade.gz

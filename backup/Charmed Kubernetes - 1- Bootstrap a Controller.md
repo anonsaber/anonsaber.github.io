@@ -72,8 +72,8 @@ In a production environment, it is recommended to deploy the Controller in high-
 ```Bash
 ssh-copy-id ares@100.64.1.82
 ssh-copy-id ares@100.64.1.83
-juju add-machine -m controller <ssh:ares@100.64.1.82>
-juju add-machine -m controller <ssh:ares@100.64.1.83>
+juju add-machine -m controller ssh:ares@100.64.1.82
+juju add-machine -m controller ssh:ares@100.64.1.83
 juju machines -m controller
 juju enable-ha --to=1,2
 juju controllers --refresh
