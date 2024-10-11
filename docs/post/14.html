@@ -75,7 +75,7 @@ Machine  State    DNS           Inst id              Series  AZ  Message
 
 Now, we begin deploying Kubernetes according to the roles assigned to the machine in the Machine Preparation step.
 
-Download https://git.motofans.club/Motofans/charmed-kubernetes/archive/Bugfix-Release_657.zip and unzip it.
+Download https://git.motofans.club/Motofans/Charmed-Kubernetes/archive/Bugfix_1.21-GA.zip and unzip it.
 
 Please proceed with the following deployment command：
 
@@ -99,9 +99,10 @@ juju deploy --to 0 ./easyrsa
 juju attach easyrsa easyrsa=./resources/easyrsa/easyrsa.tgz
 
 # ETCD
-juju deploy --to 0 ./etcd \\
-    --config bind_to_all_interfaces=false \\
+juju deploy --to 0 ./etcd \
+    --config bind_to_all_interfaces=false \
     --config channel=3.4/stable
+
 juju attach etcd snapshot=./resources/etcd/snapshot.gz
 juju attach etcd etcd=./resources/etcd/etcd.snap
 
@@ -239,10 +240,9 @@ juju config kubernetes-worker proxy-extra-args='bind-address=0.0.0.0 proxy-mode=
 
 When using an external load balancer, you need to distribute the traffic to two Master nodes, and it is recommended to ensure high availability of the external load balancer in a production environment.
 
-```
+```bash
 juju config kubernetes-master extra_sans='$VIP $VIP_HOSTNAME'
 juju config kubernetes-master loadbalancer-ips='$VIP $VIP_HOSTNAME'
-
 ```
 
 ## Retrieve Config File
@@ -340,7 +340,7 @@ Machine  State    DNS           Inst id              Series  AZ  Message
 
 Now, we begin deploying Kubernetes according to the roles assigned to the machine in the Machine Preparation step.
 
-Download https://git.motofans.club/Motofans/charmed-kubernetes/archive/Bugfix-Release_657.zip and unzip it.
+Download https://git.motofans.club/Motofans/Charmed-Kubernetes/archive/Bugfix_1.21-GA.zip and unzip it.
 
 Please proceed with the following deployment command：
 
@@ -364,9 +364,10 @@ juju deploy --to 0 ./easyrsa
 juju attach easyrsa easyrsa=./resources/easyrsa/easyrsa.tgz
 
 # ETCD
-juju deploy --to 0 ./etcd \\
-    --config bind_to_all_interfaces=false \\
+juju deploy --to 0 ./etcd \
+    --config bind_to_all_interfaces=false \
     --config channel=3.4/stable
+
 juju attach etcd snapshot=./resources/etcd/snapshot.gz
 juju attach etcd etcd=./resources/etcd/etcd.snap
 
@@ -504,10 +505,9 @@ juju config kubernetes-worker proxy-extra-args='bind-address=0.0.0.0 proxy-mode=
 
 When using an external load balancer, you need to distribute the traffic to two Master nodes, and it is recommended to ensure high availability of the external load balancer in a production environment.
 
-```
+```bash
 juju config kubernetes-master extra_sans='$VIP $VIP_HOSTNAME'
 juju config kubernetes-master loadbalancer-ips='$VIP $VIP_HOSTNAME'
-
 ```
 
 ## Retrieve Config File
@@ -645,7 +645,7 @@ Machine  State    DNS           Inst id              Series  AZ  Message
 8        started  100.64.1.129  manual:100.64.1.129  focal       Manually provisioned machine</pre></div>
 <h2>Deploy Kubernetes</h2>
 <p>Now, we begin deploying Kubernetes according to the roles assigned to the machine in the Machine Preparation step.</p>
-<p>Download <a href="https://git.motofans.club/Motofans/charmed-kubernetes/archive/Bugfix-Release_657.zip" rel="nofollow">https://git.motofans.club/Motofans/charmed-kubernetes/archive/Bugfix-Release_657.zip</a> and unzip it.</p>
+<p>Download <a href="https://git.motofans.club/Motofans/Charmed-Kubernetes/archive/Bugfix_1.21-GA.zip" rel="nofollow">https://git.motofans.club/Motofans/Charmed-Kubernetes/archive/Bugfix_1.21-GA.zip</a> and unzip it.</p>
 <p>Please proceed with the following deployment command：</p>
 <div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>At the beginning, we will not deploy it in a high-availability state. We will temporarily deploy only a single replica for each component.</p>
 <p>Please make sure to replace the "service-cidr" and "calico-cidr" with the appropriate values.</p>
@@ -663,9 +663,10 @@ juju deploy --to 0 ./easyrsa
 juju attach easyrsa easyrsa=./resources/easyrsa/easyrsa.tgz
 
 <span class="pl-c"><span class="pl-c">#</span> ETCD</span>
-juju deploy --to 0 ./etcd <span class="pl-cce">\\</span>
-    --config bind_to_all_interfaces=false <span class="pl-cce">\\</span>
+juju deploy --to 0 ./etcd \
+    --config bind_to_all_interfaces=false \
     --config channel=3.4/stable
+
 juju attach etcd snapshot=./resources/etcd/snapshot.gz
 juju attach etcd etcd=./resources/etcd/etcd.snap
 
@@ -776,10 +777,8 @@ juju config kubernetes-worker proxy-extra-args=<span class="pl-s"><span class="p
 <p><strong>Recommendation</strong></p>
 <p><em>If you are not using an external load balancer, you can skip this part.</em></p>
 <p>When using an external load balancer, you need to distribute the traffic to two Master nodes, and it is recommended to ensure high availability of the external load balancer in a production environment.</p>
-<pre class="notranslate"><code class="notranslate">juju config kubernetes-master extra_sans="$VIP $VIP_HOSTNAME"
-juju config kubernetes-master loadbalancer-ips="$VIP $VIP_HOSTNAME"
-
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju config kubernetes-master extra_sans=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$VIP</span> <span class="pl-smi">$VIP_HOSTNAME</span><span class="pl-pds">"</span></span>
+juju config kubernetes-master loadbalancer-ips=<span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$VIP</span> <span class="pl-smi">$VIP_HOSTNAME</span><span class="pl-pds">"</span></span></pre></div>
 <h2>Retrieve Config File</h2>
 <p>Finally, You can use the following command to retrieve the cluster config file:</p>
 <div class="highlight highlight-source-shell"><pre class="notranslate">mkdir -p .kube

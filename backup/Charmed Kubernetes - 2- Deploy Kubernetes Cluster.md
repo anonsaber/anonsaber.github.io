@@ -63,7 +63,7 @@ Machine  State    DNS           Inst id              Series  AZ  Message
 
 Now, we begin deploying Kubernetes according to the roles assigned to the machine in the Machine Preparation step.
 
-Download https://git.motofans.club/Motofans/charmed-kubernetes/archive/Bugfix-Release_657.zip and unzip it.
+Download https://git.motofans.club/Motofans/Charmed-Kubernetes/archive/Bugfix_1.21-GA.zip and unzip it.
 
 Please proceed with the following deployment command：
 
@@ -87,9 +87,10 @@ juju deploy --to 0 ./easyrsa
 juju attach easyrsa easyrsa=./resources/easyrsa/easyrsa.tgz
 
 # ETCD
-juju deploy --to 0 ./etcd \\
-    --config bind_to_all_interfaces=false \\
+juju deploy --to 0 ./etcd \
+    --config bind_to_all_interfaces=false \
     --config channel=3.4/stable
+
 juju attach etcd snapshot=./resources/etcd/snapshot.gz
 juju attach etcd etcd=./resources/etcd/etcd.snap
 
@@ -227,10 +228,9 @@ juju config kubernetes-worker proxy-extra-args='bind-address=0.0.0.0 proxy-mode=
 
 When using an external load balancer, you need to distribute the traffic to two Master nodes, and it is recommended to ensure high availability of the external load balancer in a production environment.
 
-```
+```bash
 juju config kubernetes-master extra_sans="$VIP $VIP_HOSTNAME"
 juju config kubernetes-master loadbalancer-ips="$VIP $VIP_HOSTNAME"
-
 ```
 
 ## Retrieve Config File
