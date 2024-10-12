@@ -10,175 +10,17 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## Infrastructure updates
+<meta name="description" content="## 背景
 
-### Containerd
+在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。">
+<meta property="og:title" content="使用 ULogd 收集 Iptables 的日志">
+<meta property="og:description" content="## 背景
 
-```bash
-juju upgrade-charm containerd --path=./containerd
-```
-
-### ETCD
-
-```bash
-juju upgrade-charm etcd --path=./etcd
-juju config etcd channel=3.4/stable
-juju attach etcd etcd=./resources/etcd/etcd.snap
-```
-
-### EasyRSA
-
-```bash
-juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz
-```
-
-### Calico CNI
-
-```bash
-juju upgrade-charm calico --path=./calico \
-    --resource calico=./resources/calico/calico.gz \
-    --resource calico-node-image=./resources/calico/calico-node-image.gz \
-    --resource calico-upgrade=./resources/calico/calico-upgrade.gz
-```
-
-## Upgrading Kubernetes
-
-### KubeAPI Load Balancer
-
-```bash
-juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
-juju upgrade-charm keepalived --path=./keepalived
-```
-
-### Kubernetes-Master Units
-
-```bash
-juju upgrade-charm kubernetes-master --path=./kubernetes-master \
-    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
-    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
-    --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
-juju attach kubernetes-master core=./resources/core/core.snap
-juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
-juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
-juju attach kubernetes-master kube-controller-manager=./resources/kubernetes-master/kube-controller-manager.snap
-juju attach kubernetes-master kube-scheduler=./resources/kubernetes-master/kube-scheduler.snap
-juju attach kubernetes-master kube-proxy=./resources/kubernetes-master/kube-proxy.snap
-juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
-
-juju config kubernetes-master channel=1.22/stable
-juju run-action kubernetes-master/0 upgrade
-juju run-action kubernetes-master/1 upgrade
-```
-
-### Update Relation
-
-```bash
-juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
-juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers
-```
-
-### Kubernetes-Worker Units
-
-```bash
-juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
-    --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
-juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
-juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
-juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
-
-juju config kubernetes-worker channel=1.22/stable
-juju run-action kubernetes-worker/0 upgrade
-juju run-action kubernetes-worker/1 upgrade
-```
-
-<!-- ##{'timestamp':1667750400}## -->。">
-<meta property="og:title" content="Charmed Kubernetes - 3: Upgrade Kubernetes Cluster">
-<meta property="og:description" content="## Infrastructure updates
-
-### Containerd
-
-```bash
-juju upgrade-charm containerd --path=./containerd
-```
-
-### ETCD
-
-```bash
-juju upgrade-charm etcd --path=./etcd
-juju config etcd channel=3.4/stable
-juju attach etcd etcd=./resources/etcd/etcd.snap
-```
-
-### EasyRSA
-
-```bash
-juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz
-```
-
-### Calico CNI
-
-```bash
-juju upgrade-charm calico --path=./calico \
-    --resource calico=./resources/calico/calico.gz \
-    --resource calico-node-image=./resources/calico/calico-node-image.gz \
-    --resource calico-upgrade=./resources/calico/calico-upgrade.gz
-```
-
-## Upgrading Kubernetes
-
-### KubeAPI Load Balancer
-
-```bash
-juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
-juju upgrade-charm keepalived --path=./keepalived
-```
-
-### Kubernetes-Master Units
-
-```bash
-juju upgrade-charm kubernetes-master --path=./kubernetes-master \
-    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
-    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
-    --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
-juju attach kubernetes-master core=./resources/core/core.snap
-juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
-juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
-juju attach kubernetes-master kube-controller-manager=./resources/kubernetes-master/kube-controller-manager.snap
-juju attach kubernetes-master kube-scheduler=./resources/kubernetes-master/kube-scheduler.snap
-juju attach kubernetes-master kube-proxy=./resources/kubernetes-master/kube-proxy.snap
-juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
-
-juju config kubernetes-master channel=1.22/stable
-juju run-action kubernetes-master/0 upgrade
-juju run-action kubernetes-master/1 upgrade
-```
-
-### Update Relation
-
-```bash
-juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
-juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers
-```
-
-### Kubernetes-Worker Units
-
-```bash
-juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
-    --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
-juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
-juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
-juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
-
-juju config kubernetes-worker channel=1.22/stable
-juju run-action kubernetes-worker/0 upgrade
-juju run-action kubernetes-worker/1 upgrade
-```
-
-<!-- ##{'timestamp':1667750400}## -->。">
+在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/15.html">
+<meta property="og:url" content="https://blog.motofans.club/post/shi-yong-%20ULogd%20-shou-ji-%20Iptables%20-de-ri-zhi.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Charmed Kubernetes - 3: Upgrade Kubernetes Cluster</title>
+<title>使用 ULogd 收集 Iptables 的日志</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -221,7 +63,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Charmed Kubernetes - 3: Upgrade Kubernetes Cluster</h1>
+<h1 class="postTitle">使用 ULogd 收集 Iptables 的日志</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -239,53 +81,41 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>Infrastructure updates</h2>
-<h3>Containerd</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm containerd --path=./containerd</pre></div>
-<h3>ETCD</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm etcd --path=./etcd
-juju config etcd channel=3.4/stable
-juju attach etcd etcd=./resources/etcd/etcd.snap</pre></div>
-<h3>EasyRSA</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz</pre></div>
-<h3>Calico CNI</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm calico --path=./calico \
-    --resource calico=./resources/calico/calico.gz \
-    --resource calico-node-image=./resources/calico/calico-node-image.gz \
-    --resource calico-upgrade=./resources/calico/calico-upgrade.gz</pre></div>
-<h2>Upgrading Kubernetes</h2>
-<h3>KubeAPI Load Balancer</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
-juju upgrade-charm keepalived --path=./keepalived</pre></div>
-<h3>Kubernetes-Master Units</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubernetes-master --path=./kubernetes-master \
-    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
-    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
-    --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
-juju attach kubernetes-master core=./resources/core/core.snap
-juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
-juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
-juju attach kubernetes-master kube-controller-manager=./resources/kubernetes-master/kube-controller-manager.snap
-juju attach kubernetes-master kube-scheduler=./resources/kubernetes-master/kube-scheduler.snap
-juju attach kubernetes-master kube-proxy=./resources/kubernetes-master/kube-proxy.snap
-juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
+<div class="markdown-body" id="postBody"><h2>背景</h2>
+<p>在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。本来想着只需要使用<code class="notranslate">iptables –j LOG</code> 就可以轻松实现目标，然而由于这两台服务器上的流量是巨大的。使用这种方式直接导致了 CPU 单核被打爆。</p>
+<p>于是找到了 <a href="https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf" rel="nofollow">这篇文章</a>，它推荐了本文标题中提到的 ULogd。</p>
+<h2>简介</h2>
+<p>Ulogd 是 <a href="http://netfilter.org/" rel="nofollow">netfilter</a> 的一个项目，它是一个运行在用户态的日志记录守护进程，用于 NetFilter/iptables 相关日志记录。</p>
+<p>在 Ubuntu 上，你可以轻松的通过 apt 进行安装。而在 CentOS 上，由于官方的 Repo 里面并没有这个东西。所以你需要手动编译安装它，或是使用 <a href="http://repo.iotti.biz/" rel="nofollow">http://repo.iotti.biz/</a> 提供的 Repo。</p>
+<p>在我的使用场景下，ulogd 能极大的提升 Iptables Log 的性能，几乎没有开销。</p>
+<h2>配置</h2>
+<p>可惜的是，这个项目的文档写的不是太好，网上也少见现成的使用范例。这里只能介绍一下我本人的使用案例。</p>
+<h3>ulogd</h3>
+<p><em>/etc/ulogd.conf 的配置样例</em></p>
+<p>如果你使用的不是我在本文中提供的 RPM，请不要直接复制粘贴。对于较旧的版本，你可能需要调整 stack 部分为 ULOG 而不是 NFLOG，并且使用 <code class="notranslate">iptables -j ULOG --ulog-nlgroup &lt;id&gt;</code> 来记录 Log。</p>
+<pre class="notranslate"><code class="notranslate">[global]
+logfile="/var/log/ulogd/ulogd.log"
 
-juju config kubernetes-master channel=1.22/stable
-juju run-action kubernetes-master/0 upgrade
-juju run-action kubernetes-master/1 upgrade</pre></div>
-<h3>Update Relation</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
-juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers</pre></div>
-<h3>Kubernetes-Worker Units</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
-    --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
-juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
-juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
-juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
+plugin="/usr/lib64/ulogd/ulogd_inppkt_NFLOG.so"
+plugin="/usr/lib64/ulogd/ulogd_filter_IFINDEX.so"
+plugin="/usr/lib64/ulogd/ulogd_filter_IP2STR.so"
+plugin="/usr/lib64/ulogd/ulogd_filter_PRINTPKT.so"
+plugin="/usr/lib64/ulogd/ulogd_output_LOGEMU.so"
+plugin="/usr/lib64/ulogd/ulogd_raw2packet_BASE.so"
 
-juju config kubernetes-worker channel=1.22/stable
-juju run-action kubernetes-worker/0 upgrade
-juju run-action kubernetes-worker/1 upgrade</pre></div>
+stack=log1:NFLOG,base1:BASE,ifi1:IFINDEX,ip2str1:IP2STR,print1:PRINTPKT,emu1:LOGEMU
+
+[log1]
+group=1
+
+[emu1]
+file="/var/log/iptables"
+sync=1
+</code></pre>
+<h3>iptables</h3>
+<p>这里 nflog-group 后面的 ID 需要和上面保持一致</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">iptables -I POSTROUTING -o <span class="pl-k">&lt;</span>public_nic <span class="pl-k">&gt;</span> -m state --state NEW -j NFLOG --nflog-group 1 --nflog-prefix <span class="pl-s"><span class="pl-pds">'</span>[&gt;]NAT <span class="pl-pds">'</span></span></pre></div>
+<p>现在你可以考虑使用 Grafana + Loki + Promtail 对日志进行查询、展示。</p>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

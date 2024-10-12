@@ -10,17 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 前言
-
-在 Kubernetes 上使用 Cert Manager 的 ACME DNS Challenge 方式能够很轻松的为域名签发一张受信任的泛域名证书。">
-<meta property="og:title" content="安全的使用 Cert Manager">
-<meta property="og:description" content="## 前言
-
-在 Kubernetes 上使用 Cert Manager 的 ACME DNS Challenge 方式能够很轻松的为域名签发一张受信任的泛域名证书。">
+<meta name="description" content="在 Jenkins 使用 distributed builds 时，可能会遇到一些特定的网络环境使得 Jenkins Master 无法通过 SSH Agent 一类的方式实现主动的与 Jenkins Node 建立链接。">
+<meta property="og:title" content="Jenkins 使用 Inbound Agent">
+<meta property="og:description" content="在 Jenkins 使用 distributed builds 时，可能会遇到一些特定的网络环境使得 Jenkins Master 无法通过 SSH Agent 一类的方式实现主动的与 Jenkins Node 建立链接。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/24.html">
+<meta property="og:url" content="https://blog.motofans.club/post/Jenkins%20-shi-yong-%20Inbound%20Agent.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>安全的使用 Cert Manager</title>
+<title>Jenkins 使用 Inbound Agent</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -63,7 +59,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">安全的使用 Cert Manager</h1>
+<h1 class="postTitle">Jenkins 使用 Inbound Agent</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -81,71 +77,45 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>前言</h2>
-<p>在 Kubernetes 上使用 Cert Manager 的 ACME DNS Challenge 方式能够很轻松的为域名签发一张受信任的泛域名证书。然而由于 ACME-DNS 为了能够验证域名的所有权需要修改 DNS 记录，因此需要提供 DNS 服务商的 API Secret，如果它被泄漏了呢？</p>
-<h2>更安全的实现</h2>
-<p>简单来说就是实现通过 A 域名为 B 域名申请证书。</p>
-<p>在下面的例子中，我们使用 <code class="notranslate">acme.exampleacmeverify.info</code> 为 <code class="notranslate">example.net</code> 生成一张泛域名证书。你可以将 <code class="notranslate">acme.exampleacmeverify.info</code> 单独托管到一个 DNS 服务商（本文中将其单独托管到阿里云），从而无需使用 <code class="notranslate">example.net</code> 的 API Secret.</p>
-<h3>Cert Manager</h3>
-<p>在 Kubernetes 上部署 Cert Manager</p>
-<p><a href="https://cert-manager.io/docs/installation/helm/" rel="nofollow">https://cert-manager.io/docs/installation/helm/</a></p>
-<h3>添加解析</h3>
-<p>在 <code class="notranslate">example.net</code> 的域名下添加一个 CNAME 解析。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">_acme-challenge CNAME _acme-challenge.acme.exampleacmeverify.info.</pre></div>
-<p>在 <code class="notranslate">exampleacmeverify.info</code> 的域名下添加一个 NS 解析。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">acme NS ns1.alidns.com.
-acme NS ns2.alidns.com.</pre></div>
-<h3>使用 AliDNS-Webhook</h3>
-<p>本文以 AliDNS 为例，你也可以使用 CloudFlare.</p>
-<p>在阿里云上，添加子域 <code class="notranslate">acme.exampleacmeverify.info</code></p>
-<p>💡 添加子域的时候，需要在主域 exampleacmeverify.info 添加 TXT 验证记录</p>
-<p>生成能够管理子域 <code class="notranslate">acme.exampleacmeverify.info</code> 的 API Secret，随后在 Kubernetes 中创建一个 Secret，用于管理 AliDNS</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">kubectl -n cert-manager create secret generic alidns-secret --from-literal=access-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_ACCESS_KEY<span class="pl-pds">'</span></span> --from-literal=secret-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_SECRET_KEY<span class="pl-pds">'</span></span></pre></div>
-<p>部署 alidns-webhook</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">wget https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml</pre></div>
-<p><em>获取下来的 yaml 不要直接用，要将里面的示例信息换掉</em></p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sed -i <span class="pl-s"><span class="pl-pds">'</span>s|acme.yourcompany.com|acme.exampleacmeverify.info|g<span class="pl-pds">'</span></span> bundle.yaml</pre></div>
-<p><em>有必要的话，可以把里面涉及的 Images Pull 下来，并传到自己的镜像仓库。</em></p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sed -i <span class="pl-s"><span class="pl-pds">'</span>s|pragkent/alidns-webhook|nexus.motofans.club/infra-pub/pragkent/alidns-webhook|g<span class="pl-pds">'</span></span> bundle.yaml
+<div class="markdown-body" id="postBody"><p>在 Jenkins 使用 distributed builds 时，可能会遇到一些特定的网络环境使得 Jenkins Master 无法通过 SSH Agent 一类的方式实现主动的与 Jenkins Node 建立链接。这时候往往会在 Jenkins Master 上开启一个 TCP Inboud Port， 让 Agent 节点主动连接到 Jenkins Master。这样需要为 Jenkins Master 多开放了一个端口，而如果 Jenkins Master 部署在 Kubernettes 的话，则需要另外引入一个 config-map 来为 Nginx Ingress 增加 TCP 服务暴露。</p>
+<h2>更好的实现</h2>
+<p>Jenkins 于 2.217 版本的增加了 Websocket 支持。</p>
+<p><a href="https://www.jenkins.io/blog/2020/02/02/web-socket/" rel="nofollow">https://www.jenkins.io/blog/2020/02/02/web-socket/</a></p>
+<p>使用 Websocket，当 Inbound Agent 启动时会与  <a href="https://jenkins.yourdomain.com/wsagents/" rel="nofollow">https://jenkins.yourdomain.com/wsagents/</a> 建立 Websoket 连接，这是一个双向流式的长连接，它并不需要在 Jenkins Master 上开启更多的端口。</p>
+<h2>启用 Websocket</h2>
+<p>如果你使用的是 Nginx，请为 PATH: /wsagents/ 打开 websocket 支持，这里不做说明</p>
+<h3>配置 Nginx Ingress</h3>
+<p>很多资料都提到了 Nginx Ingress 需要添加注解以支持 Websocket，但是下面的 Ingress 示例中并没有添加注解。原因如下：</p>
+<p><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="344337367" data-permission-text="Title is private" data-url="https://github.com/nginxinc/kubernetes-ingress/issues/322" data-hovercard-type="issue" data-hovercard-url="/nginxinc/kubernetes-ingress/issues/322/hovercard" href="https://github.com/nginxinc/kubernetes-ingress/issues/322">nginxinc/kubernetes-ingress#322</a></p>
+<p><code class="notranslate">The only reason I can think of where this would be the case, is if you are actually running the community ingress controller instead where the Upgrade and Connection headers are added based on NGINX map based conditions. Without the need for any annotation.</code></p>
+<p>也就是说 community ingress controller 并不需要添加注解。</p>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">kind</span>: <span class="pl-s">Ingress</span>
+<span class="pl-ent">apiVersion</span>: <span class="pl-s">extensions/v1beta1</span>
+<span class="pl-ent">metadata</span>:
+  <span class="pl-ent">name</span>: <span class="pl-s">jenkins-ingress</span>
+  <span class="pl-ent">namespace</span>: <span class="pl-s">sre-devops</span>
+  <span class="pl-ent">annotations</span>:
+    <span class="pl-ent">kubesphere.io/creator</span>: <span class="pl-s">admin</span>
+<span class="pl-ent">spec</span>:
+  <span class="pl-ent">tls</span>:
+    - <span class="pl-ent">hosts</span>:
+        - <span class="pl-s">jenkins.yourdomain.com</span>
+      <span class="pl-ent">secretName</span>: <span class="pl-s">aks-ingress-tls</span>
+  <span class="pl-ent">rules</span>:
+    - <span class="pl-ent">host</span>: <span class="pl-s">jenkins.yourdomain.com</span>
+      <span class="pl-ent">http</span>:
+        <span class="pl-ent">paths</span>:
+          - <span class="pl-ent">path</span>: <span class="pl-s">/</span>
+            <span class="pl-ent">pathType</span>: <span class="pl-s">ImplementationSpecific</span>
+            <span class="pl-ent">backend</span>:
+              <span class="pl-ent">serviceName</span>: <span class="pl-s">jenkins-http-api</span>
+              <span class="pl-ent">servicePort</span>: <span class="pl-c1">80</span>
 </pre></div>
-<h3>创建 Clusterissuer</h3>
-<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">apiVersion</span>: <span class="pl-s">cert-manager.io/v1</span>
-<span class="pl-ent">kind</span>: <span class="pl-s">ClusterIssuer</span>
-<span class="pl-ent">metadata</span>:
-  <span class="pl-ent">name</span>: <span class="pl-s">motofans-prod-issuer</span>
-<span class="pl-ent">spec</span>:
-  <span class="pl-ent">acme</span>:
-    <span class="pl-ent">email</span>: <span class="pl-s">reg@motofans.club</span>
-    <span class="pl-ent">server</span>: <span class="pl-s">&lt;https://acme-v02.api.letsencrypt.org/directory&gt;</span>
-    <span class="pl-ent">privateKeySecretRef</span>:
-      <span class="pl-ent">name</span>: <span class="pl-s">motofans-prod-issuer-priv-key</span>
-    <span class="pl-ent">solvers</span>:
-    - <span class="pl-ent">dns01</span>:
-        <span class="pl-ent">cnameStrategy</span>: <span class="pl-s">Follow</span>
-        <span class="pl-ent">webhook</span>:
-          <span class="pl-ent">groupName</span>: <span class="pl-s">acme.exampleacmeverify.info</span>
-          <span class="pl-ent">solverName</span>: <span class="pl-s">alidns</span>
-          <span class="pl-ent">config</span>:
-            <span class="pl-ent">region</span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
-            <span class="pl-ent">accessKeySecretRef</span>:
-              <span class="pl-ent">name</span>: <span class="pl-s">alidns-secret</span>
-              <span class="pl-ent">key</span>: <span class="pl-s">access-key</span>
-            <span class="pl-ent">secretKeySecretRef</span>:
-              <span class="pl-ent">name</span>: <span class="pl-s">alidns-secret</span>
-              <span class="pl-ent">key</span>: <span class="pl-s">secret-key</span></pre></div>
-<h3>申请证书</h3>
-<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">apiVersion</span>: <span class="pl-s">cert-manager.io/v1</span>
-<span class="pl-ent">kind</span>: <span class="pl-s">Certificate</span>
-<span class="pl-ent">metadata</span>:
-  <span class="pl-ent">name</span>: <span class="pl-s">example-net-tls</span>
-  <span class="pl-ent">namespace</span>: <span class="pl-s">sre</span>
-<span class="pl-ent">spec</span>:
-  <span class="pl-ent">secretName</span>: <span class="pl-s">example-net-tls</span>
-  <span class="pl-ent">dnsNames</span>:
-  - <span class="pl-s"><span class="pl-pds">"</span>*.example.net<span class="pl-pds">"</span></span>
-  <span class="pl-ent">issuerRef</span>:
-    <span class="pl-ent">kind</span>: <span class="pl-s">ClusterIssuer</span>
-    <span class="pl-ent">name</span>: <span class="pl-s">motofans-prod-issuer</span></pre></div>
+<h3>配置 Agent 节点</h3>
+<p>开启 Websocket 的方式很简单，在 Jenkins Master 中点击添加一个 Node，然后勾选 Use WebSocket 即可。</p>
+<p>将 4.0 版本以后的 agent.jar 上传至 Agent 节点，执行启动命令即可。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">java -jar agent.jar -jnlpUrl <span class="pl-k">&lt;</span>https://jenkins.yourdomain.com/computer/test/jenkins-agent.jnlp<span class="pl-k">&gt;</span> -secret @secret-file -workDir <span class="pl-s"><span class="pl-pds">"</span>/home/jenkins<span class="pl-pds">"</span></span></pre></div>
+<p>现在你可以在 Jenkins Master 中看到一个 Jenkins Agent 上线了。</p>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

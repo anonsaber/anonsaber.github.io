@@ -10,13 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="在广域网上提供的公共 DNS 实际上是有 QOS 限制的，并且由于中国大陆特殊的网络情况，经常容易获得被污染的 DNS 解析。">
-<meta property="og:title" content="高性能 DNS 服务器: SmartDNS">
-<meta property="og:description" content="在广域网上提供的公共 DNS 实际上是有 QOS 限制的，并且由于中国大陆特殊的网络情况，经常容易获得被污染的 DNS 解析。">
+<meta name="description" content="*本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的。">
+<meta property="og:title" content="OSPF + tun2socks 实现全局代理">
+<meta property="og:description" content="*本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/1.html">
+<meta property="og:url" content="https://blog.motofans.club/post/OSPF%20%2B%20tun2socks%20-shi-xian-quan-ju-dai-li.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>高性能 DNS 服务器: SmartDNS</title>
+<title>OSPF + tun2socks 实现全局代理</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -59,7 +59,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">高性能 DNS 服务器: SmartDNS</h1>
+<h1 class="postTitle">OSPF + tun2socks 实现全局代理</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -77,143 +77,111 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>在广域网上提供的公共 DNS 实际上是有 QOS 限制的，并且由于中国大陆特殊的网络情况，经常容易获得被污染的 DNS 解析。因此，在学习和工作中，架设一个 DNS 服务器是很有必要的。</p>
-<blockquote>
-<p>SmartDNS 是一个运行在本地的 DNS 服务器，它接受来自本地客户端的 DNS 查询请求，然后从多个上游 DNS 服务器获取 DNS 查询结果，并将访问速度最快的结果返回给客户端，以此提高网络访问速度。 SmartDNS 同时支持指定特定域名 IP 地址，并高性匹配，可达到过滤广告的效果; 支持 DOT(DNS over TLS) 和 DOH(DNS over HTTPS)，更好的保护隐私。</p>
-</blockquote>
-<h2>分流配置</h2>
-<p>首先使用下面的脚本生成针对于中国大陆域名列表的分流规则</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#!</span>/bin/bash</span>
-
-<span class="pl-c"><span class="pl-c">#</span> Trap any error and perform cleanup</span>
-<span class="pl-en">cleanup</span>() {
-    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Cleaning up...<span class="pl-pds">"</span></span>
-    rm -rf <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span>
-}
-<span class="pl-c1">trap</span> cleanup EXIT
-
-<span class="pl-c"><span class="pl-c">#</span> Define variables for repository URL, directory and output file</span>
-REPO_URL=<span class="pl-s"><span class="pl-pds">"</span>https://github.com/felixonmars/dnsmasq-china-list.git<span class="pl-pds">"</span></span>
-REPO_DIR=<span class="pl-s"><span class="pl-pds">"</span>dnsmasq-china-list<span class="pl-pds">"</span></span>
-OUTPUT_FILE=<span class="pl-s"><span class="pl-pds">"</span>/tmp/china.domain.smartdns.conf<span class="pl-pds">"</span></span>
-
-<span class="pl-c"><span class="pl-c">#</span> Clone the repository with a depth of 1 to fetch only the latest commit</span>
-git clone --depth=1 <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_URL</span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span> <span class="pl-k">||</span> <span class="pl-c1">exit</span> 1
-
-<span class="pl-c"><span class="pl-c">#</span> Change into the cloned directory</span>
-<span class="pl-c1">cd</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span>
-
-<span class="pl-c"><span class="pl-c">#</span> Run make command with specified server</span>
-make SERVER=cn_network smartdns-domain-rules <span class="pl-k">||</span> <span class="pl-c1">exit</span> 1
-
-<span class="pl-c"><span class="pl-c">#</span> Update smartdns.conf files and concatenate them into a single output file</span>
-<span class="pl-c"><span class="pl-c">#</span> Use process substitution with cat to avoid creating intermediate files</span>
-cat <span class="pl-s"><span class="pl-pds">&lt;(</span>sed <span class="pl-s"><span class="pl-pds">'</span>/-speed-check-mode ping,tcp:80 -nameserver cn_network/s//-nameserver cn_network/<span class="pl-pds">'</span></span> <span class="pl-k">*</span>.smartdns.conf<span class="pl-pds">)</span></span> <span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$OUTPUT_FILE</span><span class="pl-pds">"</span></span>
-
-<span class="pl-c"><span class="pl-c">#</span> Output success message with output file location</span>
-<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>SmartDNS configuration saved to <span class="pl-smi">$OUTPUT_FILE</span><span class="pl-pds">"</span></span> 
-
-<span class="pl-c"><span class="pl-c">#</span> Cleanup</span>
-<span class="pl-c1">cd</span> ..
-rm -rf <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span>
-
-<span class="pl-c"><span class="pl-c">#</span> Check for the existence of the specified configuration file</span>
-<span class="pl-k">if</span> [ <span class="pl-k">-f</span> <span class="pl-s"><span class="pl-pds">"</span>/etc/smartdns/china.domain.smartdns.conf<span class="pl-pds">"</span></span> ]<span class="pl-k">;</span> <span class="pl-k">then</span>
-    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Verification complete: The configuration file exists.<span class="pl-pds">"</span></span>
-
-    <span class="pl-c"><span class="pl-c">#</span> Proceed to check the operational status of the smartdns service</span>
-    <span class="pl-k">if</span> systemctl is-active --quiet smartdns<span class="pl-k">;</span> <span class="pl-k">then</span>
-        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Service status confirmed: smartdns is actively running.<span class="pl-pds">"</span></span>
-        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Initiating configuration update from temporary file.<span class="pl-pds">"</span></span>
-        cat /tmp/china.domain.smartdns.conf <span class="pl-k">&gt;</span> /etc/smartdns/china.domain.smartdns.conf
-        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Configuration file has been successfully updated.<span class="pl-pds">"</span></span>
-
-        <span class="pl-c"><span class="pl-c">#</span> Restart the smartdns service to apply new configuration settings</span>
-        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Restarting the smartdns service to enact changes.<span class="pl-pds">"</span></span>
-        systemctl restart smartdns
-        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Service restart complete. Process concluded successfully.<span class="pl-pds">"</span></span>
-    <span class="pl-k">else</span>
-        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Service check result: smartdns is not running. Update aborted.<span class="pl-pds">"</span></span>
-    <span class="pl-k">fi</span>
-<span class="pl-k">else</span>
-    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>File check error: Configuration file does not exist. Operation aborted.<span class="pl-pds">"</span></span>
-<span class="pl-k">fi</span></pre></div>
-<p>一切正常的话，你得到一个 <code class="notranslate">/etc/smartdns/china.domain.smartdns.conf</code> 配置文件。</p>
-<p>然后配置 <code class="notranslate">/etc/smartdns/smartdns.conf</code> ，你需要根据具体情况对配置进行调整。其中 subnet 配置项是 EDNS 配置，需要对应的上游 DNS 服务器支持。</p>
-<pre class="notranslate"><code class="notranslate">conf-file /etc/smartdns/china.domain.smartdns.conf
-
-bind 0.0.0.0:5353
-force-AAAA-SOA yes
-cache-size 4096
-prefetch-domain yes
-serve-expired yes
-serve-expired-ttl 0
-speed-check-mode none
-rr-ttl-min 60
-rr-ttl-max 86400
-log-level info
-
-# ----- Bootstap DNS -----
-server 119.29.29.29 -bootstrap-dns
-
-# ----- Default Group -----
-server-tls 1.1.1.1:853 -subnet 123.123.123.123/24
-server-tls 8.8.8.8:853 -subnet 123.123.123.123/24
-server-https https://1.1.1.1/dns-query -subnet 123.123.123.123/24
-
-# ----- Domestic Group: cn_network -----
-server 117.50.10.10 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
-server 119.29.29.29 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
-server-tls 1.12.12.12:853 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
-server-tls 223.5.5.5:853 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
-server-https https://1.12.12.12/dns-query -group cn_network -exclude-default-group -subnet 123.123.123.123/24
-</code></pre>
-<h2>性能测试</h2>
-<p>使用 dnsperf 进行 dns 测试。</p>
-<p>首先你需要安装 dnsperf，在 ubuntu 20.04/22.04 上可以通过 apt 进行安装。然后你需要准备一个文件用来测试，他里面应该有庞大的域名列表，类似于这样。</p>
-<pre class="notranslate"><code class="notranslate">citysportsblog.com A
-runningfromthereels.com A
-manhattanrestaurantmonth.com A
-homeremediesrelief.com A
-articulate-online.com A
-oblateyouthservice.com A
-ultimacleaning.com A
-isitrial.com A
-siwaqq.com A
-arborescent.com A
-smarttouchcrm.com A
-adsreceptors.com A
+<div class="markdown-body" id="postBody"><p><em>本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的。</em></p>
+<h2>背景</h2>
+<p>由于 ChromeOS 的生态链一直算不上完整，尽管同时拥有 ChromeOS Android Linux 三个平台的软件资源，但是就实际使用而言，并不能做到很好的互通有无，比如如何在 ChromeOS 上不使用开发者模式实现全局使用代理服务器，就是个比较麻烦的事情。为此要在网络层面下功夫，实现设备级的全局代理。</p>
+<p>我们先看一下现状，看一下现在大家所采用的主流的代理服务器技术。因为在计算机行业，弄出来个新东西的根本思路就是把当前的技术东拼西凑，哪怕创造一门新的语言也是如此，所以接下来我们要怎么解决问题也会是如此。所以笔者比较赞成计算机科学是不存在的，只有计算机工程，你当然可以有你的理解，这不是本文要讨论的东西。言归正传，我们讲回正题。</p>
+<p>标准的代理服务器常用的有两种，HTTP(S) 与 Socks。此外，基于 Iptables 实现的 Redirect 虽然实现了和代理服务器同样的效果，但是并不能称之为代理服务器，在这种现状下，我们这里同样将它也视为一种方案。</p>
+<h2>方案设计</h2>
+<p>现在，我们提出解决问题的思路:</p>
+<ol>
+<li>如果希望一个设备在接入网络后不需要做任何配置就能够实现全局代理（对该设备而言也是透明代理）的话，我们需要实现当设备访问到路由器时能够在路由器内部实现分流。</li>
+<li>我们需要在路由器里面设计 Iptables Redirect 到 HTTP(S)/Socks/Redir，或是使用路由表将流量引入到 HTTP(S)/Socks/Redir 代理所在的服务器。</li>
+</ol>
+<p>到这里，可能 Iptables Redirect 是最受广大软路由玩家青睐的，这个做法我觉得是可行的，搭配一些脚本实现健康检查也不是非常困难的事情，它应该能工作的很好。</p>
+<p>然而我并不喜欢使用 ipset 这样的方式去处理流量，因为我算不上是个软路由玩家，相比起来软路由，我更喜欢商业路由器，不过本文的方案依旧能够在 OPNSense 或是 OpenWRT 上工作。</p>
+<p>如果我们放弃了使用 Iptables Redirect 的方案，那么就产生了下面两个问题:</p>
+<ol>
+<li>如何将路由表导入到路由器内部，进而将流量路由到特定的网络位置？</li>
+<li>如何将三层协议路由过去的流量导入到三层协议以上的 HTTP(S)/Socks/Redir 代理所在的服务器？</li>
+</ol>
+<p>对于第一个问题，这个问题的解决办法有很多，我们暂时不做讨论。</p>
+<p>再看第二个问题，对于 HTTP(S) 代理服务器，笔者找到了 tun2proxy，对于 Socks 代理服务器，tun2socks 就很好用，而对于 Redir，很抱歉，笔者没有什么建议，因此才有了本文的第一句话「本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的」。顺便一提，由于 Socks 代理比 HTTP(S) 有更好的性能，笔者推荐使用 Socks + tun2socks。而 tun2socks 与 tun2proxy，简单来说就是能够实现将进入到 tun 虚拟网卡的流量转发到 Socks/HTTP(S) 代理服务器。</p>
+<p>接着，我们可以利用一种办法从路由器按照特定的路由表将流量引流到 tun 虚拟网卡上（tun 虚拟网卡的位置可以是在 HTTP(S)/Socks/Redir 代理所在的服务器，也可以是另外一台机器，笔者推荐将 tun 虚拟网卡启动在 HTTP(S)/Socks/Redir 代理所在的服务器上面）以实现设备的全局透明代理。</p>
+<p>现在回看第一个问题，尽管第一个问题的解决方案有很多，但是如何较为轻松的维护这个路由表实际上还是值得讨论的。笔者这里使用了 [<a href="https://idndx.com/use-routeros-ospf-and-raspberry-pi-to-create-split-routing-for-different-ip-ranges/" rel="nofollow">idndx.com</a>](<a href="https://idndx.com/use-routeros-ospf-and-raspberry-pi-to-create-split-routing-for-different-ip-ranges/" rel="nofollow">https://idndx.com/use-routeros-ospf-and-raspberry-pi-to-create-split-routing-for-different-ip-ranges/</a>) 提供的解决方案。该作者制作了非大陆 IP 的路由表，能够搭配 OSPF 实现动态的更新路由器内部的路由表。</p>
+<h2>实现过程</h2>
+<p>我们假设，你已经有了一个 socks 代理服务器，以及已经有了一个无污染的 DNS，随便他们部署在什么位置，只要他们是可用的。</p>
+<p>后续的演示仅针对 IPv4，对于 Ipv6 同样可以照葫芦画瓢实现，对于防火墙放行规则，请自行查阅文档处理。</p>
+<h3>Tun2socks</h3>
+<p>开启服务器的路由转发</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sysctl -w net.ipv4.ip_forward=1</pre></div>
+<p>创建 TUN 虚拟网卡</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ip tuntap add mode tun dev tun0
+ip addr add 198.18.0.1/15 dev tun0
+ip link <span class="pl-c1">set</span> dev tun0 up</pre></div>
+<p>开启 tun 虚拟网卡到 socks5 的转发</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">tun2socks -device tun0 -proxy socks5://<span class="pl-k">&lt;</span>your_server<span class="pl-k">&gt;</span>:<span class="pl-k">&lt;</span>your_port<span class="pl-k">&gt;</span> -interface eth0</pre></div>
+<p>我们不需要按照 Tun2socks 的 Wiki 为 tun 虚拟网卡开启任何的路由规则，因为这些路由规则将有 Bird 来做。</p>
+<h3>Bird</h3>
+<p>安装并启动 bird，略。</p>
+<h3>生成使用 tun 网卡的路由表规则</h3>
+<p>你可以使用 nchnroutes 来生成这张表，要记得注意修改出接口的名字，并且使用 exclude 选项排除一些地址，比如代理服务器的地址，请根据你的实际情况来落实。</p>
+<p>/etc/bird/routes4.conf</p>
+<pre class="notranslate"><code class="notranslate">...
+route 1.1.1.1/32 via "tun0";
 ...
 </code></pre>
-<p>然后执行如下命令进行性能测试。</p>
+<h3>配置 OSPF 将路由表广播给路由器</h3>
+<p>/etc/bird/bird.conf</p>
+<pre class="notranslate"><code class="notranslate"># This is a minimal configuration file, which allows the bird daemon to start
+# but will not cause anything else to happen.
+#
+# Please refer to the documentation in the bird-doc package or BIRD User's
+# Guide on &lt;http://bird.network.cz/&gt; for more information on configuring BIRD and
+# adding routing protocols.
 
-💡 我使用的 CPU 是8核的 Intel(R) Xeon(R) CPU D-1521 @ 2.40GHz，并在虚拟机中使用了 2 个核心进行测试。
+# Change this into your BIRD router ID. It's a world-wide unique identification
+# of your router, usually one of router's IPv4 addresses.
+router id 10.255.255.2;
 
-<div class="highlight highlight-source-shell"><pre class="notranslate">dnsperf -p 5353 -s 127.0.0.1 -q 200 -d dnsperf-300w.txt -T 50000
+# The Kernel protocol is not a real routing protocol. Instead of communicating
+# with other routers in the network, it performs synchronization of BIRD's
+# routing tables with the OS kernel.
+protocol kernel {
+	scan time 60;
+	import none;
+	export all;   # Actually insert routes into the kernel routing table
+}
 
-DNS Performance Testing Tool
-Version 2.9.0
+# The Device protocol is not a real routing protocol. It doesn't generate any
+# routes and it only serves as a module for getting information about network
+# interfaces from the kernel.
+protocol device {
+	scan time 60;
+}
 
-[Status] Command line: dnsperf -p 5353 -s 127.0.0.1 -q 200 -d dnsperf-300w.txt -T 50000
-[Status] Sending queries (to 127.0.0.1:5353)
-[Status] Started at: Thu May  2 13:09:48 2024
-[Status] Stopping after 1 run through file
-[Status] Testing <span class="pl-c1">complete</span> (end of file)
+protocol static {
+	include "routes4.conf";
+}
 
-Statistics:
-
-  Queries sent:         3000000
-  Queries completed:    3000000 (100.00%)
-  Queries lost:         0 (0.00%)
-
-  Response codes:       NOERROR 2942011 (98.07%), SERVFAIL 31712 (1.06%), NXDOMAIN 26277 (0.88%)
-  Average packet size:  request 28, response 62
-  Run <span class="pl-k">time</span> (s):         100.762912
-  Queries per second:   29772.859284
-
-  Average Latency (s):  0.006694 (min 0.000023, max 2.400308)
-  Latency StdDev (s):   0.025536</pre></div>
-<p>这个 QPS 差不多在 3w 左右，足以应对 1500 人左右的办公网络环境了。</p>
+protocol ospf {
+	export all;
+	area 0.0.0.0 {
+		interface "eth1" {
+			authentication simple;
+			password "yourpassword";
+		};
+	};
+}
+</code></pre>
+<ul>
+<li>export all: 将路由插入到内核路由表</li>
+<li>router id: OSPF 实例的唯一标识符，一般填写本设备的 IP 地址。</li>
+<li>interface: 使用哪张网卡进行 OSPF 路由广播。</li>
+<li>authentication: 有多种选项，simple 是指明文传输，其他的请自己查阅文档</li>
+<li>password: 顾名思义</li>
+</ul>
+<h3>Reload Bird 使配置生效</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">birdc configure</pre></div>
+<p>你可以使用 <code class="notranslate">curl --interface tun0 &lt;https://1.1.1.1&gt;</code> 测试你的 tun 虚拟网卡是否工作（访问的地址需要在上面的路由表内）。</p>
+<h3>配置路由器</h3>
+<p>在路由器上配置 OSFP 接受来自 Bird 的路由广播，请参考你的路由器使用手册，如果一切正常，你能够在你的路由器里面看到接收到的来自 Bird 的路由表。</p>
+<h2>宕机测试</h2>
+<p>关闭 bird 服务或是关闭 tun 网卡与 bird 所在服务器后，路由器中的路由表会消失。</p>
+<h2>注意事项</h2>
+<p>sometimes we need to disable rp_filter for the corresponding interface so that it can receive packets from other interfaces.</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sysctl net.ipv4.conf.all.rp_filter=0
+sysctl net.ipv4.conf.eth0.rp_filter=0</pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

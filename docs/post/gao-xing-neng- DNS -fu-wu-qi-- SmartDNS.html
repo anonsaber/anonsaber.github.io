@@ -10,17 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 前言
-
-为了提高虚拟机的性能，或是扩展其使用场景。">
-<meta property="og:title" content="Proxmox 开启 PCI Passthrough">
-<meta property="og:description" content="## 前言
-
-为了提高虚拟机的性能，或是扩展其使用场景。">
+<meta name="description" content="在广域网上提供的公共 DNS 实际上是有 QOS 限制的，并且由于中国大陆特殊的网络情况，经常容易获得被污染的 DNS 解析。">
+<meta property="og:title" content="高性能 DNS 服务器: SmartDNS">
+<meta property="og:description" content="在广域网上提供的公共 DNS 实际上是有 QOS 限制的，并且由于中国大陆特殊的网络情况，经常容易获得被污染的 DNS 解析。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/9.html">
+<meta property="og:url" content="https://blog.motofans.club/post/gao-xing-neng-%20DNS%20-fu-wu-qi--%20SmartDNS.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Proxmox 开启 PCI Passthrough</title>
+<title>高性能 DNS 服务器: SmartDNS</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -63,7 +59,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Proxmox 开启 PCI Passthrough</h1>
+<h1 class="postTitle">高性能 DNS 服务器: SmartDNS</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -81,118 +77,143 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>前言</h2>
-<p>为了提高虚拟机的性能，或是扩展其使用场景。有时候，我们需要让虚拟机直接访问到硬件资源。</p>
-<p>开启 PCI Passthrough 需要硬件支持。</p>
-<h2>IOMMU</h2>
-<h3>IOMMU Enable</h3>
-<h3>查看当前主机是否支持</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep -e DMAR -e IOMMU
-</pre></div>
-<p>如果没有输出，则表示不支持。</p>
-<h3>修改内核启动参数</h3>
-<p>修改 /etc/default/grub</p>
-<ul>
-<li>Intel CPU</li>
-</ul>
-<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet intel_iommu=on<span class="pl-pds">"</span></span>
-</pre></div>
-<ul>
-<li>AMD CPU</li>
-</ul>
-<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet amd_iommu=on<span class="pl-pds">"</span></span>
-</pre></div>
-<h3>更新 grub</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">Proxmox:  update-grub
-OpenSUSE: grub2-mkconfig -o /etc/grub2-efi.cfg
-CentOS:   grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
-</pre></div>
-<h3>重新启动主机</h3>
-<p>检查 grub 是否更新成功</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">cat /proc/cmdline <span class="pl-k">|</span> grep iommu
-</pre></div>
-<h3>检查 IOMMU 是否开启</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">"</span>Virtualization Technology for Directed I/O<span class="pl-pds">"</span></span>
-</pre></div>
-<p>或</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep -e DMAR -e IOMMU <span class="pl-k">|</span> grep <span class="pl-c1">enable</span>
-</pre></div>
+<div class="markdown-body" id="postBody"><p>在广域网上提供的公共 DNS 实际上是有 QOS 限制的，并且由于中国大陆特殊的网络情况，经常容易获得被污染的 DNS 解析。因此，在学习和工作中，架设一个 DNS 服务器是很有必要的。</p>
+<blockquote>
+<p>SmartDNS 是一个运行在本地的 DNS 服务器，它接受来自本地客户端的 DNS 查询请求，然后从多个上游 DNS 服务器获取 DNS 查询结果，并将访问速度最快的结果返回给客户端，以此提高网络访问速度。 SmartDNS 同时支持指定特定域名 IP 地址，并高性匹配，可达到过滤广告的效果; 支持 DOT(DNS over TLS) 和 DOH(DNS over HTTPS)，更好的保护隐私。</p>
+</blockquote>
+<h2>分流配置</h2>
+<p>首先使用下面的脚本生成针对于中国大陆域名列表的分流规则</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#!</span>/bin/bash</span>
 
-<h3>PT Mode</h3>
-<p>Intel 与 AMD 芯片组均能够通过添加 "iommu=pt" 参数开启 PT 模式，以 Intel 为例:</p>
-<p>按照如下修改 /etc/default/grub 并更新 grub</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet intel_iommu=on iommu=pt<span class="pl-pds">"</span></span>
-</pre></div>
-<p>PT 模式只为直通模式中使用的设备启用 IOMMU，这将防止 Linux 试图接触 (touching) 无法直通的设备。</p>
-<h2>Interrupt Remapping</h2>
-<p><strong>要使用 PCI passthrough，Interrupt Remapping 是必须的。</strong></p>
-<p>Interrupt Remapping 能够工作在较新的设备上，你可以使用下面的命令查看当前的主机是否支持 Interrupt Remapping:</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">'</span>remapping<span class="pl-pds">'</span></span>
-</pre></div>
-<p>如果你看到了下面任何一行</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-s"><span class="pl-pds">"</span>AMD-Vi: Interrupt remapping enabled<span class="pl-pds">"</span></span>
-<span class="pl-s"><span class="pl-pds">"</span>DMAR-IR: Enabled IRQ remapping in x2apic mode<span class="pl-pds">"</span></span> (<span class="pl-s"><span class="pl-pds">'</span>x2apic<span class="pl-pds">'</span></span> can be different on old CPUs, but should still work)
-</pre></div>
-<p>那么当前的主机是能够支持 Interrupt Remapping 的。</p>
-<p>然而，如果当前的主机不支持 interrupt remapping，你可以使用如下命令开启 <code class="notranslate">unsafe interrupt remapping</code>:</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>options vfio_iommu_type1 allow_unsafe_interrupts=1<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> /etc/modprobe.d/iommu_unsafe_interrupts.conf
-</pre></div>
-<p>完成上述修改后，你需要更新 initramfs 并重新启动系统</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">update-initramfs -u -k all
-</pre></div>
-<p>另外，你也可以尝试配置 Interrupt Remapping 的内核引导参数</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">intremap={on,off,nosid,no_x2apic_optout}
-</pre></div>
-<h2>验证 IOMMU 分组</h2>
-<div class="highlight highlight-source-shell"><pre class="notranslate">find /sys/kernel/iommu_groups/ -type l
-</pre></div>
-<h2>VFIO</h2>
-<h3>Required Moudules</h3>
-<p>修改 /etc/modules，开启以下 Kernel Moudules</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">vfio
-vfio_iommu_type1
-vfio_pci
-vfio_virqfd
-</pre></div>
-<h3>为 PCI 设备开启 VFIO</h3>
-<p>以 Intel 核心显卡为例:</p>
-<h3>查询 PCI 设备的 ID</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lspci -nn<span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">'</span>Intel Corporation<span class="pl-pds">'</span></span> <span class="pl-k">|</span> grep HD
+<span class="pl-c"><span class="pl-c">#</span> Trap any error and perform cleanup</span>
+<span class="pl-en">cleanup</span>() {
+    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Cleaning up...<span class="pl-pds">"</span></span>
+    rm -rf <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span>
+}
+<span class="pl-c1">trap</span> cleanup EXIT
 
-00:02.0 VGA compatible controller [0300]: Intel Corporation HD Graphics 630 [8086:5912] (rev 04)
-00:1f.3 Audio device [0403]: Intel Corporation 100 Series/C230 Series Chipset Family HD Audio Controller [8086:a170] (rev 31)
-</pre></div>
-<h3>绑定为 VFIO 设备</h3>
-<p>修改 /etc/modprobe.d/vfio.conf</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">options vfio-pci ids=8086:5912,8086:a170 disable_vga=1
-</pre></div>
-<p>在物理机禁用 Intel 核心显卡和音频，创建并修改 /etc/modprobe.d/custom-blacklist.conf</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">blacklist snd_hda_intel
-blacklist snd_hda_codec_hdmi
-blacklist i915</pre></div>
-<p>完成上述修改后，你需要更新 initramfs 并重新启动系统</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">update-initramfs -u -k all
-</pre></div>
-<p>重新启动系统后，确认 Intel 核心显卡使用的 driver 是不是 vfio-pci</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">lspci -nnk<span class="pl-k">|</span> grep -C1 vfio</pre></div>
-<p>现在你可以使用 virt-manager 或 Proxmox 在虚拟机上分配 PCI 设备了。</p>
-<h2>其他的内核启动参数</h2>
-<p>这里列举可能会用到的部分内核启动参数</p>
-<ul>
-<li>尽可能多的将 iommu groups 拆分，方便直通一些板载的设备</li>
-</ul>
-<div class="highlight highlight-source-shell"><pre class="notranslate">pcie_acs_override=downstream,multifunction</pre></div>
-<ul>
-<li>禁用显卡的 frame buffering</li>
-</ul>
-<div class="highlight highlight-source-shell"><pre class="notranslate">video=vesafb:off
-video=efifb:off
-video=simplefb:off
-initcall_blacklist=sysfb_init</pre></div>
-<ul>
-<li>禁用显卡的 vesa driver</li>
-</ul>
-<div class="highlight highlight-source-shell"><pre class="notranslate">video=vesa:off</pre></div>
+<span class="pl-c"><span class="pl-c">#</span> Define variables for repository URL, directory and output file</span>
+REPO_URL=<span class="pl-s"><span class="pl-pds">"</span>https://github.com/felixonmars/dnsmasq-china-list.git<span class="pl-pds">"</span></span>
+REPO_DIR=<span class="pl-s"><span class="pl-pds">"</span>dnsmasq-china-list<span class="pl-pds">"</span></span>
+OUTPUT_FILE=<span class="pl-s"><span class="pl-pds">"</span>/tmp/china.domain.smartdns.conf<span class="pl-pds">"</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> Clone the repository with a depth of 1 to fetch only the latest commit</span>
+git clone --depth=1 <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_URL</span><span class="pl-pds">"</span></span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span> <span class="pl-k">||</span> <span class="pl-c1">exit</span> 1
+
+<span class="pl-c"><span class="pl-c">#</span> Change into the cloned directory</span>
+<span class="pl-c1">cd</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> Run make command with specified server</span>
+make SERVER=cn_network smartdns-domain-rules <span class="pl-k">||</span> <span class="pl-c1">exit</span> 1
+
+<span class="pl-c"><span class="pl-c">#</span> Update smartdns.conf files and concatenate them into a single output file</span>
+<span class="pl-c"><span class="pl-c">#</span> Use process substitution with cat to avoid creating intermediate files</span>
+cat <span class="pl-s"><span class="pl-pds">&lt;(</span>sed <span class="pl-s"><span class="pl-pds">'</span>/-speed-check-mode ping,tcp:80 -nameserver cn_network/s//-nameserver cn_network/<span class="pl-pds">'</span></span> <span class="pl-k">*</span>.smartdns.conf<span class="pl-pds">)</span></span> <span class="pl-k">&gt;</span> <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$OUTPUT_FILE</span><span class="pl-pds">"</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> Output success message with output file location</span>
+<span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>SmartDNS configuration saved to <span class="pl-smi">$OUTPUT_FILE</span><span class="pl-pds">"</span></span> 
+
+<span class="pl-c"><span class="pl-c">#</span> Cleanup</span>
+<span class="pl-c1">cd</span> ..
+rm -rf <span class="pl-s"><span class="pl-pds">"</span><span class="pl-smi">$REPO_DIR</span><span class="pl-pds">"</span></span>
+
+<span class="pl-c"><span class="pl-c">#</span> Check for the existence of the specified configuration file</span>
+<span class="pl-k">if</span> [ <span class="pl-k">-f</span> <span class="pl-s"><span class="pl-pds">"</span>/etc/smartdns/china.domain.smartdns.conf<span class="pl-pds">"</span></span> ]<span class="pl-k">;</span> <span class="pl-k">then</span>
+    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Verification complete: The configuration file exists.<span class="pl-pds">"</span></span>
+
+    <span class="pl-c"><span class="pl-c">#</span> Proceed to check the operational status of the smartdns service</span>
+    <span class="pl-k">if</span> systemctl is-active --quiet smartdns<span class="pl-k">;</span> <span class="pl-k">then</span>
+        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Service status confirmed: smartdns is actively running.<span class="pl-pds">"</span></span>
+        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Initiating configuration update from temporary file.<span class="pl-pds">"</span></span>
+        cat /tmp/china.domain.smartdns.conf <span class="pl-k">&gt;</span> /etc/smartdns/china.domain.smartdns.conf
+        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Configuration file has been successfully updated.<span class="pl-pds">"</span></span>
+
+        <span class="pl-c"><span class="pl-c">#</span> Restart the smartdns service to apply new configuration settings</span>
+        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Restarting the smartdns service to enact changes.<span class="pl-pds">"</span></span>
+        systemctl restart smartdns
+        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Service restart complete. Process concluded successfully.<span class="pl-pds">"</span></span>
+    <span class="pl-k">else</span>
+        <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>Service check result: smartdns is not running. Update aborted.<span class="pl-pds">"</span></span>
+    <span class="pl-k">fi</span>
+<span class="pl-k">else</span>
+    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>File check error: Configuration file does not exist. Operation aborted.<span class="pl-pds">"</span></span>
+<span class="pl-k">fi</span></pre></div>
+<p>一切正常的话，你得到一个 <code class="notranslate">/etc/smartdns/china.domain.smartdns.conf</code> 配置文件。</p>
+<p>然后配置 <code class="notranslate">/etc/smartdns/smartdns.conf</code> ，你需要根据具体情况对配置进行调整。其中 subnet 配置项是 EDNS 配置，需要对应的上游 DNS 服务器支持。</p>
+<pre class="notranslate"><code class="notranslate">conf-file /etc/smartdns/china.domain.smartdns.conf
+
+bind 0.0.0.0:5353
+force-AAAA-SOA yes
+cache-size 4096
+prefetch-domain yes
+serve-expired yes
+serve-expired-ttl 0
+speed-check-mode none
+rr-ttl-min 60
+rr-ttl-max 86400
+log-level info
+
+# ----- Bootstap DNS -----
+server 119.29.29.29 -bootstrap-dns
+
+# ----- Default Group -----
+server-tls 1.1.1.1:853 -subnet 123.123.123.123/24
+server-tls 8.8.8.8:853 -subnet 123.123.123.123/24
+server-https https://1.1.1.1/dns-query -subnet 123.123.123.123/24
+
+# ----- Domestic Group: cn_network -----
+server 117.50.10.10 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
+server 119.29.29.29 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
+server-tls 1.12.12.12:853 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
+server-tls 223.5.5.5:853 -group cn_network -exclude-default-group -subnet 123.123.123.123/24
+server-https https://1.12.12.12/dns-query -group cn_network -exclude-default-group -subnet 123.123.123.123/24
+</code></pre>
+<h2>性能测试</h2>
+<p>使用 dnsperf 进行 dns 测试。</p>
+<p>首先你需要安装 dnsperf，在 ubuntu 20.04/22.04 上可以通过 apt 进行安装。然后你需要准备一个文件用来测试，他里面应该有庞大的域名列表，类似于这样。</p>
+<pre class="notranslate"><code class="notranslate">citysportsblog.com A
+runningfromthereels.com A
+manhattanrestaurantmonth.com A
+homeremediesrelief.com A
+articulate-online.com A
+oblateyouthservice.com A
+ultimacleaning.com A
+isitrial.com A
+siwaqq.com A
+arborescent.com A
+smarttouchcrm.com A
+adsreceptors.com A
+...
+</code></pre>
+<p>然后执行如下命令进行性能测试。</p>
+
+💡 我使用的 CPU 是8核的 Intel(R) Xeon(R) CPU D-1521 @ 2.40GHz，并在虚拟机中使用了 2 个核心进行测试。
+
+<div class="highlight highlight-source-shell"><pre class="notranslate">dnsperf -p 5353 -s 127.0.0.1 -q 200 -d dnsperf-300w.txt -T 50000
+
+DNS Performance Testing Tool
+Version 2.9.0
+
+[Status] Command line: dnsperf -p 5353 -s 127.0.0.1 -q 200 -d dnsperf-300w.txt -T 50000
+[Status] Sending queries (to 127.0.0.1:5353)
+[Status] Started at: Thu May  2 13:09:48 2024
+[Status] Stopping after 1 run through file
+[Status] Testing <span class="pl-c1">complete</span> (end of file)
+
+Statistics:
+
+  Queries sent:         3000000
+  Queries completed:    3000000 (100.00%)
+  Queries lost:         0 (0.00%)
+
+  Response codes:       NOERROR 2942011 (98.07%), SERVFAIL 31712 (1.06%), NXDOMAIN 26277 (0.88%)
+  Average packet size:  request 28, response 62
+  Run <span class="pl-k">time</span> (s):         100.762912
+  Queries per second:   29772.859284
+
+  Average Latency (s):  0.006694 (min 0.000023, max 2.400308)
+  Latency StdDev (s):   0.025536</pre></div>
+<p>这个 QPS 差不多在 3w 左右，足以应对 1500 人左右的办公网络环境了。</p>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

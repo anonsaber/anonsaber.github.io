@@ -10,13 +10,17 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="*本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的。">
-<meta property="og:title" content="OSPF + tun2socks 实现全局代理">
-<meta property="og:description" content="*本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的。">
+<meta name="description" content="可不可以在局域网内使用 Samba (共享文件夹) 来安装 Office 2016/2019 呢？
+
+当然是可以的。">
+<meta property="og:title" content="从网络位置安装 MS Office">
+<meta property="og:description" content="可不可以在局域网内使用 Samba (共享文件夹) 来安装 Office 2016/2019 呢？
+
+当然是可以的。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/3.html">
+<meta property="og:url" content="https://blog.motofans.club/post/cong-wang-luo-wei-zhi-an-zhuang-%20MS%20Office.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>OSPF + tun2socks 实现全局代理</title>
+<title>从网络位置安装 MS Office</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -59,7 +63,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">OSPF + tun2socks 实现全局代理</h1>
+<h1 class="postTitle">从网络位置安装 MS Office</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -77,111 +81,80 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p><em>本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的。</em></p>
-<h2>背景</h2>
-<p>由于 ChromeOS 的生态链一直算不上完整，尽管同时拥有 ChromeOS Android Linux 三个平台的软件资源，但是就实际使用而言，并不能做到很好的互通有无，比如如何在 ChromeOS 上不使用开发者模式实现全局使用代理服务器，就是个比较麻烦的事情。为此要在网络层面下功夫，实现设备级的全局代理。</p>
-<p>我们先看一下现状，看一下现在大家所采用的主流的代理服务器技术。因为在计算机行业，弄出来个新东西的根本思路就是把当前的技术东拼西凑，哪怕创造一门新的语言也是如此，所以接下来我们要怎么解决问题也会是如此。所以笔者比较赞成计算机科学是不存在的，只有计算机工程，你当然可以有你的理解，这不是本文要讨论的东西。言归正传，我们讲回正题。</p>
-<p>标准的代理服务器常用的有两种，HTTP(S) 与 Socks。此外，基于 Iptables 实现的 Redirect 虽然实现了和代理服务器同样的效果，但是并不能称之为代理服务器，在这种现状下，我们这里同样将它也视为一种方案。</p>
-<h2>方案设计</h2>
-<p>现在，我们提出解决问题的思路:</p>
-<ol>
-<li>如果希望一个设备在接入网络后不需要做任何配置就能够实现全局代理（对该设备而言也是透明代理）的话，我们需要实现当设备访问到路由器时能够在路由器内部实现分流。</li>
-<li>我们需要在路由器里面设计 Iptables Redirect 到 HTTP(S)/Socks/Redir，或是使用路由表将流量引入到 HTTP(S)/Socks/Redir 代理所在的服务器。</li>
-</ol>
-<p>到这里，可能 Iptables Redirect 是最受广大软路由玩家青睐的，这个做法我觉得是可行的，搭配一些脚本实现健康检查也不是非常困难的事情，它应该能工作的很好。</p>
-<p>然而我并不喜欢使用 ipset 这样的方式去处理流量，因为我算不上是个软路由玩家，相比起来软路由，我更喜欢商业路由器，不过本文的方案依旧能够在 OPNSense 或是 OpenWRT 上工作。</p>
-<p>如果我们放弃了使用 Iptables Redirect 的方案，那么就产生了下面两个问题:</p>
-<ol>
-<li>如何将路由表导入到路由器内部，进而将流量路由到特定的网络位置？</li>
-<li>如何将三层协议路由过去的流量导入到三层协议以上的 HTTP(S)/Socks/Redir 代理所在的服务器？</li>
-</ol>
-<p>对于第一个问题，这个问题的解决办法有很多，我们暂时不做讨论。</p>
-<p>再看第二个问题，对于 HTTP(S) 代理服务器，笔者找到了 tun2proxy，对于 Socks 代理服务器，tun2socks 就很好用，而对于 Redir，很抱歉，笔者没有什么建议，因此才有了本文的第一句话「本文的方案是为标准代理服务器 HTTP(S) 与 Socks 而设计的」。顺便一提，由于 Socks 代理比 HTTP(S) 有更好的性能，笔者推荐使用 Socks + tun2socks。而 tun2socks 与 tun2proxy，简单来说就是能够实现将进入到 tun 虚拟网卡的流量转发到 Socks/HTTP(S) 代理服务器。</p>
-<p>接着，我们可以利用一种办法从路由器按照特定的路由表将流量引流到 tun 虚拟网卡上（tun 虚拟网卡的位置可以是在 HTTP(S)/Socks/Redir 代理所在的服务器，也可以是另外一台机器，笔者推荐将 tun 虚拟网卡启动在 HTTP(S)/Socks/Redir 代理所在的服务器上面）以实现设备的全局透明代理。</p>
-<p>现在回看第一个问题，尽管第一个问题的解决方案有很多，但是如何较为轻松的维护这个路由表实际上还是值得讨论的。笔者这里使用了 [<a href="https://idndx.com/use-routeros-ospf-and-raspberry-pi-to-create-split-routing-for-different-ip-ranges/" rel="nofollow">idndx.com</a>](<a href="https://idndx.com/use-routeros-ospf-and-raspberry-pi-to-create-split-routing-for-different-ip-ranges/" rel="nofollow">https://idndx.com/use-routeros-ospf-and-raspberry-pi-to-create-split-routing-for-different-ip-ranges/</a>) 提供的解决方案。该作者制作了非大陆 IP 的路由表，能够搭配 OSPF 实现动态的更新路由器内部的路由表。</p>
-<h2>实现过程</h2>
-<p>我们假设，你已经有了一个 socks 代理服务器，以及已经有了一个无污染的 DNS，随便他们部署在什么位置，只要他们是可用的。</p>
-<p>后续的演示仅针对 IPv4，对于 Ipv6 同样可以照葫芦画瓢实现，对于防火墙放行规则，请自行查阅文档处理。</p>
-<h3>Tun2socks</h3>
-<p>开启服务器的路由转发</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sysctl -w net.ipv4.ip_forward=1</pre></div>
-<p>创建 TUN 虚拟网卡</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ip tuntap add mode tun dev tun0
-ip addr add 198.18.0.1/15 dev tun0
-ip link <span class="pl-c1">set</span> dev tun0 up</pre></div>
-<p>开启 tun 虚拟网卡到 socks5 的转发</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">tun2socks -device tun0 -proxy socks5://<span class="pl-k">&lt;</span>your_server<span class="pl-k">&gt;</span>:<span class="pl-k">&lt;</span>your_port<span class="pl-k">&gt;</span> -interface eth0</pre></div>
-<p>我们不需要按照 Tun2socks 的 Wiki 为 tun 虚拟网卡开启任何的路由规则，因为这些路由规则将有 Bird 来做。</p>
-<h3>Bird</h3>
-<p>安装并启动 bird，略。</p>
-<h3>生成使用 tun 网卡的路由表规则</h3>
-<p>你可以使用 nchnroutes 来生成这张表，要记得注意修改出接口的名字，并且使用 exclude 选项排除一些地址，比如代理服务器的地址，请根据你的实际情况来落实。</p>
-<p>/etc/bird/routes4.conf</p>
-<pre class="notranslate"><code class="notranslate">...
-route 1.1.1.1/32 via "tun0";
-...
+<div class="markdown-body" id="postBody"><p>可不可以在局域网内使用 Samba (共享文件夹) 来安装 Office 2016/2019 呢？</p>
+<p>当然是可以的。</p>
+<p>可不可以在安装 Office 2016/2019 时选择选择自己所需要的功能呢？</p>
+<p>当然也是可以的。</p>
+<h2>创建描述文件</h2>
+<p>这是一份将会只生成 Word，Excel，PowerPoint，以及 Visio 的描述文件。</p>
+<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;<span class="pl-ent">Configuration</span>&gt;
+  &lt;<span class="pl-ent">Add</span> <span class="pl-e">OfficeClientEdition</span>=<span class="pl-s"><span class="pl-pds">"</span>64<span class="pl-pds">"</span></span> <span class="pl-e">Channel</span>=<span class="pl-s"><span class="pl-pds">"</span>PerpetualVL2019<span class="pl-pds">"</span></span> <span class="pl-e">AllowCdnFallback</span>=<span class="pl-s"><span class="pl-pds">"</span>True<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">Product</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>ProPlus2019Volume<span class="pl-pds">"</span></span>&gt;
+      &lt;<span class="pl-ent">Language</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>zh-cn<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Access<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Groove<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Lync<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>OneDrive<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>OneNote<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Outlook<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Publisher<span class="pl-pds">"</span></span> /&gt;
+    &lt;/<span class="pl-ent">Product</span>&gt;
+    &lt;<span class="pl-ent">Product</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>VisioPro2019Volume<span class="pl-pds">"</span></span>&gt;
+      &lt;<span class="pl-ent">Language</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>zh-cn<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Groove<span class="pl-pds">"</span></span> /&gt;
+      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>OneDrive<span class="pl-pds">"</span></span> /&gt;
+    &lt;/<span class="pl-ent">Product</span>&gt;
+  &lt;/<span class="pl-ent">Add</span>&gt;
+&lt;/<span class="pl-ent">Configuration</span>&gt;
+</pre></div>
+<p>描述文件也可以使用 Office Tool Plus 完成创建。</p>
+<p>下载地址: <a href="https://otp.landian.vip/zh-cn/" rel="nofollow">https://otp.landian.vip/zh-cn/</a></p>
+<h2>下载安装文件</h2>
+<p>下载 Office Deployment Tool</p>
+<p><a href="https://www.microsoft.com/en-us/download/details.aspx?id=49117" rel="nofollow">https://www.microsoft.com/en-us/download/details.aspx?id=49117</a></p>
+<p>安装后，能够看到一个 setup.exe 和若干个 xml 文件，你可以删掉那几个 xml 文件，也可以置之不理。</p>
+<p>将我们的描述文件 configuration.xml 放到 setup.exe 所在的目录，并使用 CMD 执行如下命令</p>
+<pre class="notranslate"><code class="notranslate">setup.exe /download configuration.xml
 </code></pre>
-<h3>配置 OSPF 将路由表广播给路由器</h3>
-<p>/etc/bird/bird.conf</p>
-<pre class="notranslate"><code class="notranslate"># This is a minimal configuration file, which allows the bird daemon to start
-# but will not cause anything else to happen.
-#
-# Please refer to the documentation in the bird-doc package or BIRD User's
-# Guide on &lt;http://bird.network.cz/&gt; for more information on configuring BIRD and
-# adding routing protocols.
-
-# Change this into your BIRD router ID. It's a world-wide unique identification
-# of your router, usually one of router's IPv4 addresses.
-router id 10.255.255.2;
-
-# The Kernel protocol is not a real routing protocol. Instead of communicating
-# with other routers in the network, it performs synchronization of BIRD's
-# routing tables with the OS kernel.
-protocol kernel {
-	scan time 60;
-	import none;
-	export all;   # Actually insert routes into the kernel routing table
-}
-
-# The Device protocol is not a real routing protocol. It doesn't generate any
-# routes and it only serves as a module for getting information about network
-# interfaces from the kernel.
-protocol device {
-	scan time 60;
-}
-
-protocol static {
-	include "routes4.conf";
-}
-
-protocol ospf {
-	export all;
-	area 0.0.0.0 {
-		interface "eth1" {
-			authentication simple;
-			password "yourpassword";
-		};
-	};
-}
-</code></pre>
+<p>一切顺利的话，你会看到一个名为 Office 的文件夹。</p>
+<h2>创建共享文件夹</h2>
+<p>使用 Windows 搭建一个共享文件夹，当然你也可以使用 Linux 搭建一个 Samba 服务器，然后将 setup.exe configuration.xml 以及 Office 放到这个共享文件夹中。</p>
+<p>确保你能够在其他计算机上使用类似 <code class="notranslate">\\\\192.168.10.254\\OFFICE2019\\</code> 的方式访问到安装文件。</p>
+<h2>创建一个安装脚本</h2>
 <ul>
-<li>export all: 将路由插入到内核路由表</li>
-<li>router id: OSPF 实例的唯一标识符，一般填写本设备的 IP 地址。</li>
-<li>interface: 使用哪张网卡进行 OSPF 路由广播。</li>
-<li>authentication: 有多种选项，simple 是指明文传输，其他的请自己查阅文档</li>
-<li>password: 顾名思义</li>
+<li>Network-INSTALL-OFFICE.bat</li>
 </ul>
-<h3>Reload Bird 使配置生效</h3>
-<div class="highlight highlight-source-shell"><pre class="notranslate">birdc configure</pre></div>
-<p>你可以使用 <code class="notranslate">curl --interface tun0 &lt;https://1.1.1.1&gt;</code> 测试你的 tun 虚拟网卡是否工作（访问的地址需要在上面的路由表内）。</p>
-<h3>配置路由器</h3>
-<p>在路由器上配置 OSFP 接受来自 Bird 的路由广播，请参考你的路由器使用手册，如果一切正常，你能够在你的路由器里面看到接收到的来自 Bird 的路由表。</p>
-<h2>宕机测试</h2>
-<p>关闭 bird 服务或是关闭 tun 网卡与 bird 所在服务器后，路由器中的路由表会消失。</p>
-<h2>注意事项</h2>
-<p>sometimes we need to disable rp_filter for the corresponding interface so that it can receive packets from other interfaces.</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sysctl net.ipv4.conf.all.rp_filter=0
-sysctl net.ipv4.conf.eth0.rp_filter=0</pre></div>
+<pre class="notranslate"><code class="notranslate">@echo off
+
+setlocal
+
+::Store working directory to return after finished
+set WORKDIR=%CD%
+
+::Map and switch to a network drive and give it unmapped drive letter
+pushd \\\\192.168.10.254\\OFFICE2019\\
+
+::Store the name of the network drive so it can be unmapped when finished
+Set NETDRIVE=%CD%
+set NETDRIVE=%NETDRIVE:\\=%
+
+::Change back to the original directory
+cd /d %WORKDIR%
+
+::Run commands with the network drive mapped
+%NETDRIVE%\\setup.exe /configure
+
+::Uncomment this to catch errors from the executable
+::if %errorlevel% GTR o exit %errorlevel%
+
+::Unmap the network drive
+net use %NETDRIVE% /delete /y
+
+endlocal
+</code></pre>
+<h2>执行安装</h2>
+<p>只需要把安装脚本 Network-INSTALL-OFFICE.bat 拷贝到目标计算机上，然后双击执行即可安装。</p>
+<p>根据本文的实际测试，千兆有线网络 + SATA SSD 下，在 PD 虚拟机内安装完 Word, Excel, PowePoint 以及 Visio 总计耗时不到 5 分钟。</p>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

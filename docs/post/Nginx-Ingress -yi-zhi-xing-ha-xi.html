@@ -10,13 +10,17 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="在 Jenkins 使用 distributed builds 时，可能会遇到一些特定的网络环境使得 Jenkins Master 无法通过 SSH Agent 一类的方式实现主动的与 Jenkins Node 建立链接。">
-<meta property="og:title" content="Jenkins 使用 Inbound Agent">
-<meta property="og:description" content="在 Jenkins 使用 distributed builds 时，可能会遇到一些特定的网络环境使得 Jenkins Master 无法通过 SSH Agent 一类的方式实现主动的与 Jenkins Node 建立链接。">
+<meta name="description" content="有没有办法让同一个客户端的请求落在同一个 Pod 上面？
+
+在回答这个问题之前我们先来看看 Nginx-Ingress 是如何工作的。">
+<meta property="og:title" content="Nginx-Ingress 一致性哈希">
+<meta property="og:description" content="有没有办法让同一个客户端的请求落在同一个 Pod 上面？
+
+在回答这个问题之前我们先来看看 Nginx-Ingress 是如何工作的。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/12.html">
+<meta property="og:url" content="https://blog.motofans.club/post/Nginx-Ingress%20-yi-zhi-xing-ha-xi.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Jenkins 使用 Inbound Agent</title>
+<title>Nginx-Ingress 一致性哈希</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -59,7 +63,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Jenkins 使用 Inbound Agent</h1>
+<h1 class="postTitle">Nginx-Ingress 一致性哈希</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -77,45 +81,18 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>在 Jenkins 使用 distributed builds 时，可能会遇到一些特定的网络环境使得 Jenkins Master 无法通过 SSH Agent 一类的方式实现主动的与 Jenkins Node 建立链接。这时候往往会在 Jenkins Master 上开启一个 TCP Inboud Port， 让 Agent 节点主动连接到 Jenkins Master。这样需要为 Jenkins Master 多开放了一个端口，而如果 Jenkins Master 部署在 Kubernettes 的话，则需要另外引入一个 config-map 来为 Nginx Ingress 增加 TCP 服务暴露。</p>
-<h2>更好的实现</h2>
-<p>Jenkins 于 2.217 版本的增加了 Websocket 支持。</p>
-<p><a href="https://www.jenkins.io/blog/2020/02/02/web-socket/" rel="nofollow">https://www.jenkins.io/blog/2020/02/02/web-socket/</a></p>
-<p>使用 Websocket，当 Inbound Agent 启动时会与  <a href="https://jenkins.yourdomain.com/wsagents/" rel="nofollow">https://jenkins.yourdomain.com/wsagents/</a> 建立 Websoket 连接，这是一个双向流式的长连接，它并不需要在 Jenkins Master 上开启更多的端口。</p>
-<h2>启用 Websocket</h2>
-<p>如果你使用的是 Nginx，请为 PATH: /wsagents/ 打开 websocket 支持，这里不做说明</p>
-<h3>配置 Nginx Ingress</h3>
-<p>很多资料都提到了 Nginx Ingress 需要添加注解以支持 Websocket，但是下面的 Ingress 示例中并没有添加注解。原因如下：</p>
-<p><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="344337367" data-permission-text="Title is private" data-url="https://github.com/nginxinc/kubernetes-ingress/issues/322" data-hovercard-type="issue" data-hovercard-url="/nginxinc/kubernetes-ingress/issues/322/hovercard" href="https://github.com/nginxinc/kubernetes-ingress/issues/322">nginxinc/kubernetes-ingress#322</a></p>
-<p><code class="notranslate">The only reason I can think of where this would be the case, is if you are actually running the community ingress controller instead where the Upgrade and Connection headers are added based on NGINX map based conditions. Without the need for any annotation.</code></p>
-<p>也就是说 community ingress controller 并不需要添加注解。</p>
-<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">kind</span>: <span class="pl-s">Ingress</span>
-<span class="pl-ent">apiVersion</span>: <span class="pl-s">extensions/v1beta1</span>
-<span class="pl-ent">metadata</span>:
-  <span class="pl-ent">name</span>: <span class="pl-s">jenkins-ingress</span>
-  <span class="pl-ent">namespace</span>: <span class="pl-s">sre-devops</span>
-  <span class="pl-ent">annotations</span>:
-    <span class="pl-ent">kubesphere.io/creator</span>: <span class="pl-s">admin</span>
-<span class="pl-ent">spec</span>:
-  <span class="pl-ent">tls</span>:
-    - <span class="pl-ent">hosts</span>:
-        - <span class="pl-s">jenkins.yourdomain.com</span>
-      <span class="pl-ent">secretName</span>: <span class="pl-s">aks-ingress-tls</span>
-  <span class="pl-ent">rules</span>:
-    - <span class="pl-ent">host</span>: <span class="pl-s">jenkins.yourdomain.com</span>
-      <span class="pl-ent">http</span>:
-        <span class="pl-ent">paths</span>:
-          - <span class="pl-ent">path</span>: <span class="pl-s">/</span>
-            <span class="pl-ent">pathType</span>: <span class="pl-s">ImplementationSpecific</span>
-            <span class="pl-ent">backend</span>:
-              <span class="pl-ent">serviceName</span>: <span class="pl-s">jenkins-http-api</span>
-              <span class="pl-ent">servicePort</span>: <span class="pl-c1">80</span>
-</pre></div>
-<h3>配置 Agent 节点</h3>
-<p>开启 Websocket 的方式很简单，在 Jenkins Master 中点击添加一个 Node，然后勾选 Use WebSocket 即可。</p>
-<p>将 4.0 版本以后的 agent.jar 上传至 Agent 节点，执行启动命令即可。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">java -jar agent.jar -jnlpUrl <span class="pl-k">&lt;</span>https://jenkins.yourdomain.com/computer/test/jenkins-agent.jnlp<span class="pl-k">&gt;</span> -secret @secret-file -workDir <span class="pl-s"><span class="pl-pds">"</span>/home/jenkins<span class="pl-pds">"</span></span></pre></div>
-<p>现在你可以在 Jenkins Master 中看到一个 Jenkins Agent 上线了。</p>
+<div class="markdown-body" id="postBody"><p>有没有办法让同一个客户端的请求落在同一个 Pod 上面？</p>
+<p>在回答这个问题之前我们先来看看 Nginx-Ingress 是如何工作的。</p>
+<h2>Nginx-Ingress</h2>
+<p>Nginx-Ingress 是使用 Nginx 作为反向代理和负载均衡器的 Kubernetes Ingress 控制器， 作为 Pod 执行在 kube-system 命名空间。</p>
+<p>当我们在配置一个 Nginx-Ingress 资源时，backend 往往会是一个 serviceName，这会另很多人产生错觉，会认为当客户端的流量打到 Nginx-Ingress 时，Nginx-Ingress 会把流量打到 对对应的 Services 上面，再由 Services 进行负载。</p>
+<p>而实际上，<em><strong>Nginx-Ingress 并不使用 Services 路由流量到 Pods</strong></em></p>
+<p>关于这一点，可以看看这篇官方发布的: Why endpoints and not services.</p>
+<p><a href="https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/" rel="nofollow">https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/</a></p>
+<p>观察 Nginx-Ingress Controller 中生成的 nginx.conf 可以发现，Nginx-Ingress 是通过Lua 动态获取的 Endpoints 数据。</p>
+<h2>一致性哈希</h2>
+<p>由于会访问到哪个 Pod 这件事儿是 Nginx-Ingrss 所决定的，那么一致性哈希的实现也一定是在 Nginx-Ingress 的配置上了。</p>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">nginx.ingress.kubernetes.io/upstream-hash-by</span>: <span class="pl-s"><span class="pl-pds">"</span>$host$request_uri<span class="pl-pds">"</span></span></pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

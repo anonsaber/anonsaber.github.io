@@ -10,17 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="可不可以在局域网内使用 Samba (共享文件夹) 来安装 Office 2016/2019 呢？
-
-当然是可以的。">
-<meta property="og:title" content="从网络位置安装 MS Office">
-<meta property="og:description" content="可不可以在局域网内使用 Samba (共享文件夹) 来安装 Office 2016/2019 呢？
-
-当然是可以的。">
+<meta name="description" content="尽管 S3 似乎已经成为云存储的事实标准，不过 Azure Blob 并不支持。">
+<meta property="og:title" content="Azure Blob 兼容 S3-API">
+<meta property="og:description" content="尽管 S3 似乎已经成为云存储的事实标准，不过 Azure Blob 并不支持。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/11.html">
+<meta property="og:url" content="https://blog.motofans.club/post/Azure%20Blob%20-jian-rong-%20S3-API.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>从网络位置安装 MS Office</title>
+<title>Azure Blob 兼容 S3-API</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -63,7 +59,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">从网络位置安装 MS Office</h1>
+<h1 class="postTitle">Azure Blob 兼容 S3-API</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -81,80 +77,81 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>可不可以在局域网内使用 Samba (共享文件夹) 来安装 Office 2016/2019 呢？</p>
-<p>当然是可以的。</p>
-<p>可不可以在安装 Office 2016/2019 时选择选择自己所需要的功能呢？</p>
-<p>当然也是可以的。</p>
-<h2>创建描述文件</h2>
-<p>这是一份将会只生成 Word，Excel，PowerPoint，以及 Visio 的描述文件。</p>
-<div class="highlight highlight-text-xml"><pre class="notranslate">&lt;<span class="pl-ent">Configuration</span>&gt;
-  &lt;<span class="pl-ent">Add</span> <span class="pl-e">OfficeClientEdition</span>=<span class="pl-s"><span class="pl-pds">"</span>64<span class="pl-pds">"</span></span> <span class="pl-e">Channel</span>=<span class="pl-s"><span class="pl-pds">"</span>PerpetualVL2019<span class="pl-pds">"</span></span> <span class="pl-e">AllowCdnFallback</span>=<span class="pl-s"><span class="pl-pds">"</span>True<span class="pl-pds">"</span></span>&gt;
-    &lt;<span class="pl-ent">Product</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>ProPlus2019Volume<span class="pl-pds">"</span></span>&gt;
-      &lt;<span class="pl-ent">Language</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>zh-cn<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Access<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Groove<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Lync<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>OneDrive<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>OneNote<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Outlook<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Publisher<span class="pl-pds">"</span></span> /&gt;
-    &lt;/<span class="pl-ent">Product</span>&gt;
-    &lt;<span class="pl-ent">Product</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>VisioPro2019Volume<span class="pl-pds">"</span></span>&gt;
-      &lt;<span class="pl-ent">Language</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>zh-cn<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>Groove<span class="pl-pds">"</span></span> /&gt;
-      &lt;<span class="pl-ent">ExcludeApp</span> <span class="pl-e">ID</span>=<span class="pl-s"><span class="pl-pds">"</span>OneDrive<span class="pl-pds">"</span></span> /&gt;
-    &lt;/<span class="pl-ent">Product</span>&gt;
-  &lt;/<span class="pl-ent">Add</span>&gt;
-&lt;/<span class="pl-ent">Configuration</span>&gt;
-</pre></div>
-<p>描述文件也可以使用 Office Tool Plus 完成创建。</p>
-<p>下载地址: <a href="https://otp.landian.vip/zh-cn/" rel="nofollow">https://otp.landian.vip/zh-cn/</a></p>
-<h2>下载安装文件</h2>
-<p>下载 Office Deployment Tool</p>
-<p><a href="https://www.microsoft.com/en-us/download/details.aspx?id=49117" rel="nofollow">https://www.microsoft.com/en-us/download/details.aspx?id=49117</a></p>
-<p>安装后，能够看到一个 setup.exe 和若干个 xml 文件，你可以删掉那几个 xml 文件，也可以置之不理。</p>
-<p>将我们的描述文件 configuration.xml 放到 setup.exe 所在的目录，并使用 CMD 执行如下命令</p>
-<pre class="notranslate"><code class="notranslate">setup.exe /download configuration.xml
+<div class="markdown-body" id="postBody"><p>尽管 S3 似乎已经成为云存储的事实标准，不过 Azure Blob 并不支持。Minio 以前有个 Azure Blob 的网关服务，随着后面的更新也不再支持。</p>
+<h2>S3Proxy</h2>
+<p>s3proxy 提供了一种在 Microsoft Azure 上实现 S3 API 兼容性的方法。详细的步骤和解决方案可在以下链接中找到：</p>
+<p><a href="https://ventral.digital/posts/2020/10/11/s3-api-compatibility-on-microsoft-azure/" rel="nofollow">S3 API compatibility on Microsoft Azure</a></p>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">apiVersion</span>: <span class="pl-c1">v1</span>
+<span class="pl-ent">kind</span>: <span class="pl-s">Namespace</span>
+<span class="pl-ent">metadata</span>:
+  <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
+---
+<span class="pl-ent">apiVersion</span>: <span class="pl-c1">v1</span>
+<span class="pl-ent">kind</span>: <span class="pl-s">Service</span>
+<span class="pl-ent">metadata</span>:
+  <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
+<span class="pl-ent">spec</span>:
+  <span class="pl-ent">selector</span>:
+    <span class="pl-ent">app</span>: <span class="pl-s">s3proxy</span>
+  <span class="pl-ent">ports</span>:
+  - <span class="pl-ent">protocol</span>: <span class="pl-s">TCP</span>
+    <span class="pl-ent">port</span>: <span class="pl-c1">80</span>
+    <span class="pl-ent">targetPort</span>: <span class="pl-c1">80</span>
+---
+<span class="pl-ent">apiVersion</span>: <span class="pl-s">apps/v1</span>
+<span class="pl-ent">kind</span>: <span class="pl-s">Deployment</span>
+<span class="pl-ent">metadata</span>:
+  <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
+<span class="pl-ent">spec</span>:
+  <span class="pl-ent">replicas</span>: <span class="pl-c1">1</span>
+  <span class="pl-ent">selector</span>:
+    <span class="pl-ent">matchLabels</span>:
+      <span class="pl-ent">app</span>: <span class="pl-s">s3proxy</span>
+  <span class="pl-ent">template</span>:
+    <span class="pl-ent">metadata</span>:
+      <span class="pl-ent">labels</span>:
+        <span class="pl-ent">app</span>: <span class="pl-s">s3proxy</span>
+    <span class="pl-ent">spec</span>:
+      <span class="pl-ent">containers</span>:
+        - <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
+          <span class="pl-ent">image</span>: <span class="pl-s">andrewgaul/s3proxy:s3proxy-1.9.0</span>
+          <span class="pl-ent">ports</span>:
+            - <span class="pl-ent">containerPort</span>: <span class="pl-c1">80</span>
+              <span class="pl-ent">protocol</span>: <span class="pl-s">TCP</span>
+          <span class="pl-ent">env</span>:
+            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_PROVIDER</span>
+              <span class="pl-ent">value</span>: <span class="pl-s">azureblob</span>
+            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_REGIONS</span>
+              <span class="pl-ent">value</span>: <span class="pl-s">homelab</span>
+            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_IDENTITY</span>
+              <span class="pl-ent">value</span>: <span class="pl-s">azure_storage_account_name</span>
+            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_CREDENTIAL </span>
+              <span class="pl-ent">value</span>: <span class="pl-s">azure_storage_account_key</span>
+            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_ENDPOINT</span>
+              <span class="pl-ent">value</span>: <span class="pl-s">https://azure_storage_account_name.blob.core.chinacloudapi.cn</span>
+            - <span class="pl-ent">name</span>: <span class="pl-s">S3PROXY_IDENTITY</span>
+              <span class="pl-ent">value</span>: <span class="pl-s">custom_aws_access_key_id</span>
+            - <span class="pl-ent">name</span>: <span class="pl-s">S3PROXY_CREDENTIAL</span>
+              <span class="pl-ent">value</span>: <span class="pl-s">custom_aws_secret_access_key</span></pre></div>
+<p>其中，JCLOUDS_IDENTITY 是 Azure Storage Account 的 Name，对应的 JCLOUDS_CREDENTIAL 是 Azure Storage Account 的 Access KEY，由于 s3proxy 方面没有很好的处理特殊字符，请务必轮询出来一个没有斜杠等特殊字符的 Access KEY。</p>
+<p>而 S3PROXY_IDENTITY 与 S3PROXY_CREDENTIAL 则是 AWS CLI 类似的工具在访问 S3Proxy 时所需要的。</p>
+<h2>测试 S3Proxy</h2>
+<h3>创建一个 blob</h3>
+<p>在 Azure blob 中创建一个 Blob，比如名为 ares-test</p>
+<h3>向 blob 写入文件</h3>
+<p>本文以 AWS CLI 为例进行测试，请自行安装。</p>
+<p>首先编辑 <code class="notranslate">~/.aws/credentials</code> 配置文件并添加以下行：</p>
+<pre class="notranslate"><code class="notranslate">[default]
+aws_access_key_id = custom_aws_access_key_id
+aws_secret_access_key = custom_aws_secret_access_key
 </code></pre>
-<p>一切顺利的话，你会看到一个名为 Office 的文件夹。</p>
-<h2>创建共享文件夹</h2>
-<p>使用 Windows 搭建一个共享文件夹，当然你也可以使用 Linux 搭建一个 Samba 服务器，然后将 setup.exe configuration.xml 以及 Office 放到这个共享文件夹中。</p>
-<p>确保你能够在其他计算机上使用类似 <code class="notranslate">\\\\192.168.10.254\\OFFICE2019\\</code> 的方式访问到安装文件。</p>
-<h2>创建一个安装脚本</h2>
-<ul>
-<li>Network-INSTALL-OFFICE.bat</li>
-</ul>
-<pre class="notranslate"><code class="notranslate">@echo off
-
-setlocal
-
-::Store working directory to return after finished
-set WORKDIR=%CD%
-
-::Map and switch to a network drive and give it unmapped drive letter
-pushd \\\\192.168.10.254\\OFFICE2019\\
-
-::Store the name of the network drive so it can be unmapped when finished
-Set NETDRIVE=%CD%
-set NETDRIVE=%NETDRIVE:\\=%
-
-::Change back to the original directory
-cd /d %WORKDIR%
-
-::Run commands with the network drive mapped
-%NETDRIVE%\\setup.exe /configure
-
-::Uncomment this to catch errors from the executable
-::if %errorlevel% GTR o exit %errorlevel%
-
-::Unmap the network drive
-net use %NETDRIVE% /delete /y
-
-endlocal
+<p>然后将以下行添加到您的 <code class="notranslate">~/.aws/config</code> 文件中：</p>
+<pre class="notranslate"><code class="notranslate">[default]
+endpoint_url=http://s3proxy
+region=homelab
 </code></pre>
-<h2>执行安装</h2>
-<p>只需要把安装脚本 Network-INSTALL-OFFICE.bat 拷贝到目标计算机上，然后双击执行即可安装。</p>
-<p>根据本文的实际测试，千兆有线网络 + SATA SSD 下，在 PD 虚拟机内安装完 Word, Excel, PowePoint 以及 Visio 总计耗时不到 5 分钟。</p>
+<p>执行文件上传</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">aws s3 cp test-file.csv s3://ares-test/</pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

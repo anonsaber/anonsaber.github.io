@@ -10,13 +10,17 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="我们有两套 AKS （Azure Kubernetes Service），一套用于测试环境，另一套则是投产使用。">
-<meta property="og:title" content="AKS 上面的坑">
-<meta property="og:description" content="我们有两套 AKS （Azure Kubernetes Service），一套用于测试环境，另一套则是投产使用。">
+<meta name="description" content="## 背景
+
+Redhat/CentOS 在 release 8 后，没有再提供 minimal 镜像。">
+<meta property="og:title" content="客制化 Redhat/CentOS 8">
+<meta property="og:description" content="## 背景
+
+Redhat/CentOS 在 release 8 后，没有再提供 minimal 镜像。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/22.html">
+<meta property="og:url" content="https://blog.motofans.club/post/ke-zhi-hua-%20Redhat-CentOS%208.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>AKS 上面的坑</title>
+<title>客制化 Redhat/CentOS 8</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -53,13 +57,13 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
     font-size: 12px;
 }
 </style>
-<style>.markdown-alert{padding:0.5rem 1rem;margin-bottom:1rem;border-left:.25em solid var(--borderColor-default,var(--color-border-default));}.markdown-alert .markdown-alert-title {display:flex;font-weight:var(--base-text-weight-medium,500);align-items:center;line-height:1;}.markdown-alert>:first-child {margin-top:0;}.markdown-alert>:last-child {margin-bottom:0;}</style><style>.markdown-alert.markdown-alert-note {border-left-color:var(--borderColor-accent-emphasis, var(--color-accent-emphasis));background-color:var(--color-accent-subtle);}.markdown-alert.markdown-alert-note .markdown-alert-title {color: var(--fgColor-accent,var(--color-accent-fg));}</style>
+
 
 
 
 <body>
     <div id="header">
-<h1 class="postTitle">AKS 上面的坑</h1>
+<h1 class="postTitle">客制化 Redhat/CentOS 8</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -77,44 +81,22 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>我们有两套 AKS （Azure Kubernetes Service），一套用于测试环境，另一套则是投产使用。这两套环境一年多的使用下来，大大小小踩了一些坑，这里总结一下。</p>
-<h2>不支持 IPVS</h2>
-<p>截至目前，AKS 的 kube-proxy 仍旧不能支持 IPVS。相关的 Issuses 开了有一年多之久，尚未见到官方有任何说明。</p>
-<p><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="695984145" data-permission-text="Title is private" data-url="https://github.com/Azure/AKS/issues/1846" data-hovercard-type="issue" data-hovercard-url="/Azure/AKS/issues/1846/hovercard" href="https://github.com/Azure/AKS/issues/1846">Azure/AKS#1846</a></p>
-<p>这就是说，较大规模的 AKS 集群会因为 iptables 而产生性能问题，如果遇到这个问题的朋友可以尝试使用 cilium 这个基于 eBPF 实现的 kube-proxy。</p>
-<p><a href="https://docs.cilium.io/en/v1.9/gettingstarted/k8s-install-aks/" rel="nofollow">https://docs.cilium.io/en/v1.9/gettingstarted/k8s-install-aks/</a></p>
-<div class="markdown-alert markdown-alert-note"><p class="markdown-alert-title"><svg class="octicon octicon-info mr-2" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-6.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13ZM6.5 7.75A.75.75 0 0 1 7.25 7h1a.75.75 0 0 1 .75.75v2.75h.25a.75.75 0 0 1 0 1.5h-2a.75.75 0 0 1 0-1.5h.25v-2h-.25a.75.75 0 0 1-.75-.75ZM8 6a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"></path></svg>Note</p><p>状态更新: 2023-03-09 该功能在海外版 AKS 实现支持，目前尚未 GA</p>
-</div>
-<h2>DNS 解析失败</h2>
-<p>在使用 kubenet CNI 部署的 AKS 上，CoreDNS 中 timeout 的事件常有发生，这是 Kubernetes 的通病，它主要是由 Iptables 中 Conntrack竞争导致的 DNS 超时。</p>
-<p>具体而言，在 AKS 上面，解决这个问题有三种办法。</p>
-<ol>
-<li>使用 Node-Local DNSCache，</li>
-<li>使用 cilium 替换 kube-proxy</li>
-<li>Azure CNI Transparent Mode</li>
-</ol>
-<p>但是，第一种办法 AKS 并没有提供官方支持，只是在这个 Issuse 下面提供了 workaround。</p>
-<p><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="579146662" data-permission-text="Title is private" data-url="https://github.com/Azure/AKS/issues/1492" data-hovercard-type="issue" data-hovercard-url="/Azure/AKS/issues/1492/hovercard" href="https://github.com/Azure/AKS/issues/1492">Azure/AKS#1492</a></p>
-<p>然而，测试下来并没有根本的解决问题，再查阅了更多的资料后发现很多使用 kubenet CNI 的人都有同样的问题。于是马上我们就遇到了下面的这个坑。</p>
-<h2>CNI 不可以更换</h2>
-<p>AKS 不支持在已有的集群上调整网络策略的开关，或是切换 CNI 插件。</p>
-<p><a href="https://docs.microsoft.com/en-us/azure/aks/use-network-policies" rel="nofollow">https://docs.microsoft.com/en-us/azure/aks/use-network-policies</a></p>
-<p>这导致如果我们想要从 kubenet CNI 切换到 Azure CNI 以能够使用 Azure CNI Transparent Mode 的话，就必须另外新建集群了。</p>
-<h2>更新服务主体密钥</h2>
-<p>AKS 默认签发的服务主体密钥为 1 年，到期后将无法创建新的 PV，LB 等等 Azure 的资源。</p>
-<p>Ceate Service-Principal</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">az ad sp create-for-rbac --skip-assignment --year 99</pre></div>
-<p>The SP_ID is your appId, and the SP_SECRET is your password:</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 这些是示例，使用 &lt;https://www.uuidgenerator.net&gt; 生成</span>
-SP_ID=74ab7ddf-5273-49d4-9284-34d5b5013f1e
-SP_SECRET=0ec740d5-aca8-48c9-baf5-0fc2818e46b0</pre></div>
-<p>Excute upgrade, the nodepool will be restart.</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">az aks update-credentials <span class="pl-cce">\\</span>
-  --resource-group <span class="pl-k">&lt;&gt;</span> <span class="pl-cce">\\</span>
-  --name <span class="pl-k">&lt;&gt;</span> <span class="pl-cce">\\</span>
-  --reset-service-principal <span class="pl-cce">\\</span>
-  --service-principal <span class="pl-smi">$SP_ID</span> <span class="pl-cce">\\</span>
-  --client-secret <span class="pl-smi">$SP_SECRET</span></pre></div>
+<div class="markdown-body" id="postBody"><h2>背景</h2>
+<p>Redhat/CentOS 在 release 8 后，没有再提供 minimal 镜像。超微的 IPMI 通过网络挂载 ISO 要求镜像不得大于 4.7GB。</p>
+<p>难道要每次使用 Boot 镜像来从网络安装系统吗？亦或是使用 JAVA Client 挂载 8GB 乃至 12GB 的 DVD 镜像（那东西有多卡谁用谁知道）？</p>
+<h2>新的方式</h2>
+<p><a href="https://www.redhat.com/sysadmin/rhel-image-builder" rel="nofollow">https://www.redhat.com/sysadmin/rhel-image-builder</a></p>
+<p>Redhat 提供了在线 Build 镜像的服务，不仅可以生成适用于 GCP/AWS/Azure 云环境的镜像，还可以生成适用于私有云的 qcow2/vmdk，以及适用于裸机环境的 ISO 镜像。</p>
+<p>不仅如此，你还可以在镜像中预置一些你喜欢的 packages，比如 memcached 或是 curl 等等，如果是制作 Redhat 镜像，你也可以将 Redhat 账号预先附加到镜像当中。</p>
+<p>你要做的仅仅是简单的配置，然后点击生成按钮，等待一段时间后即可下载你需要的镜像。</p>
+<p>!<a href="https://blog.motofans.club/static/img/bf1dd60404ab6f122fa66b45af688ee8.image.png" rel="nofollow">https://blog.motofans.club/static/img/bf1dd60404ab6f122fa66b45af688ee8.image.png</a></p>
+<h2>美中不足</h2>
+<p>这项服务没有提供将 kickstart 自动装机脚本一同打包到 ISO 镜像当中的服务。如果我们希望获得一个无人值守的 ISO 安装镜像，那么 kickstart 是必不可少的。</p>
+<h2>更进一步</h2>
+<p>使用 mkksiso 将生成的镜像改造成 kickstart 安装镜像。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">yum install lorax -y</pre></div>
+<p>将你准备好的 kickstart 文件与生成的 ISO 镜像放置在同一个机器当中，执行下面的命令以生产新的镜像。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">mkksiso /PATH/TO/KICKSTART /PATH/TO/ISO /PATH/TO/NEW-ISO</pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

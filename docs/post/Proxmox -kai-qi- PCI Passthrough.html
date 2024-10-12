@@ -10,21 +10,17 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 基础
+<meta name="description" content="## 前言
 
-在一个在未经过修改的系统上，内建了以下几张路由表
+为了提高虚拟机的性能，或是扩展其使用场景。">
+<meta property="og:title" content="Proxmox 开启 PCI Passthrough">
+<meta property="og:description" content="## 前言
 
-- **local**: 本地表，处理服务器内部的流量，并包括以太网适配器和广播流量，在大部分情况下不应该修改或是删除这张表。">
-<meta property="og:title" content="Linux 的路由表">
-<meta property="og:description" content="## 基础
-
-在一个在未经过修改的系统上，内建了以下几张路由表
-
-- **local**: 本地表，处理服务器内部的流量，并包括以太网适配器和广播流量，在大部分情况下不应该修改或是删除这张表。">
+为了提高虚拟机的性能，或是扩展其使用场景。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/5.html">
+<meta property="og:url" content="https://blog.motofans.club/post/Proxmox%20-kai-qi-%20PCI%20Passthrough.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Linux 的路由表</title>
+<title>Proxmox 开启 PCI Passthrough</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -67,7 +63,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Linux 的路由表</h1>
+<h1 class="postTitle">Proxmox 开启 PCI Passthrough</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -85,66 +81,118 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>基础</h2>
-<p>在一个在未经过修改的系统上，内建了以下几张路由表</p>
+<div class="markdown-body" id="postBody"><h2>前言</h2>
+<p>为了提高虚拟机的性能，或是扩展其使用场景。有时候，我们需要让虚拟机直接访问到硬件资源。</p>
+<p>开启 PCI Passthrough 需要硬件支持。</p>
+<h2>IOMMU</h2>
+<h3>IOMMU Enable</h3>
+<h3>查看当前主机是否支持</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep -e DMAR -e IOMMU
+</pre></div>
+<p>如果没有输出，则表示不支持。</p>
+<h3>修改内核启动参数</h3>
+<p>修改 /etc/default/grub</p>
 <ul>
-<li><strong>local</strong>: 本地表，处理服务器内部的流量，并包括以太网适配器和广播流量，在大部分情况下不应该修改或是删除这张表。</li>
-<li><strong>main</strong>: 主路由表，实际上的默认表，<code class="notranslate">ip route</code> ****命令在没有指定表的情况下都会对主表进行操作。</li>
-<li><strong>default</strong>: 这个名字让人觉得这是默认情况下使用的路由表，然而实际上与其名称的逻辑相反，这是一张空表，你可以删除它。</li>
-<li><strong>unspec</strong>：当所有其他路由路径失败时，内核可以遵循，修改或是删除这张表，它不会显示在 <code class="notranslate">ip rule show</code> 里面。</li>
+<li>Intel CPU</li>
 </ul>
-<p>内建的路由表可以使用 <code class="notranslate">ip rule show</code> 命令查看</p>
-<pre class="notranslate"><code class="notranslate">0: from all lookup local
-32766: from all lookup main
-32767: from all lookup default
-</code></pre>
+<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet intel_iommu=on<span class="pl-pds">"</span></span>
+</pre></div>
 <ul>
-<li>from all 表示这条规则匹配所有源地址的 IP 包（all 也可以换成具体的 IP 或者 IP 段，类似的条件还有 to all）。</li>
-<li>lookup xxx 表示去查 xxx 这张路由表。</li>
+<li>AMD CPU</li>
 </ul>
-<p>因此，上面的输出翻译成人话就是：</p>
-<ol>
-<li>首先查 local 这张路由表，如果查到有一行匹配就按照这一行走；</li>
-<li>如果 local 表匹配不上，接着查 main 表；</li>
-<li>如果 main 表也匹配不上，就查 default 表；</li>
-</ol>
-<p>Linux 的主路由表 (也就是main) 可以使用 <code class="notranslate">ip route show</code> 命令查看</p>
-<pre class="notranslate"><code class="notranslate">default via 192.168.100.1 dev eth0 proto dhcp metric 600
-169.254.0.0/16 dev eth0 scope link metric 1000 
-172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
-192.168.100.0/24 dev eth0 proto kernel scope link src 192.168.100.13 metric 600 
-198.18.0.0/15 dev tun0 proto kernel scope link src 198.18.0.1
-</code></pre>
-<p>首先看第一列，Linux 会把一个 IP 包的目标地址和路由表第一列的网段进行匹配，如果发现匹配的行就按照那一行的路由规则进行转发，如果找不到匹配的，就按照 default 所在的行进行转发。</p>
-<p>第一列后，路由表的每一行都是由一连串的属性组成的：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet amd_iommu=on<span class="pl-pds">"</span></span>
+</pre></div>
+<h3>更新 grub</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">Proxmox:  update-grub
+OpenSUSE: grub2-mkconfig -o /etc/grub2-efi.cfg
+CentOS:   grub2-mkconfig -o /boot/efi/EFI/centos/grub.cfg
+</pre></div>
+<h3>重新启动主机</h3>
+<p>检查 grub 是否更新成功</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cat /proc/cmdline <span class="pl-k">|</span> grep iommu
+</pre></div>
+<h3>检查 IOMMU 是否开启</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">"</span>Virtualization Technology for Directed I/O<span class="pl-pds">"</span></span>
+</pre></div>
+<p>或</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep -e DMAR -e IOMMU <span class="pl-k">|</span> grep <span class="pl-c1">enable</span>
+</pre></div>
+
+<h3>PT Mode</h3>
+<p>Intel 与 AMD 芯片组均能够通过添加 "iommu=pt" 参数开启 PT 模式，以 Intel 为例:</p>
+<p>按照如下修改 /etc/default/grub 并更新 grub</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">GRUB_CMDLINE_LINUX_DEFAULT=<span class="pl-s"><span class="pl-pds">"</span>quiet intel_iommu=on iommu=pt<span class="pl-pds">"</span></span>
+</pre></div>
+<p>PT 模式只为直通模式中使用的设备启用 IOMMU，这将防止 Linux 试图接触 (touching) 无法直通的设备。</p>
+<h2>Interrupt Remapping</h2>
+<p><strong>要使用 PCI passthrough，Interrupt Remapping 是必须的。</strong></p>
+<p>Interrupt Remapping 能够工作在较新的设备上，你可以使用下面的命令查看当前的主机是否支持 Interrupt Remapping:</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">dmesg <span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">'</span>remapping<span class="pl-pds">'</span></span>
+</pre></div>
+<p>如果你看到了下面任何一行</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-s"><span class="pl-pds">"</span>AMD-Vi: Interrupt remapping enabled<span class="pl-pds">"</span></span>
+<span class="pl-s"><span class="pl-pds">"</span>DMAR-IR: Enabled IRQ remapping in x2apic mode<span class="pl-pds">"</span></span> (<span class="pl-s"><span class="pl-pds">'</span>x2apic<span class="pl-pds">'</span></span> can be different on old CPUs, but should still work)
+</pre></div>
+<p>那么当前的主机是能够支持 Interrupt Remapping 的。</p>
+<p>然而，如果当前的主机不支持 interrupt remapping，你可以使用如下命令开启 <code class="notranslate">unsafe interrupt remapping</code>:</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>options vfio_iommu_type1 allow_unsafe_interrupts=1<span class="pl-pds">"</span></span> <span class="pl-k">&gt;</span> /etc/modprobe.d/iommu_unsafe_interrupts.conf
+</pre></div>
+<p>完成上述修改后，你需要更新 initramfs 并重新启动系统</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">update-initramfs -u -k all
+</pre></div>
+<p>另外，你也可以尝试配置 Interrupt Remapping 的内核引导参数</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">intremap={on,off,nosid,no_x2apic_optout}
+</pre></div>
+<h2>验证 IOMMU 分组</h2>
+<div class="highlight highlight-source-shell"><pre class="notranslate">find /sys/kernel/iommu_groups/ -type l
+</pre></div>
+<h2>VFIO</h2>
+<h3>Required Moudules</h3>
+<p>修改 /etc/modules，开启以下 Kernel Moudules</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">vfio
+vfio_iommu_type1
+vfio_pci
+vfio_virqfd
+</pre></div>
+<h3>为 PCI 设备开启 VFIO</h3>
+<p>以 Intel 核心显卡为例:</p>
+<h3>查询 PCI 设备的 ID</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lspci -nn<span class="pl-k">|</span> grep <span class="pl-s"><span class="pl-pds">'</span>Intel Corporation<span class="pl-pds">'</span></span> <span class="pl-k">|</span> grep HD
+
+00:02.0 VGA compatible controller [0300]: Intel Corporation HD Graphics 630 [8086:5912] (rev 04)
+00:1f.3 Audio device [0403]: Intel Corporation 100 Series/C230 Series Chipset Family HD Audio Controller [8086:a170] (rev 31)
+</pre></div>
+<h3>绑定为 VFIO 设备</h3>
+<p>修改 /etc/modprobe.d/vfio.conf</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">options vfio-pci ids=8086:5912,8086:a170 disable_vga=1
+</pre></div>
+<p>在物理机禁用 Intel 核心显卡和音频，创建并修改 /etc/modprobe.d/custom-blacklist.conf</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">blacklist snd_hda_intel
+blacklist snd_hda_codec_hdmi
+blacklist i915</pre></div>
+<p>完成上述修改后，你需要更新 initramfs 并重新启动系统</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">update-initramfs -u -k all
+</pre></div>
+<p>重新启动系统后，确认 Intel 核心显卡使用的 driver 是不是 vfio-pci</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">lspci -nnk<span class="pl-k">|</span> grep -C1 vfio</pre></div>
+<p>现在你可以使用 virt-manager 或 Proxmox 在虚拟机上分配 PCI 设备了。</p>
+<h2>其他的内核启动参数</h2>
+<p>这里列举可能会用到的部分内核启动参数</p>
 <ul>
-<li>via 表示这个 IP 包应该发往的网关地址。</li>
-<li>dev 表示应该这个 IP 包应该从哪张网卡发出。</li>
-<li>metric 表示这一行路由规则的优先级，如果有多行路由都能够转发目标地址，那么系统会按照 metric 数值较小的一行来转发。</li>
-<li>scope link 表示目标地址在链路层可以直达，即不需要通过其他设备进一步转发了。</li>
-<li>proto 记录了这一行路由规则的来源。例如 kernel 说明这一行是内核加的，dhcp 则表明这一行来源于 DHCP。</li>
-<li>linkdown 表示这一行对应的网卡设备处于离线状态。</li>
-<li>src 表示这个 IP 包的源地址最好是 xxx。这个属性只有在一个 IP 包还没有确定源地址（也就是刚刚发出）的时候才有效，如果一个 IP 包已经有了一个源地址，那么这条规则是不会去改的。</li>
+<li>尽可能多的将 iommu groups 拆分，方便直通一些板载的设备</li>
 </ul>
-<h2>创建新的路由表</h2>
-<p>你可以在 <code class="notranslate">/etc/iproute2/rt_tables</code> 里面创建一些自定义的路由表，它们在文件中的顺序无关紧要。重要的是表名与编号，每个表在表文件中必须有唯一的名称/编号引用，路由表索引可以随时修改，与 DNS 不同，修改路由表文件不会有缓存问题，更改将立即生效，这是少数几个不需要重新启动服务即可使更改生效的包过滤组件。特别需要注意的是，文件中的编号并不能够代表优先级。</p>
-<pre class="notranslate"><code class="notranslate"># reserved values
-#
-255     local
-254     main
-253     default
-199     custom
-0       unspec
-#
-# local
-#
-#1      inr.ruhep
-</code></pre>
-<p>比如我们设置 只有当数据包目的地是IP地址 1.1.1.1 时，系统才会根据 custom 表中的路由信息来处理这些数据包，而该规则的优先级为300。</p>
-<p>首先我们需要在 custom 路由表里面创建一个去往 1.1.1.1 的路由规则</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ip route add 1.1.1.1/32 via 192.168.0.1 dev eth0 table custom</pre></div>
-<p>然后我们需要设置去往 1.1.1.1 的流量优先查找 custom 表</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ip rule add to 1.1.1.1 table custom priority 300</pre></div>
+<div class="highlight highlight-source-shell"><pre class="notranslate">pcie_acs_override=downstream,multifunction</pre></div>
+<ul>
+<li>禁用显卡的 frame buffering</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">video=vesafb:off
+video=efifb:off
+video=simplefb:off
+initcall_blacklist=sysfb_init</pre></div>
+<ul>
+<li>禁用显卡的 vesa driver</li>
+</ul>
+<div class="highlight highlight-source-shell"><pre class="notranslate">video=vesa:off</pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

@@ -10,17 +10,17 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 背景
+<meta name="description" content="## 前言
 
-在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。">
-<meta property="og:title" content="使用 ULogd 收集 Iptables 的日志">
-<meta property="og:description" content="## 背景
+我是不太喜欢 OpenWRT 的，相比来说 RouterOS 是我更中意的。">
+<meta property="og:title" content="OpenWRT Stable Release 编译">
+<meta property="og:description" content="## 前言
 
-在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。">
+我是不太喜欢 OpenWRT 的，相比来说 RouterOS 是我更中意的。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/4.html">
+<meta property="og:url" content="https://blog.motofans.club/post/OpenWRT%20Stable%20Release%20-bian-yi.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>使用 ULogd 收集 Iptables 的日志</title>
+<title>OpenWRT Stable Release 编译</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -63,7 +63,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">使用 ULogd 收集 Iptables 的日志</h1>
+<h1 class="postTitle">OpenWRT Stable Release 编译</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -81,41 +81,109 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>背景</h2>
-<p>在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。本来想着只需要使用<code class="notranslate">iptables –j LOG</code> 就可以轻松实现目标，然而由于这两台服务器上的流量是巨大的。使用这种方式直接导致了 CPU 单核被打爆。</p>
-<p>于是找到了 <a href="https://indico.cern.ch/event/1002953/contributions/4214017/subcontributions/328091/attachments/2186981/3697683/IRISSecurityWorkshopFeb2021_Centralized_Firewall_Logging_with_ulogd_and_loki.pdf" rel="nofollow">这篇文章</a>，它推荐了本文标题中提到的 ULogd。</p>
-<h2>简介</h2>
-<p>Ulogd 是 <a href="http://netfilter.org/" rel="nofollow">netfilter</a> 的一个项目，它是一个运行在用户态的日志记录守护进程，用于 NetFilter/iptables 相关日志记录。</p>
-<p>在 Ubuntu 上，你可以轻松的通过 apt 进行安装。而在 CentOS 上，由于官方的 Repo 里面并没有这个东西。所以你需要手动编译安装它，或是使用 <a href="http://repo.iotti.biz/" rel="nofollow">http://repo.iotti.biz/</a> 提供的 Repo。</p>
-<p>在我的使用场景下，ulogd 能极大的提升 Iptables Log 的性能，几乎没有开销。</p>
-<h2>配置</h2>
-<p>可惜的是，这个项目的文档写的不是太好，网上也少见现成的使用范例。这里只能介绍一下我本人的使用案例。</p>
-<h3>ulogd</h3>
-<p><em>/etc/ulogd.conf 的配置样例</em></p>
-<p>如果你使用的不是我在本文中提供的 RPM，请不要直接复制粘贴。对于较旧的版本，你可能需要调整 stack 部分为 ULOG 而不是 NFLOG，并且使用 <code class="notranslate">iptables -j ULOG --ulog-nlgroup &lt;id&gt;</code> 来记录 Log。</p>
-<pre class="notranslate"><code class="notranslate">[global]
-logfile="/var/log/ulogd/ulogd.log"
+<div class="markdown-body" id="postBody"><h2>前言</h2>
+<p>我是不太喜欢 OpenWRT 的，相比来说 RouterOS 是我更中意的。不过为了实现 CPE，还希望功能能够丰富一些，还想要网口多一些，还想要成本低一些，看起来也只能选择一些开发板，所以在前段时间我买了一个 MT7621 的开发板。</p>
+<p>然后插上 WIFI (MT7612EN + MT7922) 和 4G (移远 EC20) 模块后，发现这些模块并不能正常工作，虽然他们确实显示在 lsusb 中了。</p>
+<p>简单的搜了一些文档，发现需要 kmod，然后去装 kmod 的时候发现装不上。完球了，我猜我需要编译 OpenWRT 了。</p>
+<p>于是和商家要到了个开发资料，商家很爽快的就给了。解压之后，我先照着商家发的资料和文档照葫芦画瓢的编译了一个固件出来，并且很快的刷入了设备，发现问题并不像我之前想的那么简单...</p>
+<h2>调查</h2>
+<p>因为我一直不怎么关注 OpenWRT，我此时并不知道应该怎么处理下面这些在我脑子里浮现出来的问题：</p>
+<ul>
+<li>我需要在编译的时候就将 kmod 一起编译出来？</li>
+<li>如果我的问题没有得到解决，或是我更换了其他的硬件，需要更多的 kmod，我就可能需要不断的编译更多的东西？</li>
+<li>需要强制安装 kmod？</li>
+<li>官方的 opkg Repo，难道不能使用在自编译的固件上？</li>
+</ul>
+<p>这是当时我脑子里意识到的东西（虽然有些现在来看并不是那么准确）</p>
+<p>在我整理了思路后，我认为官方的固件也必然是个 CI/CD 来完成编译的，所以一定有办法在自编译固件上使用官方的 opkg Repo。至于强制安装或许能解决当下的问题，但是肯定是下下策。</p>
+<p>基于上面的判断，经过了一些搜索后我从下面的两个文章里面弄清了原因。</p>
+<p><a href="https://hamy.io/post/0015/how-to-compile-openwrt-and-still-use-the-official-repository/" rel="nofollow">https://hamy.io/post/0015/how-to-compile-openwrt-and-still-use-the-official-repository/</a></p>
+<p><a href="https://libremesh.org/development-kernel_vermagic.html" rel="nofollow">https://libremesh.org/development-kernel_vermagic.html</a></p>
+<p>你可以直接去看这两个文章，或是你可以留在这里继续看我的总结。</p>
+<h2>原因</h2>
+<p>自编译固件的 kernel 版本与官方 Repo 里面的 kmod 安装包中记录的 kernel 版本不匹配，准确的说是 vermagic。</p>
+<blockquote>
+<p>This is because OpenWRT has a system called “vermagic” that ensures you can only install kmod packages with the same settings as the build config settings of the kernel you are running.</p>
+</blockquote>
+<p>OpenWRT 通过一个名为 vermagic 的记录来确保你只能安装具有同样设置的 kmod 安装包。</p>
+<p>你可以用下面的命令查看你当前运行的固件的 vermagic</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">opkg list-installed kernel</pre></div>
+<h2>重新编译</h2>
+<p>现在，我们需要编译一个与官方 Stable Release 具有同样 vermagic 的自编译版本，并确保在刷入设备后能够从官方的 opkg Repo 安装 kmod。</p>
+<h3>查看官方固件的 vermagic</h3>
+<p>官方固件的 vermagic 从下载地址即可以看到，比如下面这个。</p>
+<p><a href="https://downloads.openwrt.org/releases/23.05.2/targets/ramips/mt7621/kmods/" rel="nofollow">https://downloads.openwrt.org/releases/23.05.2/targets/ramips/mt7621/kmods/</a></p>
+<p>里面能够看到这样一个目录: 5.15.137-1-9c242f353867f49a96054ff8c9f2c460，其中 9c242f353867f49a96054ff8c9f2c460 就是官方固件的 vermagic</p>
+<h3>编译特定 vermagic 的固件</h3>
+<h3>检出代码</h3>
+<p>由于上面我们查看的是 Stable Release 23.05.2 的 vermagic，所以我们需要检出 Stable Release 23.05.2 的 Tag。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">git clone https://git.openwrt.org/openwrt/openwrt.git
+<span class="pl-c1">cd</span> openwrt
+git checkout v23.05.2</pre></div>
+<h3>更新并安装 feeds</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 更新库</span>
+./scripts/feeds update -a
 
-plugin="/usr/lib64/ulogd/ulogd_inppkt_NFLOG.so"
-plugin="/usr/lib64/ulogd/ulogd_filter_IFINDEX.so"
-plugin="/usr/lib64/ulogd/ulogd_filter_IP2STR.so"
-plugin="/usr/lib64/ulogd/ulogd_filter_PRINTPKT.so"
-plugin="/usr/lib64/ulogd/ulogd_output_LOGEMU.so"
-plugin="/usr/lib64/ulogd/ulogd_raw2packet_BASE.so"
+<span class="pl-c"><span class="pl-c">#</span> 下载软件包</span>
+./scripts/feeds install -a</pre></div>
+<h3>调整代码</h3>
 
-stack=log1:NFLOG,base1:BASE,ifi1:IFINDEX,ip2str1:IP2STR,print1:PRINTPKT,emu1:LOGEMU
+💡 如果你需要修改 DTS 请在更新并安装 feeds 后开始。比如我的开发板硬件与 mqmaker WiTi Board 很像，所以我需要将此设备的 DTS 按照商家所提供的 DTS 进行修改。在编译时即可以将机型选择为 mqmaker WiTi Board。而如果你的设备无需修改 DTS，它是官方固件下载地址里面有的，那你又何必如此折腾的编译固件呢?
 
-[log1]
-group=1
+<h3>设置 .config</h3>
+<p>获取 Stable Release 23.05.2 官方固件的 config.buildinfo</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">wget -O .config https://downloads.openwrt.org/releases/23.05.2/targets/ramips/mt7621/config.buildinfo</pre></div>
+<p>补全 .config</p>
+<p>上面的 config 是一份精简的配置，我们首先需要对其进行补全。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">make defconfig</pre></div>
+<h3>检查 vermagic</h3>
+<p>编译完整的固件会花费非常久的时间，你肯定不想完成构建后发现 vermagic 依旧是不匹配的。所以在编译完整固件之前，我们可以通过下面的命令来以仅编译内核并检查 vermagic。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">make target/linux/{clean,compile}</pre></div>
 
-[emu1]
-file="/var/log/iptables"
-sync=1
-</code></pre>
-<h3>iptables</h3>
-<p>这里 nflog-group 后面的 ID 需要和上面保持一致</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">iptables -I POSTROUTING -o <span class="pl-k">&lt;</span>public_nic <span class="pl-k">&gt;</span> -m state --state NEW -j NFLOG --nflog-group 1 --nflog-prefix <span class="pl-s"><span class="pl-pds">'</span>[&gt;]NAT <span class="pl-pds">'</span></span></pre></div>
-<p>现在你可以考虑使用 Grafana + Loki + Promtail 对日志进行查询、展示。</p>
+<g-emoji class="g-emoji" alias="warning">⚠️</g-emoji> 在 `make target/linux/{clean,compile}` 执行之后，最终它很可能会失败，并且你此时无法构建完整的内核（因为你尚未首先构建必要的先决条件）。
+<p>但不要害怕！我们所需要的 .vermagic 文件应该在失败之前就会生成，这就是我们现阶段所需要的。</p>
+
+<div class="highlight highlight-source-shell"><pre class="notranslate">find build_dir/ -name .vermagic -exec cat {} <span class="pl-cce">\;</span></pre></div>
+<p>确认你看到的 vermagic 与前面步骤中得到的官方固件的 vermagic 是一致的。</p>
+<h3>做适当的调整</h3>
+<p>在这一步，你可以做一些自定义的改动。但是请注意，不恰当的改动会影响 vermagic，<strong>我的建议是这里只做机型选择，别的不要动</strong>。</p>
+<p>或是如果你能忍耐漫长的编译时间，可以跳过这一步骤，它将编译所有的机型。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">make menuconfig</pre></div>
+<h3>再次检查 vermagic</h3>
+<p>如果你执行过 <code class="notranslate">make menuconfig</code>，我们需要重新确认 vermagic 的</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">make target/linux/{clean,compile}</pre></div>
+<p>当然，像前面的步骤一样，这个编译依旧很可能不会成功。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">find build_dir/ -name .vermagic -exec cat {} <span class="pl-cce">\;</span></pre></div>
+<p>如果你看到的 vermagic 值依旧是官方固件的 vermagic 是一致的。那么我们可以进行下面的步骤了。如果不是，你需要重新执行上面的几个步骤。或是考虑跳过 <code class="notranslate">make menuconfig</code>。</p>
+<h3>下载编译所需要的资源</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">make download</pre></div>
+<h3>执行编译</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">make V=s</pre></div>
+<p>这一步会花费很长时间。编译完成后，你将得到一个包含了基础软件的固件。</p>
+<p>在我的例子当中，它会存放在 <code class="notranslate">bin/targets/ramips/mt7621/openwrt-23.05.2-ramips-mt7621-mqmaker_witi-squashfs-sysupgrade.bin</code>。</p>
+<p>一切正常的话，它已经能够刷入并完成启动，你可以直接使用官方 opkg Repo 镜像 kmod 或是其他 opkg 包的安装。</p>
+<h2>添加更多的包</h2>
+<p>这是一个可选步骤。</p>
+
+💡 个人认为，如果是自用的情况，没有必要再做这些步骤，因为现在我们已经能够从官方 opkg Repo 镜像执行 opkg 的安装。
+
+<p>如果想要在固件中引入更多特定的包（以实现在恢复出厂设置时不会丢失他们），除了可以在编译的时候使用 <code class="notranslate">make menuconfig</code> 进行添加（这可能需要反复调整以保证 vermagic 的一致性，<strong>使用 Image Builder（这个工具也会在上一步的编译过程中一起获得。） 来进行后续的处理是更好的选择。</strong></p>
+<h3>解压 Image Builder</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cp bin/targets/ramips/mt7621/openwrt-imagebuilder-23.05.2-ramips-mt7621.Linux-x86_64.tar.xz /home/ares
+
+tar -xf /home/ares/openwrt-imagebuilder-23.05.2-ramips-mt7621.Linux-x86_64.tar.xz</pre></div>
+<h3>复制 Base-files</h3>
+<p>将上一步编译出来的 <code class="notranslate">base-files_*_mipsel_24kc.ipk</code> (位于 bin/targets/ramips/mt7621/packages) 拷贝到 openwrt-imagebuilder-23.05.2-ramips-mt7621.Linux-x86_64/packages。</p>
+<p><em>这是针对我们的硬件的 OpenWRT 框架文件，除了这个其他的包我们都可以使用 Image Builder 从官方下载到的 opkg file。</em></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">cp bin/targets/ramips/mt7621/base-files_<span class="pl-k">*</span>_mipsel_24kc.ipk /home/ares/openwrt-imagebuilder-23.05.2-ramips-mt7621.Linux-x86_64/packages</pre></div>
+<h3>生成新的固件</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c1">cd</span> /home/ares/imagebuilder-23.05.2-ramips-mt7621.Linux-x86_64
+
+make image <span class="pl-cce">\\</span>
+PROFILE=mqmaker_witi <span class="pl-cce">\\</span>
+PACKAGES=<span class="pl-s"><span class="pl-pds">"</span>pkg1 pkg2 pkg3 -pkg4 -pkg5 -pkg6<span class="pl-pds">"</span></span> <span class="pl-cce">\\</span>
+FILES=<span class="pl-s"><span class="pl-pds">"</span>files<span class="pl-pds">"</span></span> <span class="pl-cce">\\</span>
+DISABLED_SERVICES=<span class="pl-s"><span class="pl-pds">"</span>svc1 svc2 svc3<span class="pl-pds">"</span></span></pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

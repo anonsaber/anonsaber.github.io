@@ -10,13 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="在生产环境中运行 zookeeper 需要考虑的关键点。">
-<meta property="og:title" content="Zookeeper in Production">
-<meta property="og:description" content="在生产环境中运行 zookeeper 需要考虑的关键点。">
+<meta name="description" content="*前排劝退，这不是一个免费的个人云存储方案，它的实现需要你投入一定的成本。">
+<meta property="og:title" content="个人云存储方案设计">
+<meta property="og:description" content="*前排劝退，这不是一个免费的个人云存储方案，它的实现需要你投入一定的成本。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/25.html">
+<meta property="og:url" content="https://blog.motofans.club/post/ge-ren-yun-cun-chu-fang-an-she-ji.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Zookeeper in Production</title>
+<title>个人云存储方案设计</title>
 
 
 
@@ -49,7 +49,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Zookeeper in Production</h1>
+<h1 class="postTitle">个人云存储方案设计</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -67,45 +67,31 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>在生产环境中运行 zookeeper 需要考虑的关键点。</p>
-<p><a href="https://docs.confluent.io/platform/current/zookeeper/deployment.html" rel="nofollow">https://docs.confluent.io/platform/current/zookeeper/deployment.html</a></p>
-<h2>硬件层面</h2>
-<h3>内存</h3>
-<p>Zookeeper Cluster 中的每个 Zookeeper 节点在任何时间都将所有 znode 内容保存在内存中。在生产用例中，至少应该有 4 GB 的 RAM 专供 Zookeeper 使用。此外必须要注意的是，Zookeeper 对 SWAP 很敏感，任何运行 Zookeeper 服务器的主机都应避免 SWAP。</p>
-<h3>CPU</h3>
-<p>一般来说，Zookeeper 并不会占用大量 CPU 资源。</p>
-<h3>磁盘</h3>
-<p>磁盘性能对于维护健康的 ZooKeeper 集群至关重要。强烈建议使用固态驱动器 (SSD)，因为 ZooKeeper 必须具有低延迟的磁盘写入才能实现最佳性能。可以通过配置 <code class="notranslate">autopurge.purgeInterval</code> 和 <code class="notranslate">autopurge.snapRetainCount</code> 来自动清理 ZooKeeper 数据并降低维护开销。</p>
-<h2>JVM 优化</h2>
-<p>Zookeeper 运行在 JVM中，为了避免垃圾回收造成延迟，通常建议设置堆内存为1GB。</p>
-<h2>配置选项</h2>
-<p>以下罗列了在生产环境中运行 Zookeeper Cluster 需要特别考虑的参数。最理想的情况，dataDir和 dataLogDir 所指定的目录应该是在不同的设备中，这减少了随机读写和顺序写入之间的争执。</p>
+<div class="markdown-body" id="postBody"><p><em>前排劝退，这不是一个免费的个人云存储方案，它的实现需要你投入一定的成本。</em></p>
+<h2>需求分析</h2>
+<p><a href="https://github.com/perkeep/perkeep">Perkeep</a> ( Golang 核心开发者的一个项目 ) 在其官方网站上探讨了如何实现一个永久保存个人文件的存储系统。从 Perkeep 所实现的主要功能来看，一个满足上述需求的系统应该具备以下几个特征。</p>
+<h3>支援对象存储</h3>
+<p>有很多只能使用 Local File System 的个人存储系统，使用这些存储系统时，往往需要在扩容和迁移方面需要投入额外的精力。因此，能够良好的对接诸如 S3 这样的对象存储的个人存储系统会成为你节省下很多时间成本。</p>
+<h3>支援多节点数据同步</h3>
+<p>能够从一个实例向另一个实例同步数据，这会让你的数据能够存放在两个地方，减少不可抗力所带来的损失。</p>
+<h3>支援跨平台访问</h3>
+<p>在实际使用上，我认为通用性与易管理性也是个人文件存储系统所应该考虑的。能够同时提供 Web(H5)、WebDAV 的访问方式会极大的提高使用的便利性。</p>
+<h2>解决方案</h2>
+<p>使用 Pydio + <del>Seafile</del> + <del>SftpGo</del> + Rclone + <del>Filestash</del> 就可以完美实现上述需求。</p>
 <ul>
-<li>
-<p>dataDir</p>
-<p>用于配置输出 in-memory database 的快照存储位置，一般应该是位于 SSD 上的目录</p>
-</li>
-<li>
-<p>dataLogDir</p>
-<p>用于配置输出transaction log 的存储位置，一般应该是位于 SSD 上的目录</p>
-</li>
-<li>
-<p>tickTime</p>
-<p>是用于计算时间的基本时间单元，最小会话超时将是tickTime的两倍</p>
-</li>
-<li>
-<p>maxClientCnxns</p>
-<p>ZooKeeper 服务器允许的最大客户端连接数。为避免用完允许的连接，将此设置为 0（无限制）。</p>
-</li>
-<li>
-<p>autopurge.snapRetainCount</p>
-<p>启用后，ZooKeeper 自动清除功能分别在 dataDir 和 dataLogDir 中保留 autopurge.snapRetainCount 最近的快照和相应的事务日志，并删除其余的。</p>
-</li>
-<li>
-<p>autopurge.purgeInterval</p>
-<p>触发清除任务的时间间隔（以小时为单位）。设置为正整数以启用自动清除。</p>
-</li>
+<li><del>SftpGo 能够对接 Azure Blob 以及兼容 S3 的对象存储，并提供 WebDAV 和 FTP 的访问接口</del></li>
+<li>Pydio <del>Seafile</del> 能够对接兼容 S3 的对象存储，并提供 Web 以及多种平台的客户端， 还包括了 WebDAV 访问接口</li>
+<li>Rclone 能够实现定期在多种对象存储之间进行数据同步</li>
+<li><del>Filestash 能够提供通过 Web 的方式访问 WebDAV 和 FTP，并且支援文件分享功能</del></li>
+<li><del>SftpGo 自带的 Web Client 实际上已经满足基本的使用，并且同样支援文件分享功能，减少组件能够降低性能损耗和维护成本</del></li>
 </ul>
+<h2>FAQ</h2>
+<h3>1. 为什么不使用 Syncthing 进行数据同步?</h3>
+<p>Syncthing 很好，能够实时同步，不过遗憾的是 Syncthing 没有办法直接在两个对象存储之间完成数据同步。虽然可以通过将对象存储挂载到本地的方式完成这种操作。但是，你真的需要在两个对象存储之间实时同步吗？我认为通过 Rclone 进行定期的同步已经足矣满足个人用户的需求了。</p>
+<h3>2. 为什么不用直接使用 Nextcloud ？</h3>
+<p>Nextcloud 需要的硬件资源更多， 而 SFTPGo 只需要一台 512MB 内存的虚拟机，并且有着远超过 Nextcloud 的性能，改用 Seafile 后，内存需求虽然增加，但是性能依旧好于 Nextcloud。</p>
+<h3>3. 有什么推荐的 S3 兼容存储吗？</h3>
+<p>个人认为，国内的话，青云的对象存储还不错，而国外的话，Scaleway 或是 Blackblaze 是比较经济的选择。目前，我所使用的是 Scaleway 和 Azure Blob 做主要存储，使用这两种存储分别放大文件和小文件，大文件 Scaleway 经济一些，小文件 AzureBlob 速度快一些，而在备份方面则是选择了 Blackblaze。</p>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

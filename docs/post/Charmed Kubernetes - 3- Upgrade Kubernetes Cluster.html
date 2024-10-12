@@ -10,175 +10,175 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="This section will cover how to deploy a Controller in a bare-metal environment.
+<meta name="description" content="## Infrastructure updates
 
-For The official documentation is already well-prepared for public cloud environments. If you are not deploying in a bare-metal environment, Please refer to https://ubuntu.com/kubernetes/docs for more information.
-
-## Install Juju
-
-Juju is a tool that helps automate the deployment, configuration, and management of applications in cloud environments. It makes it easier to manage multiple applications and their interactions within the cloud.
+### Containerd
 
 ```bash
-sudo snap install juju --channel=2.9 --classic
+juju upgrade-charm containerd --path=./containerd
 ```
 
-## Setting up password-less login
-
-Generate SSH keys:
+### ETCD
 
 ```bash
-ssh-keygen
+juju upgrade-charm etcd --path=./etcd
+juju config etcd channel=3.4/stable
+juju attach etcd etcd=./resources/etcd/etcd.snap
 ```
 
-Copy the generated SSH keys to the specified address
-
-> Replace 'ares@100.64.1.81' with the actual username and IP address. The following steps will continue in the same manner. There will be no further prompts.
+### EasyRSA
 
 ```bash
-ssh-copy-id ares@100.64.1.81
+juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz
 ```
 
-## Create a Cloud
-
-Since we are not generating the nodes to be deployed via a cloud environment or infrastructure API, please enter 'manual' here.
-
-> You can give a name to your private cloud. I'll use 'ares-homelab' here.
+### Calico CNI
 
 ```bash
-juju add-cloud
-
-This operation can be applied to both a copy on this client and to the one on a controller.
-No current controller was detected and there are no registered controllers on this client: either bootstrap one or register one.
-Cloud Types
-  lxd
-  maas
-  manual
-  openstack
-  vsphere
-
-Select cloud type: manual
-
-Enter a name for your manual cloud: ares-homelab
-
-Enter the ssh connection string for controller, username@<hostname or IP> or <hostname or IP>: ares@100.64.1.81
-
-Cloud 'ares-homelab' successfully added to your local client.
+juju upgrade-charm calico --path=./calico \
+    --resource calico=./resources/calico/calico.gz \
+    --resource calico-node-image=./resources/calico/calico-node-image.gz \
+    --resource calico-upgrade=./resources/calico/calico-upgrade.gz
 ```
 
-## Bootstrap a Controller
+## Upgrading Kubernetes
 
-The Juju controller is used to manage the software deployed through Juju, from deployment to upgrades to day-two operations. One Juju controller can manage multiple projects or workspaces, which in Juju are known as ‘models’.
+### KubeAPI Load Balancer
 
-> You can give a name to your Controller. I'll use 'infra-demo' here.
-
-```Bash
-juju bootstrap ares-homelab infra-demo --no-gui
+```bash
+juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
+juju upgrade-charm keepalived --path=./keepalived
 ```
 
-## Enable Controller HA
+### Kubernetes-Master Units
 
-In a production environment, it is recommended to deploy the Controller in high-availability (HA) mode, with a suggested number of 3 or 5 nodes. If you are only testing, this step can be skipped.
+```bash
+juju upgrade-charm kubernetes-master --path=./kubernetes-master \
+    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
+    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
+    --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
+juju attach kubernetes-master core=./resources/core/core.snap
+juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
+juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
+juju attach kubernetes-master kube-controller-manager=./resources/kubernetes-master/kube-controller-manager.snap
+juju attach kubernetes-master kube-scheduler=./resources/kubernetes-master/kube-scheduler.snap
+juju attach kubernetes-master kube-proxy=./resources/kubernetes-master/kube-proxy.snap
+juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
 
-> Enabling HA requires a minimum of three nodes
+juju config kubernetes-master channel=1.22/stable
+juju run-action kubernetes-master/0 upgrade
+juju run-action kubernetes-master/1 upgrade
+```
 
-```Bash
-ssh-copy-id ares@100.64.1.82
-ssh-copy-id ares@100.64.1.83
-juju add-machine -m controller ssh:ares@100.64.1.82
-juju add-machine -m controller ssh:ares@100.64.1.83
-juju machines -m controller
-juju enable-ha --to=1,2
-juju controllers --refresh
+### Update Relation
+
+```bash
+juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
+juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers
+```
+
+### Kubernetes-Worker Units
+
+```bash
+juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
+    --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
+juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
+juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
+juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
+
+juju config kubernetes-worker channel=1.22/stable
+juju run-action kubernetes-worker/0 upgrade
+juju run-action kubernetes-worker/1 upgrade
 ```
 
 <!-- ##{'timestamp':1667750400}## -->。">
-<meta property="og:title" content="Charmed Kubernetes - 1: Bootstrap a Controller">
-<meta property="og:description" content="This section will cover how to deploy a Controller in a bare-metal environment.
+<meta property="og:title" content="Charmed Kubernetes - 3: Upgrade Kubernetes Cluster">
+<meta property="og:description" content="## Infrastructure updates
 
-For The official documentation is already well-prepared for public cloud environments. If you are not deploying in a bare-metal environment, Please refer to https://ubuntu.com/kubernetes/docs for more information.
-
-## Install Juju
-
-Juju is a tool that helps automate the deployment, configuration, and management of applications in cloud environments. It makes it easier to manage multiple applications and their interactions within the cloud.
+### Containerd
 
 ```bash
-sudo snap install juju --channel=2.9 --classic
+juju upgrade-charm containerd --path=./containerd
 ```
 
-## Setting up password-less login
-
-Generate SSH keys:
+### ETCD
 
 ```bash
-ssh-keygen
+juju upgrade-charm etcd --path=./etcd
+juju config etcd channel=3.4/stable
+juju attach etcd etcd=./resources/etcd/etcd.snap
 ```
 
-Copy the generated SSH keys to the specified address
-
-> Replace 'ares@100.64.1.81' with the actual username and IP address. The following steps will continue in the same manner. There will be no further prompts.
+### EasyRSA
 
 ```bash
-ssh-copy-id ares@100.64.1.81
+juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz
 ```
 
-## Create a Cloud
-
-Since we are not generating the nodes to be deployed via a cloud environment or infrastructure API, please enter 'manual' here.
-
-> You can give a name to your private cloud. I'll use 'ares-homelab' here.
+### Calico CNI
 
 ```bash
-juju add-cloud
-
-This operation can be applied to both a copy on this client and to the one on a controller.
-No current controller was detected and there are no registered controllers on this client: either bootstrap one or register one.
-Cloud Types
-  lxd
-  maas
-  manual
-  openstack
-  vsphere
-
-Select cloud type: manual
-
-Enter a name for your manual cloud: ares-homelab
-
-Enter the ssh connection string for controller, username@<hostname or IP> or <hostname or IP>: ares@100.64.1.81
-
-Cloud 'ares-homelab' successfully added to your local client.
+juju upgrade-charm calico --path=./calico \
+    --resource calico=./resources/calico/calico.gz \
+    --resource calico-node-image=./resources/calico/calico-node-image.gz \
+    --resource calico-upgrade=./resources/calico/calico-upgrade.gz
 ```
 
-## Bootstrap a Controller
+## Upgrading Kubernetes
 
-The Juju controller is used to manage the software deployed through Juju, from deployment to upgrades to day-two operations. One Juju controller can manage multiple projects or workspaces, which in Juju are known as ‘models’.
+### KubeAPI Load Balancer
 
-> You can give a name to your Controller. I'll use 'infra-demo' here.
-
-```Bash
-juju bootstrap ares-homelab infra-demo --no-gui
+```bash
+juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
+juju upgrade-charm keepalived --path=./keepalived
 ```
 
-## Enable Controller HA
+### Kubernetes-Master Units
 
-In a production environment, it is recommended to deploy the Controller in high-availability (HA) mode, with a suggested number of 3 or 5 nodes. If you are only testing, this step can be skipped.
+```bash
+juju upgrade-charm kubernetes-master --path=./kubernetes-master \
+    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
+    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
+    --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
+juju attach kubernetes-master core=./resources/core/core.snap
+juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
+juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
+juju attach kubernetes-master kube-controller-manager=./resources/kubernetes-master/kube-controller-manager.snap
+juju attach kubernetes-master kube-scheduler=./resources/kubernetes-master/kube-scheduler.snap
+juju attach kubernetes-master kube-proxy=./resources/kubernetes-master/kube-proxy.snap
+juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
 
-> Enabling HA requires a minimum of three nodes
+juju config kubernetes-master channel=1.22/stable
+juju run-action kubernetes-master/0 upgrade
+juju run-action kubernetes-master/1 upgrade
+```
 
-```Bash
-ssh-copy-id ares@100.64.1.82
-ssh-copy-id ares@100.64.1.83
-juju add-machine -m controller ssh:ares@100.64.1.82
-juju add-machine -m controller ssh:ares@100.64.1.83
-juju machines -m controller
-juju enable-ha --to=1,2
-juju controllers --refresh
+### Update Relation
+
+```bash
+juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
+juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers
+```
+
+### Kubernetes-Worker Units
+
+```bash
+juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
+    --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
+juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
+juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
+juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
+
+juju config kubernetes-worker channel=1.22/stable
+juju run-action kubernetes-worker/0 upgrade
+juju run-action kubernetes-worker/1 upgrade
 ```
 
 <!-- ##{'timestamp':1667750400}## -->。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/13.html">
+<meta property="og:url" content="https://blog.motofans.club/post/Charmed%20Kubernetes%20-%203-%20Upgrade%20Kubernetes%20Cluster.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Charmed Kubernetes - 1: Bootstrap a Controller</title>
+<title>Charmed Kubernetes - 3: Upgrade Kubernetes Cluster</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -221,7 +221,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Charmed Kubernetes - 1: Bootstrap a Controller</h1>
+<h1 class="postTitle">Charmed Kubernetes - 3: Upgrade Kubernetes Cluster</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -239,60 +239,53 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>This section will cover how to deploy a Controller in a bare-metal environment.</p>
-<p>For The official documentation is already well-prepared for public cloud environments. If you are not deploying in a bare-metal environment, Please refer to <a href="https://ubuntu.com/kubernetes/docs" rel="nofollow">https://ubuntu.com/kubernetes/docs</a> for more information.</p>
-<h2>Install Juju</h2>
-<p>Juju is a tool that helps automate the deployment, configuration, and management of applications in cloud environments. It makes it easier to manage multiple applications and their interactions within the cloud.</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">sudo snap install juju --channel=2.9 --classic</pre></div>
-<h2>Setting up password-less login</h2>
-<p>Generate SSH keys:</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ssh-keygen</pre></div>
-<p>Copy the generated SSH keys to the specified address</p>
-<blockquote>
-<p>Replace "ares@100.64.1.81" with the actual username and IP address. The following steps will continue in the same manner. There will be no further prompts.</p>
-</blockquote>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ssh-copy-id ares@100.64.1.81</pre></div>
-<h2>Create a Cloud</h2>
-<p>Since we are not generating the nodes to be deployed via a cloud environment or infrastructure API, please enter "manual" here.</p>
-<blockquote>
-<p>You can give a name to your private cloud. I'll use "ares-homelab" here.</p>
-</blockquote>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju add-cloud
+<div class="markdown-body" id="postBody"><h2>Infrastructure updates</h2>
+<h3>Containerd</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm containerd --path=./containerd</pre></div>
+<h3>ETCD</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm etcd --path=./etcd
+juju config etcd channel=3.4/stable
+juju attach etcd etcd=./resources/etcd/etcd.snap</pre></div>
+<h3>EasyRSA</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm easyrsa --path=./easyrsa --resource esayrsa=./resources/easyrsa/easyrsa.tgz</pre></div>
+<h3>Calico CNI</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm calico --path=./calico \
+    --resource calico=./resources/calico/calico.gz \
+    --resource calico-node-image=./resources/calico/calico-node-image.gz \
+    --resource calico-upgrade=./resources/calico/calico-upgrade.gz</pre></div>
+<h2>Upgrading Kubernetes</h2>
+<h3>KubeAPI Load Balancer</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubeapi-load-balancer --path=./kubeapi-load-balancer
+juju upgrade-charm keepalived --path=./keepalived</pre></div>
+<h3>Kubernetes-Master Units</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubernetes-master --path=./kubernetes-master \
+    --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
+    --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
+    --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
+juju attach kubernetes-master core=./resources/core/core.snap
+juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
+juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
+juju attach kubernetes-master kube-controller-manager=./resources/kubernetes-master/kube-controller-manager.snap
+juju attach kubernetes-master kube-scheduler=./resources/kubernetes-master/kube-scheduler.snap
+juju attach kubernetes-master kube-proxy=./resources/kubernetes-master/kube-proxy.snap
+juju attach kubernetes-master kubectl=./resources/kubernetes-master/kubectl.snap
 
-This operation can be applied to both a copy on this client and to the one on a controller.
-No current controller was detected and there are no registered controllers on this client: either bootstrap one or register one.
-Cloud Types
-  lxd
-  maas
-  manual
-  openstack
-  vsphere
+juju config kubernetes-master channel=1.22/stable
+juju run-action kubernetes-master/0 upgrade
+juju run-action kubernetes-master/1 upgrade</pre></div>
+<h3>Update Relation</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju add-relation kubernetes-master:loadbalancer-external kubeapi-load-balancer:lb-consumers
+juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:lb-consumers</pre></div>
+<h3>Kubernetes-Worker Units</h3>
+<div class="highlight highlight-source-shell"><pre class="notranslate">juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
+    --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
+juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
+juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
+juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
 
-Select cloud type: manual
-
-Enter a name <span class="pl-k">for</span> your manual cloud: ares-homelab
-
-Enter the ssh connection string <span class="pl-k">for</span> controller, username@<span class="pl-k">&lt;</span>hostname or IP<span class="pl-k">&gt;</span> or <span class="pl-k">&lt;</span>hostname or IP<span class="pl-k">&gt;</span>: ares@100.64.1.81
-
-Cloud <span class="pl-s"><span class="pl-pds">"</span>ares-homelab<span class="pl-pds">"</span></span> successfully added to your <span class="pl-k">local</span> client.</pre></div>
-<h2>Bootstrap a Controller</h2>
-<p>The Juju controller is used to manage the software deployed through Juju, from deployment to upgrades to day-two operations. One Juju controller can manage multiple projects or workspaces, which in Juju are known as ‘models’.</p>
-<blockquote>
-<p>You can give a name to your Controller. I'll use "infra-demo" here.</p>
-</blockquote>
-<div class="highlight highlight-source-shell"><pre class="notranslate">juju bootstrap ares-homelab infra-demo --no-gui</pre></div>
-<h2>Enable Controller HA</h2>
-<p>In a production environment, it is recommended to deploy the Controller in high-availability (HA) mode, with a suggested number of 3 or 5 nodes. If you are only testing, this step can be skipped.</p>
-<blockquote>
-<p>Enabling HA requires a minimum of three nodes</p>
-</blockquote>
-<div class="highlight highlight-source-shell"><pre class="notranslate">ssh-copy-id ares@100.64.1.82
-ssh-copy-id ares@100.64.1.83
-juju add-machine -m controller ssh:ares@100.64.1.82
-juju add-machine -m controller ssh:ares@100.64.1.83
-juju machines -m controller
-juju enable-ha --to=1,2
-juju controllers --refresh</pre></div>
+juju config kubernetes-worker channel=1.22/stable
+juju run-action kubernetes-worker/0 upgrade
+juju run-action kubernetes-worker/1 upgrade</pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

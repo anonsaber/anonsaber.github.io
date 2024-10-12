@@ -10,17 +10,21 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="有没有办法让同一个客户端的请求落在同一个 Pod 上面？
+<meta name="description" content="## 基础
 
-在回答这个问题之前我们先来看看 Nginx-Ingress 是如何工作的。">
-<meta property="og:title" content="Nginx-Ingress 一致性哈希">
-<meta property="og:description" content="有没有办法让同一个客户端的请求落在同一个 Pod 上面？
+在一个在未经过修改的系统上，内建了以下几张路由表
 
-在回答这个问题之前我们先来看看 Nginx-Ingress 是如何工作的。">
+- **local**: 本地表，处理服务器内部的流量，并包括以太网适配器和广播流量，在大部分情况下不应该修改或是删除这张表。">
+<meta property="og:title" content="Linux 的路由表">
+<meta property="og:description" content="## 基础
+
+在一个在未经过修改的系统上，内建了以下几张路由表
+
+- **local**: 本地表，处理服务器内部的流量，并包括以太网适配器和广播流量，在大部分情况下不应该修改或是删除这张表。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/23.html">
+<meta property="og:url" content="https://blog.motofans.club/post/Linux%20-de-lu-you-biao.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Nginx-Ingress 一致性哈希</title>
+<title>Linux 的路由表</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -63,7 +67,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Nginx-Ingress 一致性哈希</h1>
+<h1 class="postTitle">Linux 的路由表</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -81,18 +85,66 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>有没有办法让同一个客户端的请求落在同一个 Pod 上面？</p>
-<p>在回答这个问题之前我们先来看看 Nginx-Ingress 是如何工作的。</p>
-<h2>Nginx-Ingress</h2>
-<p>Nginx-Ingress 是使用 Nginx 作为反向代理和负载均衡器的 Kubernetes Ingress 控制器， 作为 Pod 执行在 kube-system 命名空间。</p>
-<p>当我们在配置一个 Nginx-Ingress 资源时，backend 往往会是一个 serviceName，这会另很多人产生错觉，会认为当客户端的流量打到 Nginx-Ingress 时，Nginx-Ingress 会把流量打到 对对应的 Services 上面，再由 Services 进行负载。</p>
-<p>而实际上，<em><strong>Nginx-Ingress 并不使用 Services 路由流量到 Pods</strong></em></p>
-<p>关于这一点，可以看看这篇官方发布的: Why endpoints and not services.</p>
-<p><a href="https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/" rel="nofollow">https://kubernetes.github.io/ingress-nginx/user-guide/miscellaneous/</a></p>
-<p>观察 Nginx-Ingress Controller 中生成的 nginx.conf 可以发现，Nginx-Ingress 是通过Lua 动态获取的 Endpoints 数据。</p>
-<h2>一致性哈希</h2>
-<p>由于会访问到哪个 Pod 这件事儿是 Nginx-Ingrss 所决定的，那么一致性哈希的实现也一定是在 Nginx-Ingress 的配置上了。</p>
-<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">nginx.ingress.kubernetes.io/upstream-hash-by</span>: <span class="pl-s"><span class="pl-pds">"</span>$host$request_uri<span class="pl-pds">"</span></span></pre></div>
+<div class="markdown-body" id="postBody"><h2>基础</h2>
+<p>在一个在未经过修改的系统上，内建了以下几张路由表</p>
+<ul>
+<li><strong>local</strong>: 本地表，处理服务器内部的流量，并包括以太网适配器和广播流量，在大部分情况下不应该修改或是删除这张表。</li>
+<li><strong>main</strong>: 主路由表，实际上的默认表，<code class="notranslate">ip route</code> ****命令在没有指定表的情况下都会对主表进行操作。</li>
+<li><strong>default</strong>: 这个名字让人觉得这是默认情况下使用的路由表，然而实际上与其名称的逻辑相反，这是一张空表，你可以删除它。</li>
+<li><strong>unspec</strong>：当所有其他路由路径失败时，内核可以遵循，修改或是删除这张表，它不会显示在 <code class="notranslate">ip rule show</code> 里面。</li>
+</ul>
+<p>内建的路由表可以使用 <code class="notranslate">ip rule show</code> 命令查看</p>
+<pre class="notranslate"><code class="notranslate">0: from all lookup local
+32766: from all lookup main
+32767: from all lookup default
+</code></pre>
+<ul>
+<li>from all 表示这条规则匹配所有源地址的 IP 包（all 也可以换成具体的 IP 或者 IP 段，类似的条件还有 to all）。</li>
+<li>lookup xxx 表示去查 xxx 这张路由表。</li>
+</ul>
+<p>因此，上面的输出翻译成人话就是：</p>
+<ol>
+<li>首先查 local 这张路由表，如果查到有一行匹配就按照这一行走；</li>
+<li>如果 local 表匹配不上，接着查 main 表；</li>
+<li>如果 main 表也匹配不上，就查 default 表；</li>
+</ol>
+<p>Linux 的主路由表 (也就是main) 可以使用 <code class="notranslate">ip route show</code> 命令查看</p>
+<pre class="notranslate"><code class="notranslate">default via 192.168.100.1 dev eth0 proto dhcp metric 600
+169.254.0.0/16 dev eth0 scope link metric 1000 
+172.17.0.0/16 dev docker0 proto kernel scope link src 172.17.0.1 linkdown 
+192.168.100.0/24 dev eth0 proto kernel scope link src 192.168.100.13 metric 600 
+198.18.0.0/15 dev tun0 proto kernel scope link src 198.18.0.1
+</code></pre>
+<p>首先看第一列，Linux 会把一个 IP 包的目标地址和路由表第一列的网段进行匹配，如果发现匹配的行就按照那一行的路由规则进行转发，如果找不到匹配的，就按照 default 所在的行进行转发。</p>
+<p>第一列后，路由表的每一行都是由一连串的属性组成的：</p>
+<ul>
+<li>via 表示这个 IP 包应该发往的网关地址。</li>
+<li>dev 表示应该这个 IP 包应该从哪张网卡发出。</li>
+<li>metric 表示这一行路由规则的优先级，如果有多行路由都能够转发目标地址，那么系统会按照 metric 数值较小的一行来转发。</li>
+<li>scope link 表示目标地址在链路层可以直达，即不需要通过其他设备进一步转发了。</li>
+<li>proto 记录了这一行路由规则的来源。例如 kernel 说明这一行是内核加的，dhcp 则表明这一行来源于 DHCP。</li>
+<li>linkdown 表示这一行对应的网卡设备处于离线状态。</li>
+<li>src 表示这个 IP 包的源地址最好是 xxx。这个属性只有在一个 IP 包还没有确定源地址（也就是刚刚发出）的时候才有效，如果一个 IP 包已经有了一个源地址，那么这条规则是不会去改的。</li>
+</ul>
+<h2>创建新的路由表</h2>
+<p>你可以在 <code class="notranslate">/etc/iproute2/rt_tables</code> 里面创建一些自定义的路由表，它们在文件中的顺序无关紧要。重要的是表名与编号，每个表在表文件中必须有唯一的名称/编号引用，路由表索引可以随时修改，与 DNS 不同，修改路由表文件不会有缓存问题，更改将立即生效，这是少数几个不需要重新启动服务即可使更改生效的包过滤组件。特别需要注意的是，文件中的编号并不能够代表优先级。</p>
+<pre class="notranslate"><code class="notranslate"># reserved values
+#
+255     local
+254     main
+253     default
+199     custom
+0       unspec
+#
+# local
+#
+#1      inr.ruhep
+</code></pre>
+<p>比如我们设置 只有当数据包目的地是IP地址 1.1.1.1 时，系统才会根据 custom 表中的路由信息来处理这些数据包，而该规则的优先级为300。</p>
+<p>首先我们需要在 custom 路由表里面创建一个去往 1.1.1.1 的路由规则</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ip route add 1.1.1.1/32 via 192.168.0.1 dev eth0 table custom</pre></div>
+<p>然后我们需要设置去往 1.1.1.1 的流量优先查找 custom 表</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">ip rule add to 1.1.1.1 table custom priority 300</pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

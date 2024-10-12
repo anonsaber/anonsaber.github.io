@@ -10,17 +10,17 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 背景
+<meta name="description" content="## 前言
 
-Redhat/CentOS 在 release 8 后，没有再提供 minimal 镜像。">
-<meta property="og:title" content="客制化 Redhat/CentOS 8">
-<meta property="og:description" content="## 背景
+在 Kubernetes 上使用 Cert Manager 的 ACME DNS Challenge 方式能够很轻松的为域名签发一张受信任的泛域名证书。">
+<meta property="og:title" content="安全的使用 Cert Manager">
+<meta property="og:description" content="## 前言
 
-Redhat/CentOS 在 release 8 后，没有再提供 minimal 镜像。">
+在 Kubernetes 上使用 Cert Manager 的 ACME DNS Challenge 方式能够很轻松的为域名签发一张受信任的泛域名证书。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/8.html">
+<meta property="og:url" content="https://blog.motofans.club/post/an-quan-de-shi-yong-%20Cert%20Manager.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>客制化 Redhat/CentOS 8</title>
+<title>安全的使用 Cert Manager</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -63,7 +63,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">客制化 Redhat/CentOS 8</h1>
+<h1 class="postTitle">安全的使用 Cert Manager</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -81,22 +81,71 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>背景</h2>
-<p>Redhat/CentOS 在 release 8 后，没有再提供 minimal 镜像。超微的 IPMI 通过网络挂载 ISO 要求镜像不得大于 4.7GB。</p>
-<p>难道要每次使用 Boot 镜像来从网络安装系统吗？亦或是使用 JAVA Client 挂载 8GB 乃至 12GB 的 DVD 镜像（那东西有多卡谁用谁知道）？</p>
-<h2>新的方式</h2>
-<p><a href="https://www.redhat.com/sysadmin/rhel-image-builder" rel="nofollow">https://www.redhat.com/sysadmin/rhel-image-builder</a></p>
-<p>Redhat 提供了在线 Build 镜像的服务，不仅可以生成适用于 GCP/AWS/Azure 云环境的镜像，还可以生成适用于私有云的 qcow2/vmdk，以及适用于裸机环境的 ISO 镜像。</p>
-<p>不仅如此，你还可以在镜像中预置一些你喜欢的 packages，比如 memcached 或是 curl 等等，如果是制作 Redhat 镜像，你也可以将 Redhat 账号预先附加到镜像当中。</p>
-<p>你要做的仅仅是简单的配置，然后点击生成按钮，等待一段时间后即可下载你需要的镜像。</p>
-<p>!<a href="https://blog.motofans.club/static/img/bf1dd60404ab6f122fa66b45af688ee8.image.png" rel="nofollow">https://blog.motofans.club/static/img/bf1dd60404ab6f122fa66b45af688ee8.image.png</a></p>
-<h2>美中不足</h2>
-<p>这项服务没有提供将 kickstart 自动装机脚本一同打包到 ISO 镜像当中的服务。如果我们希望获得一个无人值守的 ISO 安装镜像，那么 kickstart 是必不可少的。</p>
-<h2>更进一步</h2>
-<p>使用 mkksiso 将生成的镜像改造成 kickstart 安装镜像。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">yum install lorax -y</pre></div>
-<p>将你准备好的 kickstart 文件与生成的 ISO 镜像放置在同一个机器当中，执行下面的命令以生产新的镜像。</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">mkksiso /PATH/TO/KICKSTART /PATH/TO/ISO /PATH/TO/NEW-ISO</pre></div>
+<div class="markdown-body" id="postBody"><h2>前言</h2>
+<p>在 Kubernetes 上使用 Cert Manager 的 ACME DNS Challenge 方式能够很轻松的为域名签发一张受信任的泛域名证书。然而由于 ACME-DNS 为了能够验证域名的所有权需要修改 DNS 记录，因此需要提供 DNS 服务商的 API Secret，如果它被泄漏了呢？</p>
+<h2>更安全的实现</h2>
+<p>简单来说就是实现通过 A 域名为 B 域名申请证书。</p>
+<p>在下面的例子中，我们使用 <code class="notranslate">acme.exampleacmeverify.info</code> 为 <code class="notranslate">example.net</code> 生成一张泛域名证书。你可以将 <code class="notranslate">acme.exampleacmeverify.info</code> 单独托管到一个 DNS 服务商（本文中将其单独托管到阿里云），从而无需使用 <code class="notranslate">example.net</code> 的 API Secret.</p>
+<h3>Cert Manager</h3>
+<p>在 Kubernetes 上部署 Cert Manager</p>
+<p><a href="https://cert-manager.io/docs/installation/helm/" rel="nofollow">https://cert-manager.io/docs/installation/helm/</a></p>
+<h3>添加解析</h3>
+<p>在 <code class="notranslate">example.net</code> 的域名下添加一个 CNAME 解析。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">_acme-challenge CNAME _acme-challenge.acme.exampleacmeverify.info.</pre></div>
+<p>在 <code class="notranslate">exampleacmeverify.info</code> 的域名下添加一个 NS 解析。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">acme NS ns1.alidns.com.
+acme NS ns2.alidns.com.</pre></div>
+<h3>使用 AliDNS-Webhook</h3>
+<p>本文以 AliDNS 为例，你也可以使用 CloudFlare.</p>
+<p>在阿里云上，添加子域 <code class="notranslate">acme.exampleacmeverify.info</code></p>
+<p>💡 添加子域的时候，需要在主域 exampleacmeverify.info 添加 TXT 验证记录</p>
+<p>生成能够管理子域 <code class="notranslate">acme.exampleacmeverify.info</code> 的 API Secret，随后在 Kubernetes 中创建一个 Secret，用于管理 AliDNS</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">kubectl -n cert-manager create secret generic alidns-secret --from-literal=access-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_ACCESS_KEY<span class="pl-pds">'</span></span> --from-literal=secret-key=<span class="pl-s"><span class="pl-pds">'</span>YOUR_SECRET_KEY<span class="pl-pds">'</span></span></pre></div>
+<p>部署 alidns-webhook</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">wget https://raw.githubusercontent.com/pragkent/alidns-webhook/master/deploy/bundle.yaml</pre></div>
+<p><em>获取下来的 yaml 不要直接用，要将里面的示例信息换掉</em></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sed -i <span class="pl-s"><span class="pl-pds">'</span>s|acme.yourcompany.com|acme.exampleacmeverify.info|g<span class="pl-pds">'</span></span> bundle.yaml</pre></div>
+<p><em>有必要的话，可以把里面涉及的 Images Pull 下来，并传到自己的镜像仓库。</em></p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">sed -i <span class="pl-s"><span class="pl-pds">'</span>s|pragkent/alidns-webhook|nexus.motofans.club/infra-pub/pragkent/alidns-webhook|g<span class="pl-pds">'</span></span> bundle.yaml
+</pre></div>
+<h3>创建 Clusterissuer</h3>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">apiVersion</span>: <span class="pl-s">cert-manager.io/v1</span>
+<span class="pl-ent">kind</span>: <span class="pl-s">ClusterIssuer</span>
+<span class="pl-ent">metadata</span>:
+  <span class="pl-ent">name</span>: <span class="pl-s">motofans-prod-issuer</span>
+<span class="pl-ent">spec</span>:
+  <span class="pl-ent">acme</span>:
+    <span class="pl-ent">email</span>: <span class="pl-s">reg@motofans.club</span>
+    <span class="pl-ent">server</span>: <span class="pl-s">&lt;https://acme-v02.api.letsencrypt.org/directory&gt;</span>
+    <span class="pl-ent">privateKeySecretRef</span>:
+      <span class="pl-ent">name</span>: <span class="pl-s">motofans-prod-issuer-priv-key</span>
+    <span class="pl-ent">solvers</span>:
+    - <span class="pl-ent">dns01</span>:
+        <span class="pl-ent">cnameStrategy</span>: <span class="pl-s">Follow</span>
+        <span class="pl-ent">webhook</span>:
+          <span class="pl-ent">groupName</span>: <span class="pl-s">acme.exampleacmeverify.info</span>
+          <span class="pl-ent">solverName</span>: <span class="pl-s">alidns</span>
+          <span class="pl-ent">config</span>:
+            <span class="pl-ent">region</span>: <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
+            <span class="pl-ent">accessKeySecretRef</span>:
+              <span class="pl-ent">name</span>: <span class="pl-s">alidns-secret</span>
+              <span class="pl-ent">key</span>: <span class="pl-s">access-key</span>
+            <span class="pl-ent">secretKeySecretRef</span>:
+              <span class="pl-ent">name</span>: <span class="pl-s">alidns-secret</span>
+              <span class="pl-ent">key</span>: <span class="pl-s">secret-key</span></pre></div>
+<h3>申请证书</h3>
+<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">apiVersion</span>: <span class="pl-s">cert-manager.io/v1</span>
+<span class="pl-ent">kind</span>: <span class="pl-s">Certificate</span>
+<span class="pl-ent">metadata</span>:
+  <span class="pl-ent">name</span>: <span class="pl-s">example-net-tls</span>
+  <span class="pl-ent">namespace</span>: <span class="pl-s">sre</span>
+<span class="pl-ent">spec</span>:
+  <span class="pl-ent">secretName</span>: <span class="pl-s">example-net-tls</span>
+  <span class="pl-ent">dnsNames</span>:
+  - <span class="pl-s"><span class="pl-pds">"</span>*.example.net<span class="pl-pds">"</span></span>
+  <span class="pl-ent">issuerRef</span>:
+    <span class="pl-ent">kind</span>: <span class="pl-s">ClusterIssuer</span>
+    <span class="pl-ent">name</span>: <span class="pl-s">motofans-prod-issuer</span></pre></div>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

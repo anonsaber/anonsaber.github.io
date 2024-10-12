@@ -10,13 +10,21 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="尽管 S3 似乎已经成为云存储的事实标准，不过 Azure Blob 并不支持。">
-<meta property="og:title" content="Azure Blob 兼容 S3-API">
-<meta property="og:description" content="尽管 S3 似乎已经成为云存储的事实标准，不过 Azure Blob 并不支持。">
+<meta name="description" content="## 背景
+
+因为升级和分布式部署，现在需要将 jumpserver 的数据库从 SQLite 切换为 MySQL/Mariadb
+
+网上搜了一圈，没见到有人写这个，可能没有倒霉蛋需要填这个坑吧。">
+<meta property="og:title" content="Jumpserver 切换 SQLiite 到 MYSQL">
+<meta property="og:description" content="## 背景
+
+因为升级和分布式部署，现在需要将 jumpserver 的数据库从 SQLite 切换为 MySQL/Mariadb
+
+网上搜了一圈，没见到有人写这个，可能没有倒霉蛋需要填这个坑吧。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/2.html">
+<meta property="og:url" content="https://blog.motofans.club/post/Jumpserver%20-qie-huan-%20SQLiite%20-dao-%20MYSQL.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>Azure Blob 兼容 S3-API</title>
+<title>Jumpserver 切换 SQLiite 到 MYSQL</title>
 <link href="//unpkg.com/@wooorm/starry-night@2.1.1/style/both.css" rel="stylesheet" />
 
 
@@ -59,7 +67,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">Azure Blob 兼容 S3-API</h1>
+<h1 class="postTitle">Jumpserver 切换 SQLiite 到 MYSQL</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -77,81 +85,75 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><p>尽管 S3 似乎已经成为云存储的事实标准，不过 Azure Blob 并不支持。Minio 以前有个 Azure Blob 的网关服务，随着后面的更新也不再支持。</p>
-<h2>S3Proxy</h2>
-<p>s3proxy 提供了一种在 Microsoft Azure 上实现 S3 API 兼容性的方法。详细的步骤和解决方案可在以下链接中找到：</p>
-<p><a href="https://ventral.digital/posts/2020/10/11/s3-api-compatibility-on-microsoft-azure/" rel="nofollow">S3 API compatibility on Microsoft Azure</a></p>
-<div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">apiVersion</span>: <span class="pl-c1">v1</span>
-<span class="pl-ent">kind</span>: <span class="pl-s">Namespace</span>
-<span class="pl-ent">metadata</span>:
-  <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
----
-<span class="pl-ent">apiVersion</span>: <span class="pl-c1">v1</span>
-<span class="pl-ent">kind</span>: <span class="pl-s">Service</span>
-<span class="pl-ent">metadata</span>:
-  <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
-<span class="pl-ent">spec</span>:
-  <span class="pl-ent">selector</span>:
-    <span class="pl-ent">app</span>: <span class="pl-s">s3proxy</span>
-  <span class="pl-ent">ports</span>:
-  - <span class="pl-ent">protocol</span>: <span class="pl-s">TCP</span>
-    <span class="pl-ent">port</span>: <span class="pl-c1">80</span>
-    <span class="pl-ent">targetPort</span>: <span class="pl-c1">80</span>
----
-<span class="pl-ent">apiVersion</span>: <span class="pl-s">apps/v1</span>
-<span class="pl-ent">kind</span>: <span class="pl-s">Deployment</span>
-<span class="pl-ent">metadata</span>:
-  <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
-<span class="pl-ent">spec</span>:
-  <span class="pl-ent">replicas</span>: <span class="pl-c1">1</span>
-  <span class="pl-ent">selector</span>:
-    <span class="pl-ent">matchLabels</span>:
-      <span class="pl-ent">app</span>: <span class="pl-s">s3proxy</span>
-  <span class="pl-ent">template</span>:
-    <span class="pl-ent">metadata</span>:
-      <span class="pl-ent">labels</span>:
-        <span class="pl-ent">app</span>: <span class="pl-s">s3proxy</span>
-    <span class="pl-ent">spec</span>:
-      <span class="pl-ent">containers</span>:
-        - <span class="pl-ent">name</span>: <span class="pl-s">s3proxy</span>
-          <span class="pl-ent">image</span>: <span class="pl-s">andrewgaul/s3proxy:s3proxy-1.9.0</span>
-          <span class="pl-ent">ports</span>:
-            - <span class="pl-ent">containerPort</span>: <span class="pl-c1">80</span>
-              <span class="pl-ent">protocol</span>: <span class="pl-s">TCP</span>
-          <span class="pl-ent">env</span>:
-            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_PROVIDER</span>
-              <span class="pl-ent">value</span>: <span class="pl-s">azureblob</span>
-            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_REGIONS</span>
-              <span class="pl-ent">value</span>: <span class="pl-s">homelab</span>
-            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_IDENTITY</span>
-              <span class="pl-ent">value</span>: <span class="pl-s">azure_storage_account_name</span>
-            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_CREDENTIAL </span>
-              <span class="pl-ent">value</span>: <span class="pl-s">azure_storage_account_key</span>
-            - <span class="pl-ent">name</span>: <span class="pl-s">JCLOUDS_ENDPOINT</span>
-              <span class="pl-ent">value</span>: <span class="pl-s">https://azure_storage_account_name.blob.core.chinacloudapi.cn</span>
-            - <span class="pl-ent">name</span>: <span class="pl-s">S3PROXY_IDENTITY</span>
-              <span class="pl-ent">value</span>: <span class="pl-s">custom_aws_access_key_id</span>
-            - <span class="pl-ent">name</span>: <span class="pl-s">S3PROXY_CREDENTIAL</span>
-              <span class="pl-ent">value</span>: <span class="pl-s">custom_aws_secret_access_key</span></pre></div>
-<p>其中，JCLOUDS_IDENTITY 是 Azure Storage Account 的 Name，对应的 JCLOUDS_CREDENTIAL 是 Azure Storage Account 的 Access KEY，由于 s3proxy 方面没有很好的处理特殊字符，请务必轮询出来一个没有斜杠等特殊字符的 Access KEY。</p>
-<p>而 S3PROXY_IDENTITY 与 S3PROXY_CREDENTIAL 则是 AWS CLI 类似的工具在访问 S3Proxy 时所需要的。</p>
-<h2>测试 S3Proxy</h2>
-<h3>创建一个 blob</h3>
-<p>在 Azure blob 中创建一个 Blob，比如名为 ares-test</p>
-<h3>向 blob 写入文件</h3>
-<p>本文以 AWS CLI 为例进行测试，请自行安装。</p>
-<p>首先编辑 <code class="notranslate">~/.aws/credentials</code> 配置文件并添加以下行：</p>
-<pre class="notranslate"><code class="notranslate">[default]
-aws_access_key_id = custom_aws_access_key_id
-aws_secret_access_key = custom_aws_secret_access_key
+<div class="markdown-body" id="postBody"><h2>背景</h2>
+<p>因为升级和分布式部署，现在需要将 jumpserver 的数据库从 SQLite 切换为 MySQL/Mariadb</p>
+<p>网上搜了一圈，没见到有人写这个，可能没有倒霉蛋需要填这个坑吧。</p>
+<p>不知道是哪一任从若干年前 1.4.x 版本发布的时候使用了 SQLite 做数据库一直不更新的用到现在，有几百台设备，几十个设备分组，几十个权限分组。</p>
+<p>现在的情况是：如果不能很好的把数据库从 SQLite 迁移到 MYSQL/MariaDB，并且升级到一个比较新的版本的话，就得新搭建一个新版本然后照着之前的一个一个手工录入。</p>
+<p>X，想想也是恶心的事儿，何况有些私钥可能没人有保留。</p>
+<p>折腾了半天，验证了可行的方案，提供给有需要的倒霉蛋。</p>
+<p>以下步骤在某组织架构不怎么靠谱的盈利的勉强算得上是互联网中厂的生产环境做过验证(v1.4.10-2 &gt; v2.28.7)。</p>
+<h2>不完全停掉旧版本</h2>
+<p>具体来说，就是保留 redis 和 mysql，停掉其他的。</p>
+<p>如果使用源码方式部署找到 core 服务所在的目录，执行下面的命令</p>
+<pre class="notranslate"><code class="notranslate">python manage.py dumpdata --natural-foreign --exclude admin.logentry --exclude sessions.session --exclude contenttypes --exclude auth.permission --indent 4 &gt; /tmp/dump.json
 </code></pre>
-<p>然后将以下行添加到您的 <code class="notranslate">~/.aws/config</code> 文件中：</p>
-<pre class="notranslate"><code class="notranslate">[default]
-endpoint_url=http://s3proxy
-region=homelab
+<p>如果使用 docker 部署，想想办法把 core 服务容器启动命令换成 sleep 12288 （总之不要让服务启动），然后也是执行上面的命令。至于导出的 dump.json 要怎么从容器里面弄出来，这里不做解释。<br>
+创建数据库</p>
+<p>这里创建了 MariaDB 5.5 版本，或许可以直接使用 10.3 以后的版本，但是我没有测试过（因为我最开始没有看 jumpserver 2.8 版本需要 MariaDB 大于等于 10.3 ，于是后面有个数据库升级的操作，或许可以直接用 10.3，或许）</p>
+<div class="highlight highlight-source-sql"><pre class="notranslate"><span class="pl-k">create</span> <span class="pl-k">database</span> <span class="pl-en">jumpserver</span> default charset <span class="pl-s"><span class="pl-pds">'</span>utf8<span class="pl-pds">'</span></span>;
+<span class="pl-k">create</span> <span class="pl-k">user</span> '<span class="pl-en">jumpserver</span>'@<span class="pl-s"><span class="pl-pds">'</span>%<span class="pl-pds">'</span></span> identified by <span class="pl-s"><span class="pl-pds">'</span>jumpserver<span class="pl-pds">'</span></span>;
+<span class="pl-k">grant</span> all <span class="pl-k">on</span> jumpserver.<span class="pl-k">*</span> to <span class="pl-s"><span class="pl-pds">'</span>jumpserver<span class="pl-pds">'</span></span>@<span class="pl-s"><span class="pl-pds">'</span>%<span class="pl-pds">'</span></span>;
+flush privileges;</pre></div>
+<h2>修改当前旧版本配置文件</h2>
+<p>注释掉 SQLite，调整为 MySQL</p>
+<pre class="notranslate"><code class="notranslate"># SQLite setting:
+# 使用单文件sqlite数据库
+# DB_ENGINE: sqlite3
+# DB_NAME: /opt/jumpserver/jumpserver.db
+
+# MySQL or postgres setting like:
+# 使用Mysql作为数据库
+DB_ENGINE: mysql
+DB_HOST: 127.0.0.1
+DB_PORT: 3306
+DB_USER: jumpserver
+DB_PASSWORD: jumpserver
+DB_NAME: jumpserver
 </code></pre>
-<p>执行文件上传</p>
-<div class="highlight highlight-source-shell"><pre class="notranslate">aws s3 cp test-file.csv s3://ares-test/</pre></div>
+<h2>初始化新数据库</h2>
+<p>这里不能直接启动 jumpserver，使用源码部署的话用下面的命令。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">python apps/manage.py migrate
+python apps/manage.py flush
+python apps/manage.py loaddata /tmp/dump.json</pre></div>
+<p>如果使用 docker 部署，想想办法把 core 服务容器启动命令换成 sleep 12288（总之不要让服务启动），然后也是执行上面的命令。至于怎么把 dump.json 弄到容器里面，这里也不做解释。<br>
+启动当前旧版本</p>
+<p>现在，将所有旧版本的 jumpserver 服务启动，数据库就完成了切换。</p>
+<h2>备份数据库</h2>
+<p>测试通过后，停掉除了 MYSQL/MariaDB 的所有服务（你也可以使用 xtrabackup 之类的其他东西做热备份），然后执行数据库备份。</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate">mysqldump --databases jumpserver -h127.0.0.1 -uroot -p <span class="pl-k">&gt;</span> /tmp/database-backup.sql</pre></div>
+<h2>修改数据库字符集</h2>
+<p>来自官方的迁移文档：</p>
+<div class="highlight highlight-source-shell"><pre class="notranslate"><span class="pl-c"><span class="pl-c">#</span> 如果你不需要或不想处理数据库字符集可以跳过此步骤, 保证迁移前后的数据库字符集一样即可.</span>
+<span class="pl-k">if</span> grep -q <span class="pl-s"><span class="pl-pds">'</span>COLLATE=utf8_bin<span class="pl-pds">'</span></span> /opt/jumpserver.sql<span class="pl-k">;</span> <span class="pl-k">then</span>
+    cp /opt/jumpserver.sql /opt/jumpserver_bak.sql
+    sed -i <span class="pl-s"><span class="pl-pds">'</span>s@ COLLATE=utf8_bin@@g<span class="pl-pds">'</span></span> /opt/jumpserver.sql
+    sed -i <span class="pl-s"><span class="pl-pds">'</span>s@ COLLATE utf8_bin@@g<span class="pl-pds">'</span></span> /opt/jumpserver.sql
+<span class="pl-k">else</span>
+    <span class="pl-c1">echo</span> <span class="pl-s"><span class="pl-pds">"</span>备份数据库字符集正确<span class="pl-pds">"</span></span><span class="pl-k">;</span>
+<span class="pl-k">fi</span></pre></div>
+<h2>升级 MariaDB 版本到 10.3</h2>
+<div class="highlight highlight-source-sql"><pre class="notranslate"><span class="pl-k">drop</span> <span class="pl-k">database</span> jumpserver;
+<span class="pl-k">create</span> <span class="pl-k">database</span> <span class="pl-en">jumpserver</span> default charset <span class="pl-s"><span class="pl-pds">'</span>utf8<span class="pl-pds">'</span></span>;
+<span class="pl-k">GRANT</span> ALL PRIVILEGES <span class="pl-k">ON</span> <span class="pl-k">*</span>.<span class="pl-k">*</span> TO <span class="pl-s"><span class="pl-pds">'</span>jumpserver<span class="pl-pds">'</span></span>@<span class="pl-s"><span class="pl-pds">'</span>%<span class="pl-pds">'</span></span> IDENTIFIED BY <span class="pl-s"><span class="pl-pds">'</span>jumpserver<span class="pl-pds">'</span></span> WITH <span class="pl-k">GRANT</span> OPTION;
+use jumpserver
+source <span class="pl-k">/</span>tmp<span class="pl-k">/</span>database<span class="pl-k">-</span><span class="pl-c1">backup</span>.<span class="pl-c1">sql</span>
+flush privileges;</pre></div>
+<p>这里用了将备份还原的方式，你也可以用其他方式升级上来。</p>
+<h2>更新新版本服务</h2>
+<p>这部分请参考官方文档，该注意的地方都要注意，比如 SECRET_KEY 之类的。</p>
+<p>本文同步发表于</p>
+<p><a href="https://bbs.fit2cloud.com/t/topic/639/1" rel="nofollow">https://bbs.fit2cloud.com/t/topic/639/1</a></p>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 

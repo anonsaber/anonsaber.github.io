@@ -10,17 +10,13 @@
         let theme = localStorage.getItem("meek_theme") || "light";
         document.documentElement.setAttribute("data-color-mode", theme);
     </script>
-<meta name="description" content="## 前言
-
-在 [OpenWRT Stable Release 编译 ](https://blog.motofans.club/post/6.html) 这篇博文中我提到了我在使用 EC20 实现一个 CPE 设备。">
-<meta property="og:title" content="OpenWRT + 移远 EC20 接入 LTE">
-<meta property="og:description" content="## 前言
-
-在 [OpenWRT Stable Release 编译 ](https://blog.motofans.club/post/6.html) 这篇博文中我提到了我在使用 EC20 实现一个 CPE 设备。">
+<meta name="description" content="本文最后修订时间为 2024 年 07 月 06 日，以下描述基于本文最后修订时间可能会有调整。">
+<meta property="og:title" content="使用 GCS 的 Maven 中央仓库">
+<meta property="og:description" content="本文最后修订时间为 2024 年 07 月 06 日，以下描述基于本文最后修订时间可能会有调整。">
 <meta property="og:type" content="article">
-<meta property="og:url" content="https://blog.motofans.club/post/18.html">
+<meta property="og:url" content="https://blog.motofans.club/post/shi-yong-%20GCS%20-de-%20Maven%20-zhong-yang-cang-ku.html">
 <meta property="og:image" content="https://blog.motofans.club/photo.png">
-<title>OpenWRT + 移远 EC20 接入 LTE</title>
+<title>使用 GCS 的 Maven 中央仓库</title>
 
 
 
@@ -53,7 +49,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 
 <body>
     <div id="header">
-<h1 class="postTitle">OpenWRT + 移远 EC20 接入 LTE</h1>
+<h1 class="postTitle">使用 GCS 的 Maven 中央仓库</h1>
 <div class="title-right">
     <a href="https://blog.motofans.club" id="buttonHome" class="btn btn-invisible circle" title="首页">
         <svg class="octicon" width="16" height="16">
@@ -71,13 +67,16 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 </div>
 </div>
     <div id="content">
-<div class="markdown-body" id="postBody"><h2>前言</h2>
-<p>在 <a href="https://blog.motofans.club/post/6.html" rel="nofollow">OpenWRT Stable Release 编译 </a> 这篇博文中我提到了我在使用 EC20 实现一个 CPE 设备。</p>
-<p>在本篇文章中，将会介绍如何在 OpenWRT 中使用 EC20 进行联网以及接收短信。</p>
-<p>EC20 有多个版本，包括不限于下面这张图片（截取自京东移远旗舰店）。</p>
-<p>我不想花费太多的时间调查网络上流传的各种版本哪一个更强大，以及强大在哪里，所以我从上面选了一个能够满足我使用需求的版本（访问网络和接收短信），即 CEFHLG-128-SNNS，这个版本除了不支持 GPS 看起来都 OK，它在二手市场上卖 40 人民币。</p>
-<h2>访问网络</h2>
-<p><a href="https://openwrt.org/docs/guide-user/network/wan/wwan/ltedongle" rel="nofollow">https://openwrt.org/docs/guide-user/network/wan/wwan/ltedongle</a></p>
+<div class="markdown-body" id="postBody"><p>本文最后修订时间为 2024 年 07 月 06 日，以下描述基于本文最后修订时间可能会有调整。</p>
+<h2>前言</h2>
+<p><a href="http://repo1.maven.org" rel="nofollow">Maven Central</a> 的服务器地址位于美国，即便是使用亚太的代理去访问有时候速度也是不怎么理想。</p>
+<p>而国内的镜像站关的关，慢的慢，总之没有十分理想的替代品。</p>
+<p>所幸的是，Apache Maven 的发起人 Jason van Zyl 创建了一个完整的中央仓库的镜像并托管在了 Google 云存储上。</p>
+<h2>项目地址</h2>
+<p><a href="https://storage-download.googleapis.com/maven-central/index.html" rel="nofollow">https://storage-download.googleapis.com/maven-central/index.html</a></p>
+<p>Jason van Zyl 在 Blog 里面介绍了为什么要创建这个中央仓库的副本。</p>
+<p><a href="http://takari.io/2015/10/28/google-maven-central.html" rel="nofollow">http://takari.io/2015/10/28/google-maven-central.html</a></p>
+<p>得益于 GCS 覆盖了美国，欧洲，亚太的服务器节点，这个仓库要比 <a href="http://repo1.maven.org" rel="nofollow">Maven Central</a> 的速度快得多。</p>
 </div>
 <div style="font-size:small;margin-top:8px;float:right;">转载请注明出处</div>
 
