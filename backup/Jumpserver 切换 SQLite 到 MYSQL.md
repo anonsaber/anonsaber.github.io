@@ -115,5 +115,4 @@ flush privileges;
 
 https://bbs.fit2cloud.com/t/topic/639/1
 
-<!-- ##{"timestamp":1704643200}## -->
-<!-- ##{"custom_url":"jumpserver-switch-sqlite-to-mysql"}## -->
+<!-- ##{"timestamp":1704643200, "custom_url":"jumpserver-switch-sqlite-to-mysql"}## -->
