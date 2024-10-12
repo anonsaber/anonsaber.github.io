@@ -261,5 +261,4 @@ juju relate -m k8s-lab coredns kubernetes-master
 
 Once everything settles out, new or restarted pods will use the CoreDNS charm as their DNS provider. The CoreDNS charm config allows you to change the cluster domain, the IP address or config file to forward unhandled queries to, add additional DNS servers, or even override the Corefile entirely.
 
-<!-- ##{"timestamp":1667750400}## -->
-<!-- ##{"custom_url":"charmed-kubernetes-chapter-2-deploy-kubernetes-cluster"}## -->
+<!-- ##{"timestamp":1667750400,"custom_url":"charmed-kubernetes-chapter-2-deploy-kubernetes-cluster"}## -->
