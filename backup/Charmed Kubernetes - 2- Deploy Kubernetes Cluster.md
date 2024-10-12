@@ -104,7 +104,7 @@ juju deploy --to 3 ./kubernetes-master \
     --config channel=1.21/stable \
     --config service-cidr=172.31.192.0/21 \
     --config enable-dashboard-addons=false \
-    --config image-registry=jcr.motofans.club/mirror/rocks.canonical.com/cdk \
+    --config image-registry=jcr.motofans.club/rocks.canonical.com/cdk \
     --config proxy-extra-args='bind-address=0.0.0.0 proxy-mode=ipvs'
 
 juju attach kubernetes-master core=./resources/core/core.snap
@@ -262,3 +262,4 @@ juju relate -m k8s-lab coredns kubernetes-master
 Once everything settles out, new or restarted pods will use the CoreDNS charm as their DNS provider. The CoreDNS charm config allows you to change the cluster domain, the IP address or config file to forward unhandled queries to, add additional DNS servers, or even override the Corefile entirely.
 
 <!-- ##{"timestamp":1667750400}## -->
+<!-- ##{"custom_url":"charmed-kubernetes-chapter-2-deploy-kubernetes-cluster"}## -->
