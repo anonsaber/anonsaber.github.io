@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>XiaFan's Vision</title><link>https://blog.motofans.club</link><description>不过经验之谈</description><copyright>XiaFan's Vision</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://blog.motofans.club/photo.png</url><title>avatar</title><link>https://blog.motofans.club</link></image><lastBuildDate>Sat, 12 Oct 2024 08:08:03 +0000</lastBuildDate><managingEditor>XiaFan's Vision</managingEditor><ttl>60</ttl><webMaster>XiaFan's Vision</webMaster><item><title>我的个人基础设施 - Homelab</title><link>https://blog.motofans.club/post/my-infrastructure.html</link><description>目前我的万兆家庭基础设施&#13;
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>XiaFan's Vision</title><link>https://blog.motofans.club</link><description>不过经验之谈</description><copyright>XiaFan's Vision</copyright><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><image><url>https://blog.motofans.club/photo.png</url><title>avatar</title><link>https://blog.motofans.club</link></image><lastBuildDate>Sat, 12 Oct 2024 08:17:58 +0000</lastBuildDate><managingEditor>XiaFan's Vision</managingEditor><ttl>60</ttl><webMaster>XiaFan's Vision</webMaster><item><title>我的个人基础设施 - Homelab</title><link>https://blog.motofans.club/post/my-infrastructure.html</link><description>目前我的万兆家庭基础设施&#13;
 &#13;
 Version: 202403&#13;
 &#13;
@@ -17,11 +17,11 @@ Version: 202403&#13;
 &#13;
 ## Upgrading CentOS 7&#13;
 &#13;
-在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。</description><guid isPermaLink="true">https://blog.motofans.club/post/upgrade-centos-7-to-centos-stream-9.html</guid><pubDate>Sun, 07 Jul 2024 09:39:32 +0000</pubDate></item><item><title>Jumpserver 切换 SQLiite 到 MYSQL</title><link>https://blog.motofans.club/post/Jumpserver%20-qie-huan-%20SQLiite%20-dao-%20MYSQL.html</link><description>## 背景&#13;
+在开始升级到 CentOS 9 之前，我们需要确保当前的 CentOS 7 系统已经更新到最新版本。</description><guid isPermaLink="true">https://blog.motofans.club/post/upgrade-centos-7-to-centos-stream-9.html</guid><pubDate>Sun, 07 Jul 2024 09:39:32 +0000</pubDate></item><item><title>Jumpserver 切换 SQLite 到 MYSQL</title><link>https://blog.motofans.club/post/jumpserver-switch-sqlite-to-mysql.html</link><description>## 背景&#13;
 &#13;
 因为升级和分布式部署，现在需要将 jumpserver 的数据库从 SQLite 切换为 MySQL/Mariadb&#13;
 &#13;
-网上搜了一圈，没见到有人写这个，可能没有倒霉蛋需要填这个坑吧。</description><guid isPermaLink="true">https://blog.motofans.club/post/Jumpserver%20-qie-huan-%20SQLiite%20-dao-%20MYSQL.html</guid><pubDate>Sun, 07 Jan 2024 16:00:00 +0000</pubDate></item><item><title>使用 ULogd 收集 Iptables 的日志</title><link>https://blog.motofans.club/post/shi-yong-%20ULogd%20-shou-ji-%20Iptables%20-de-ri-zhi.html</link><description>## 背景&#13;
+网上搜了一圈，没见到有人写这个，可能没有倒霉蛋需要填这个坑吧。</description><guid isPermaLink="true">https://blog.motofans.club/post/jumpserver-switch-sqlite-to-mysql.html</guid><pubDate>Thu, 04 Jul 2024 15:15:40 +0000</pubDate></item><item><title>使用 ULogd 收集 Iptables 的日志</title><link>https://blog.motofans.club/post/shi-yong-%20ULogd%20-shou-ji-%20Iptables%20-de-ri-zhi.html</link><description>## 背景&#13;
 &#13;
 在充当 NAT 网关的两个 CentOS 7 服务器上，因为审计需求，需要打开 Iptables 的 Log。</description><guid isPermaLink="true">https://blog.motofans.club/post/shi-yong-%20ULogd%20-shou-ji-%20Iptables%20-de-ri-zhi.html</guid><pubDate>Fri, 22 Dec 2023 16:00:00 +0000</pubDate></item><item><title>OpenWRT Stable Release 编译</title><link>https://blog.motofans.club/post/OpenWRT%20Stable%20Release%20-bian-yi.html</link><description>## 前言&#13;
 &#13;
