@@ -80,3 +80,4 @@ juju controllers --refresh
 ```
 
 <!-- ##{"timestamp":1667750400}## -->
+<!-- ##{"custom_url":"charmed-kubernetes-chapter-1-bootstrap-a-controller"}## -->
