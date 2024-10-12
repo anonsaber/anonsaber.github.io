@@ -428,3 +428,5 @@ Although CentOS 7/8/Stream-8 has already reached EOL, as the community distro of
     ```bash
     dnf -y distro-sync
     ```
+
+<!-- ##{"custom_url":"upgrade-centos-7-to-centos-stream-9"}## -->
