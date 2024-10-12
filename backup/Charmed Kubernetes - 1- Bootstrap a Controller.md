@@ -79,5 +79,4 @@ juju enable-ha --to=1,2
 juju controllers --refresh
 ```
 
-<!-- ##{"timestamp":1667750400}## -->
-<!-- ##{"custom_url":"charmed-kubernetes-chapter-1-bootstrap-a-controller"}## -->
+<!-- ##{"timestamp":1667750400,"custom_url":"charmed-kubernetes-chapter-1-bootstrap-a-controller"}## -->
