@@ -79,4 +79,4 @@ juju run-action kubernetes-worker/0 upgrade
 juju run-action kubernetes-worker/1 upgrade
 ```
 
-<!-- ##{"timestamp":1667750400}## -->
+<!-- ##{"timestamp":1667750400,"custom_url":"charmed-kubernetes-chapter-3-upgrade-kubernetes-cluster"}## -->
