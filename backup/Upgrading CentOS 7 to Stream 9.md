@@ -431,5 +431,4 @@ Although CentOS 7/8/Stream-8 has already reached EOL, as the community distro of
 
 现在，你已经完成了 centos 7 到 centos stream 9 的升级。
 
-<!-- ##{"timestamp":1616688000}## -->
 <!-- ##{"custom_url":"upgrade-centos-7-to-centos-stream-9"}## -->
