@@ -4,5 +4,4 @@ Version: 202403
 
 `Gmeek-html<img src="https://blog.motofans.club/homelab.svg">`
 
-<!-- ##{"timestamp":1616688000}## -->
-<!-- ##{"custom_url":"my-infrastructure"}## -->
+<!-- ##{"timestamp":1616688000,"custom_url":"my-infrastructure"}## -->
