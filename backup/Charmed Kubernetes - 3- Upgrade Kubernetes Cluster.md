@@ -45,6 +45,7 @@ juju upgrade-charm kubernetes-master --path=./kubernetes-master \
     --resource cni-amd64=./resources/kubernetes-master/cni-amd64.tgz \
     --resource cni-arm64=./resources/kubernetes-master/cni-arm64.tgz \
     --resource cni-s390x=./resources/kubernetes-master/cni-s390x.tgz
+
 juju attach kubernetes-master core=./resources/core/core.snap
 juju attach kubernetes-master cdk-addons=./resources/kubernetes-master/cdk-addons.snap
 juju attach kubernetes-master kube-apiserver=./resources/kubernetes-master/kube-apiserver.snap
@@ -70,6 +71,8 @@ juju add-relation kubernetes-master:loadbalancer-internal kubeapi-load-balancer:
 ```bash
 juju upgrade-charm kubernetes-worker --path=./kubernetes-worker \
     --resource cni-amd64=./resources/kubernetes-worker/cni-amd64.tgz
+
+juju attach kubernetes-worker core=./resources/core/core.snap
 juju attach kubernetes-worker kube-proxy=./resources/kubernetes-worker/kube-proxy.snap
 juju attach kubernetes-worker kubectl=./resources/kubernetes-worker/kubectl.snap
 juju attach kubernetes-worker kubelet=./resources/kubernetes-worker/kubelet.snap
