@@ -86,7 +86,7 @@ body{box-sizing: border-box;min-width: 200px;max-width: 900px;margin: 20px auto;
 <p>如果你使用的是 Nginx，请为 PATH: /wsagents/ 打开 websocket 支持，这里不做说明</p>
 <h3>配置 Nginx Ingress</h3>
 <p>很多资料都提到了 Nginx Ingress 需要添加注解以支持 Websocket，但是下面的 Ingress 示例中并没有添加注解。原因如下：</p>
-<p><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="344337367" data-permission-text="Title is private" data-url="https://github.com/nginxinc/kubernetes-ingress/issues/322" data-hovercard-type="issue" data-hovercard-url="/nginxinc/kubernetes-ingress/issues/322/hovercard" href="https://github.com/nginxinc/kubernetes-ingress/issues/322">nginxinc/kubernetes-ingress#322</a></p>
+<p><a class="issue-link js-issue-link" data-error-text="Failed to load title" data-id="344337367" data-permission-text="Title is private" data-url="https://github.com/nginx/kubernetes-ingress/issues/322" data-hovercard-type="issue" data-hovercard-url="/nginx/kubernetes-ingress/issues/322/hovercard" href="https://github.com/nginx/kubernetes-ingress/issues/322">nginx/kubernetes-ingress#322</a></p>
 <p><code class="notranslate">The only reason I can think of where this would be the case, is if you are actually running the community ingress controller instead where the Upgrade and Connection headers are added based on NGINX map based conditions. Without the need for any annotation.</code></p>
 <p>也就是说 community ingress controller 并不需要添加注解。</p>
 <div class="highlight highlight-source-yaml"><pre class="notranslate"><span class="pl-ent">kind</span>: <span class="pl-s">Ingress</span>
